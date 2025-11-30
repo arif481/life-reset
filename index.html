@@ -2323,15 +2323,16 @@
             });
         }
 
-        function loadAnalyticsData() {
-            // In a real app, this would load data from Firebase
-            // For demo, we'll use sample data
-            document.getElementById('avgMood').textContent = '4.2';
-            document.getElementById('bestStreak').textContent = '12';
-            document.getElementById('totalTasks').textContent = '47';
-            document.getElementById('productivityScore').tecd ~/Desktop/life-reset
-xtContent = '78%';
-        }
+	        function loadAnalyticsData() {
+	    // Fixed the error in this line - removed the corrupted text
+	    document.getElementById('productivityScore').textContent = '78%';
+	    
+	    // In a real app, this would load data from Firebase
+	    // For demo, we are using sample data
+	    document.getElementById('avgMood').textContent = '4.2';
+	    document.getElementById('bestStreak').textContent = '12';
+	    document.getElementById('totalTasks').textContent = '47';
+	}
 
         // Achievements
         function renderAchievements() {
