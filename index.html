@@ -1731,10 +1731,17 @@
     <script src="firebase-config.js"></script>
     
     <script>
-	// Firebase will be initialized from firebase-config.js
-	const auth = firebase.auth();
-	const db = firebase.firestore();
-	console.log("Firebase initialized successfully");
+	// Wait for Firebase to be initialized from firebase-config.js
+	// Firebase initialization happens in the external file
+	let auth, db;
+	
+	// Small delay to ensure firebase-config.js has loaded and initialized
+	setTimeout(() => {
+		auth = firebase.auth();
+		db = firebase.firestore();
+		console.log("Firebase initialized successfully");
+	}, 100);
+	
         // App state
         let currentUser = null;
         let currentView = 'dashboard';
