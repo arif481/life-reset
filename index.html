@@ -1727,19 +1727,11 @@
         </div>
     </div>
 
+    <!-- Firebase Configuration - Load from external file -->
+    <script src="firebase-config.js"></script>
+    
     <script>
-	// Firebase Configuration
-	const firebaseConfig = {
-	  apiKey: "AIzaSyC1elvm-s3DJkH4o1O_4Vd9TWrvjl-JsuA",
-	  authDomain: "life-reset-e39f4.firebaseapp.com",
-	  projectId: "life-reset-e39f4",
-	  storageBucket: "life-reset-e39f4.firebasestorage.app",
-	  messagingSenderId: "214444955038",
-	  appId: "1:214444955038:web:666ab309bdc1171e7c728f",
-	  measurementId: "G-GXHKRHYEM1"
-	};
-
-	firebase.initializeApp(firebaseConfig);
+	// Firebase will be initialized from firebase-config.js
 	const auth = firebase.auth();
 	const db = firebase.firestore();
 	console.log("Firebase initialized successfully");
