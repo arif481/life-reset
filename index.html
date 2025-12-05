@@ -89,6 +89,7 @@
         .auth-header h1 {
             font-size: 32px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
@@ -1818,11 +1819,21 @@
         }
 
         // Dark mode functions
-        function toggleDarkMode() {
+        async function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('darkMode', isDarkMode);
-            document.getElementById('darkModeToggle').checked = isDarkMode;
+            if (document.getElementById('darkModeToggle')) {
+                document.getElementById('darkModeToggle').checked = isDarkMode;
+            }
+            // Save to Firebase
+            if (currentUser && db) {
+                await db.collection('users').doc(currentUser.uid).set({
+                    settings: {
+                        darkMode: isDarkMode
+                    }
+                }, { merge: true });
+            }
         }
 
         function toggleDarkModeSetting() {
@@ -1847,12 +1858,6 @@
         }
 
         async function login() {
-            if (!auth) { 
-                // Demo mode - simulate login
-                handleUserLoggedIn({ uid: 'demo', displayName: 'Demo User', email: 'demo@example.com' });
-                return;
-            }
-            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             if (!email || !password) { showToast('Please fill all fields', 'error'); return; }
@@ -1866,13 +1871,6 @@
         }
 
         async function signup() {
-            if (!auth) { 
-                // Demo mode - simulate signup
-                const name = document.getElementById('signupName').value;
-                handleUserLoggedIn({ uid: 'demo', displayName: name, email: document.getElementById('signupEmail').value });
-                return;
-            }
-            
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
@@ -1894,16 +1892,17 @@
             try {
                 const result = await auth.createUserWithEmailAndPassword(email, password);
                 await result.user.updateProfile({ displayName: name });
-                if (db) {
-                    await db.collection('users').doc(result.user.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: new Date(),
-                        streakDays: 0,
-                        totalDays: 0,
-                        bestStreak: 0
-                    });
-                }
+                await db.collection('users').doc(result.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    streak: 0,
+                    totalDays: 0,
+                    settings: {
+                        darkMode: false,
+                        notifications: true
+                    }
+                });
                 handleUserLoggedIn(result.user);
             } catch (error) {
                 showToast('Signup failed: ' + error.message, 'error');
@@ -1911,27 +1910,22 @@
         }
 
         async function googleSignIn() {
-            if (!auth) { 
-                // Demo mode - simulate Google sign in
-                handleUserLoggedIn({ uid: 'demo', displayName: 'Google User', email: 'google@example.com' });
-                return;
-            }
-            
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
                 const result = await auth.signInWithPopup(provider);
-                if (db) {
-                    const userDoc = await db.collection('users').doc(result.user.uid).get();
-                    if (!userDoc.exists) {
-                        await db.collection('users').doc(result.user.uid).set({
-                            name: result.user.displayName,
-                            email: result.user.email,
-                            createdAt: new Date(),
-                            streakDays: 0,
-                            totalDays: 0,
-                            bestStreak: 0
-                        });
-                    }
+                const userDoc = await db.collection('users').doc(result.user.uid).get();
+                if (!userDoc.exists) {
+                    await db.collection('users').doc(result.user.uid).set({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        streak: 0,
+                        totalDays: 0,
+                        settings: {
+                            darkMode: false,
+                            notifications: true
+                        }
+                    });
                 }
                 handleUserLoggedIn(result.user);
             } catch (error) {
@@ -1940,16 +1934,23 @@
         }
 
         async function guestSignIn() {
-            if (!auth) {
-                // No Firebase - just use local user
-                handleUserLoggedIn({ uid: 'guest', isAnonymous: true, displayName: 'Guest User' });
-            } else {
-                try {
-                    await auth.signInAnonymously();
-                    handleUserLoggedIn(auth.currentUser);
-                } catch (error) {
-                    showToast('Guest sign-in failed: ' + error.message, 'error');
-                }
+            try {
+                const result = await auth.signInAnonymously();
+                await db.collection('users').doc(result.user.uid).set({
+                    name: 'Guest User',
+                    email: null,
+                    isAnonymous: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    streak: 0,
+                    totalDays: 0,
+                    settings: {
+                        darkMode: false,
+                        notifications: true
+                    }
+                });
+                handleUserLoggedIn(result.user);
+            } catch (error) {
+                showToast('Guest sign-in failed: ' + error.message, 'error');
             }
         }
 
@@ -1965,6 +1966,9 @@
             if (user.email) {
                 document.getElementById('emailInput').value = user.email;
             }
+            
+            // Load custom tasks
+            loadCustomTasks();
             
             initApp();
             showToast('Welcome back!', 'success');
@@ -2125,24 +2129,52 @@
             document.getElementById('completionRate').textContent = `${progressPercentage}%`;
         }
 
-        function saveTaskCompletion(taskId, completed) {
-            // Save task completion to Firebase
+        async function saveTaskCompletion(taskId, completed) {
+            // Save task completion to Firebase in real-time
             if (db && currentUser) {
                 const dateString = currentDate.toISOString().split('T')[0];
-                db.collection('users').doc(currentUser.uid).collection('tasks').doc(dateString).set({
-                    [taskId]: completed
-                }, { merge: true });
+                try {
+                    await db.collection('users').doc(currentUser.uid).collection('tasks').doc(dateString).set({
+                        [taskId]: completed,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    // Update streak and total days
+                    await updateUserStats();
+                } catch (error) {
+                    showToast('Failed to save task: ' + error.message, 'error');
+                }
             }
         }
 
-        function loadTasksForDate() {
-            // In a real app, this would load tasks for the selected date from Firebase
-            // For demo purposes, we'll just reset all tasks to not completed
+        async function loadTasksForDate() {
+            // Reset all tasks first
             for (const category in defaultTasks) {
                 defaultTasks[category].forEach(task => {
                     task.completed = false;
                 });
             }
+            
+            // Load from Firebase
+            if (db && currentUser) {
+                const dateString = currentDate.toISOString().split('T')[0];
+                try {
+                    const doc = await db.collection('users').doc(currentUser.uid).collection('tasks').doc(dateString).get();
+                    if (doc.exists) {
+                        const tasksData = doc.data();
+                        // Update defaultTasks with saved data
+                        for (const category in defaultTasks) {
+                            defaultTasks[category].forEach(task => {
+                                if (tasksData[task.id] !== undefined) {
+                                    task.completed = tasksData[task.id];
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading tasks:', error);
+                }
+            }
+            
             renderTaskCategories();
             updateProgress();
         }
@@ -2160,14 +2192,20 @@
                 return; 
             }
             
-            const note = document.getElementById('moodNote').value;
+            if (!currentUser || !db) {
+                showToast('Please sign in to save your mood', 'error');
+                return;
+            }
             
-            if (db && currentUser) {
-                const dateString = currentDate.toISOString().split('T')[0];
+            const note = document.getElementById('moodNote').value;
+            const dateString = currentDate.toISOString().split('T')[0];
+            const moodValue = selectedMood;
+            
+            try {
                 await db.collection('users').doc(currentUser.uid).collection('moodEntries').doc(dateString).set({
-                    mood: selectedMood,
+                    mood: moodValue,
                     note: note,
-                    timestamp: new Date()
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
                 document.getElementById('moodNote').value = '';
@@ -2176,15 +2214,14 @@
                 showToast('Mood saved successfully!', 'success');
                 
                 // Update dashboard
-                document.getElementById('moodScore').textContent = selectedMood.charAt(0).toUpperCase() + selectedMood.slice(1);
-            } else if (!db) {
-                showToast('Using demo mode - mood saved locally', 'info');
-                document.getElementById('moodNote').value = '';
-                selectedMood = null;
-                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('moodScore').textContent = moodValue.charAt(0).toUpperCase() + moodValue.slice(1);
                 
-                // Update dashboard in demo mode
-                document.getElementById('moodScore').textContent = selectedMood.charAt(0).toUpperCase() + selectedMood.slice(1);
+                // Refresh analytics if on that view
+                if (currentView === 'analytics') {
+                    loadAnalyticsData();
+                }
+            } catch (error) {
+                showToast('Failed to save mood: ' + error.message, 'error');
             }
         }
 
@@ -2196,63 +2233,58 @@
                 return; 
             }
             
-            if (db && currentUser) {
+            if (!currentUser || !db) {
+                showToast('Please sign in to save journal entries', 'error');
+                return;
+            }
+            
+            try {
                 await db.collection('users').doc(currentUser.uid).collection('journal').add({
                     content: entry,
-                    timestamp: new Date()
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 document.getElementById('journalEntry').value = '';
                 showToast('Journal entry saved!', 'success');
                 loadJournalEntries();
-            } else if (!db) {
-                showToast('Using demo mode - entry saved locally', 'info');
-                document.getElementById('journalEntry').value = '';
-                
-                // Add to journal history in demo mode
-                const journalHistory = document.getElementById('journalHistory');
-                const date = new Date().toLocaleDateString();
-                journalHistory.innerHTML = `
-                    <div class="journal-entry">
-                        <div class="entry-header">
-                            <span>${date}</span>
-                            <span>Just now</span>
-                        </div>
-                        <div class="entry-content">${entry}</div>
-                        <div class="entry-actions">
-                            <button class="action-btn"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn"><i class="fas fa-trash"></i> Delete</button>
-                        </div>
-                    </div>
-                ` + journalHistory.innerHTML;
+            } catch (error) {
+                showToast('Failed to save entry: ' + error.message, 'error');
             }
         }
 
         async function loadJournalEntries() {
             if (!currentUser || !db) return;
             try {
-                const snapshot = await db.collection('users').doc(currentUser.uid).collection('journal').orderBy('timestamp', 'desc').limit(5).get();
+                const snapshot = await db.collection('users').doc(currentUser.uid).collection('journal').orderBy('timestamp', 'desc').limit(10).get();
                 const container = document.getElementById('journalHistory');
                 container.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No journal entries yet. Start writing!</p>';
+                    return;
+                }
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'Unknown';
                     const time = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                    container.innerHTML += `
-                        <div class="journal-entry">
-                            <div class="entry-header">
-                                <span>${date}</span>
-                                <span>${time}</span>
-                            </div>
-                            <div class="entry-content">${data.content}</div>
-                            <div class="entry-actions">
-                                <button class="action-btn"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="action-btn"><i class="fas fa-trash"></i> Delete</button>
-                            </div>
+                    const entryDiv = document.createElement('div');
+                    entryDiv.className = 'journal-entry';
+                    entryDiv.innerHTML = `
+                        <div class="entry-header">
+                            <span>${date} at ${time}</span>
+                        </div>
+                        <div class="entry-content">${data.content}</div>
+                        <div class="entry-actions">
+                            <button class="action-btn" onclick="deleteJournalEntry('${doc.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </div>
                     `;
+                    container.appendChild(entryDiv);
                 });
             } catch (error) {
-                console.log('No entries yet');
+                console.error('Error loading journal entries:', error);
+                showToast('Failed to load journal entries', 'error');
             }
         }
 
@@ -2323,16 +2355,103 @@
             });
         }
 
-	        function loadAnalyticsData() {
-	    // Fixed the error in this line - removed the corrupted text
-	    document.getElementById('productivityScore').textContent = '78%';
-	    
-	    // In a real app, this would load data from Firebase
-	    // For demo, we are using sample data
-	    document.getElementById('avgMood').textContent = '4.2';
-	    document.getElementById('bestStreak').textContent = '12';
-	    document.getElementById('totalTasks').textContent = '47';
-	}
+	        async function loadAnalyticsData() {
+            if (!currentUser || !db) {
+                showToast('Please sign in to view analytics', 'warning');
+                return;
+            }
+            
+            try {
+                // Load mood data for chart
+                const moodSnapshot = await db.collection('users').doc(currentUser.uid)
+                    .collection('moodEntries')
+                    .orderBy('timestamp', 'desc')
+                    .limit(7)
+                    .get();
+                
+                const moodValues = { terrible: 1, bad: 2, okay: 3, good: 4, great: 5 };
+                let totalMood = 0;
+                let moodCount = 0;
+                const moodLabels = [];
+                const moodData = [];
+                
+                moodSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.mood && data.timestamp) {
+                        totalMood += moodValues[data.mood] || 0;
+                        moodCount++;
+                        moodLabels.unshift(doc.id);
+                        moodData.unshift(moodValues[data.mood] || 0);
+                    }
+                });
+                
+                const avgMood = moodCount > 0 ? (totalMood / moodCount).toFixed(1) : '-';
+                document.getElementById('avgMood').textContent = avgMood;
+                
+                // Update mood chart
+                if (moodChart) {
+                    moodChart.data.labels = moodLabels;
+                    moodChart.data.datasets[0].data = moodData;
+                    moodChart.update();
+                }
+                
+                // Load task completion data
+                const tasksSnapshot = await db.collection('users').doc(currentUser.uid)
+                    .collection('tasks')
+                    .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
+                    .limit(7)
+                    .get();
+                
+                let totalTasksCompleted = 0;
+                const completionLabels = [];
+                const completionData = [];
+                
+                tasksSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    let completed = 0;
+                    let total = 0;
+                    
+                    Object.keys(data).forEach(key => {
+                        if (key !== 'lastUpdated') {
+                            total++;
+                            if (data[key] === true) {
+                                completed++;
+                                totalTasksCompleted++;
+                            }
+                        }
+                    });
+                    
+                    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    completionLabels.unshift(doc.id);
+                    completionData.unshift(percentage);
+                });
+                
+                // Update completion chart
+                if (completionChart) {
+                    completionChart.data.labels = completionLabels;
+                    completionChart.data.datasets[0].data = completionData;
+                    completionChart.update();
+                }
+                
+                // Load user stats
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('bestStreak').textContent = userData.streak || '0';
+                    document.getElementById('totalTasks').textContent = totalTasksCompleted;
+                }
+                
+                // Calculate productivity score
+                const avgCompletion = completionData.length > 0 
+                    ? completionData.reduce((a, b) => a + b, 0) / completionData.length 
+                    : 0;
+                document.getElementById('productivityScore').textContent = Math.round(avgCompletion) + '%';
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                showToast('Failed to load analytics data', 'error');
+            }
+        }
 
         // Achievements
         function renderAchievements() {
@@ -2358,14 +2477,24 @@
             const name = document.getElementById('displayNameInput').value;
             const email = document.getElementById('emailInput').value;
             
-            if (db && currentUser) {
+            if (!currentUser || !db) {
+                showToast('Please sign in to save settings', 'error');
+                return;
+            }
+            
+            try {
+                // Update Firestore
                 await db.collection('users').doc(currentUser.uid).set({ 
                     name: name,
                     email: email
                 }, { merge: true });
+                
+                // Update Firebase Auth profile
+                await currentUser.updateProfile({ displayName: name });
+                
                 showToast('Settings saved successfully!', 'success');
-            } else {
-                showToast('Demo mode - changes not saved permanently', 'info');
+            } catch (error) {
+                showToast('Failed to save settings: ' + error.message, 'error');
             }
         }
 
@@ -2378,12 +2507,17 @@
             document.getElementById('addTaskModal').classList.remove('show');
         }
 
-        function addCustomTask() {
+        async function addCustomTask() {
             const taskName = document.getElementById('taskName').value;
             const taskCategory = document.getElementById('taskCategory').value;
             
             if (!taskName.trim()) {
                 showToast('Please enter a task name', 'error');
+                return;
+            }
+            
+            if (!currentUser || !db) {
+                showToast('Please sign in to add custom tasks', 'error');
                 return;
             }
             
@@ -2396,14 +2530,25 @@
             
             defaultTasks[taskCategory].push(newTask);
             
-            // Re-render task categories
-            renderTaskCategories();
-            
-            // Close modal and reset form
-            closeAddTaskModal();
-            document.getElementById('taskName').value = '';
-            
-            showToast('Custom task added!', 'success');
+            // Save to Firebase
+            try {
+                await db.collection('users').doc(currentUser.uid).collection('customTasks').add({
+                    name: taskName,
+                    category: taskCategory,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Re-render task categories
+                renderTaskCategories();
+                
+                // Close modal and reset form
+                closeAddTaskModal();
+                document.getElementById('taskName').value = '';
+                
+                showToast('Custom task added!', 'success');
+            } catch (error) {
+                showToast('Failed to add task: ' + error.message, 'error');
+            }
         }
 
         // Toast notifications
@@ -2433,44 +2578,141 @@
         // Load user data
         async function loadUserData() {
             if (!currentUser || !db) {
-                // Demo data
-                document.getElementById('streakCount').textContent = '5';
-                document.getElementById('totalDays').textContent = '23';
-                document.getElementById('completionRate').textContent = '65%';
-                document.getElementById('moodScore').textContent = 'Good';
-                document.getElementById('todayProgress').style.width = '65%';
-                document.getElementById('progressText').textContent = '65% of today\'s tasks completed';
+                showToast('Please sign in to view your data', 'warning');
                 return;
             }
             
             try {
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
-                if (userDoc.exists) {
-                    const data = userDoc.data();
-                    document.getElementById('streakCount').textContent = data.streakDays || 0;
-                    document.getElementById('totalDays').textContent = data.totalDays || 0;
+                // Set up real-time listener for user document
+                db.collection('users').doc(currentUser.uid).onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('streakCount').textContent = data.streak || '0';
+                        document.getElementById('totalDays').textContent = data.totalDays || '0';
+                        
+                        // Load dark mode setting
+                        if (data.settings && data.settings.darkMode !== undefined) {
+                            isDarkMode = data.settings.darkMode;
+                            if (isDarkMode) {
+                                document.body.classList.add('dark-mode');
+                            } else {
+                                document.body.classList.remove('dark-mode');
+                            }
+                            localStorage.setItem('darkMode', isDarkMode);
+                        }
+                    }
+                });
+                
+                // Load today's tasks
+                await loadTasksForDate();
+                
+                // Load today's mood
+                const todayStr = new Date().toISOString().split('T')[0];
+                const moodDoc = await db.collection('users').doc(currentUser.uid).collection('moodEntries').doc(todayStr).get();
+                if (moodDoc.exists) {
+                    const moodData = moodDoc.data();
+                    document.getElementById('moodScore').textContent = moodData.mood.charAt(0).toUpperCase() + moodData.mood.slice(1);
+                }
+                
+                // Load journal entries
+                loadJournalEntries();
+                
+                // Update progress
+                updateProgress();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('Failed to load user data', 'error');
+            }
+        }
+
+        // Helper function to update user stats (streak and total days)
+        async function updateUserStats() {
+            if (!currentUser || !db) return;
+            
+            try {
+                const tasksSnapshot = await db.collection('users').doc(currentUser.uid).collection('tasks').get();
+                const totalDays = tasksSnapshot.size;
+                
+                // Calculate streak (consecutive days with completed tasks)
+                const sortedDates = [];
+                tasksSnapshot.forEach(doc => {
+                    sortedDates.push(doc.id);
+                });
+                sortedDates.sort().reverse();
+                
+                let streak = 0;
+                const today = new Date();
+                for (let i = 0; i < sortedDates.length; i++) {
+                    const checkDate = new Date(today);
+                    checkDate.setDate(checkDate.getDate() - i);
+                    const dateStr = checkDate.toISOString().split('T')[0];
                     
-                    if (data.name) {
-                        document.getElementById('displayNameInput').value = data.name;
+                    if (sortedDates.includes(dateStr)) {
+                        streak++;
+                    } else {
+                        break;
                     }
                 }
+                
+                await db.collection('users').doc(currentUser.uid).set({
+                    streak: streak,
+                    totalDays: totalDays
+                }, { merge: true });
             } catch (error) {
-                console.log('User data skipped');
+                console.error('Error updating stats:', error);
+            }
+        }
+        
+        // Delete journal entry
+        async function deleteJournalEntry(entryId) {
+            if (!confirm('Are you sure you want to delete this entry?')) return;
+            
+            if (!currentUser || !db) {
+                showToast('Please sign in to delete entries', 'error');
+                return;
             }
             
-            updateProgress();
-            loadJournalEntries();
+            try {
+                await db.collection('users').doc(currentUser.uid).collection('journal').doc(entryId).delete();
+                showToast('Entry deleted', 'success');
+                loadJournalEntries();
+            } catch (error) {
+                showToast('Failed to delete entry: ' + error.message, 'error');
+            }
+        }
+        
+        // Load custom tasks from Firebase
+        async function loadCustomTasks() {
+            if (!currentUser || !db) return;
+            
+            try {
+                const snapshot = await db.collection('users').doc(currentUser.uid).collection('customTasks').get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const newTask = {
+                        id: 'custom_' + doc.id,
+                        name: data.name,
+                        completed: false
+                    };
+                    
+                    // Check if task already exists
+                    const category = data.category || 'custom';
+                    const exists = defaultTasks[category].some(t => t.id === newTask.id);
+                    if (!exists) {
+                        defaultTasks[category].push(newTask);
+                    }
+                });
+                renderTaskCategories();
+            } catch (error) {
+                console.error('Error loading custom tasks:', error);
+            }
         }
 
         // Initialize auth state listener
-        if (auth) {
-            auth.onAuthStateChanged(user => {
-                if (user) handleUserLoggedIn(user);
-                else showLogin();
-            });
-        } else {
-            showLogin();
-        }
+        auth.onAuthStateChanged(user => {
+            if (user) handleUserLoggedIn(user);
+            else showLogin();
+        });
 
         // Initialize the app when the page loads
         window.addEventListener('DOMContentLoaded', initApp);
