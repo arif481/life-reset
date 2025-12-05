@@ -1731,17 +1731,28 @@
     <script src="firebase-config.js"></script>
     
     <script>
-	// Wait for Firebase to be initialized from firebase-config.js
-	// Firebase initialization happens in the external file
-	let auth, db;
-	
-	// Small delay to ensure firebase-config.js has loaded and initialized
-	setTimeout(() => {
-		auth = firebase.auth();
-		db = firebase.firestore();
-		console.log("Firebase initialized successfully");
-	}, 100);
-	
+        // Wait for Firebase to be initialized from firebase-config.js
+        // Firebase initialization happens in the external file
+        let auth, db;
+        
+        // Initialize Firebase services once the app is loaded
+        function initializeFirebase() {
+            if (typeof firebase !== 'undefined') {
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log("Firebase services initialized");
+                
+                // Set up auth state listener
+                auth.onAuthStateChanged(user => {
+                    if (user) handleUserLoggedIn(user);
+                    else showLogin();
+                });
+            } else {
+                console.error("Firebase not loaded");
+                showToast('Firebase configuration error. Please check console.', 'error');
+            }
+        }
+        
         // App state
         let currentUser = null;
         let currentView = 'dashboard';
@@ -2728,14 +2739,11 @@
             }
         }
 
-        // Initialize auth state listener
-        auth.onAuthStateChanged(user => {
-            if (user) handleUserLoggedIn(user);
-            else showLogin();
+        // Initialize auth state listener and app when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeFirebase();
+            initApp();
         });
-
-        // Initialize the app when the page loads
-        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
