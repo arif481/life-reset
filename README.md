@@ -2,11 +2,39 @@
 
 A personal wellness app to help you track daily progress, manage your mood, and journal your journey.
 
+## Setup Instructions
+
+### 1. Configure Firebase
+
+This app requires Firebase for authentication and data storage. Follow these steps:
+
+1. **Copy the template config file:**
+   ```bash
+   cp firebase-config.template.js firebase-config.js
+   ```
+
+2. **Get your Firebase credentials:**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project or select an existing one
+   - Go to Project Settings > General
+   - Scroll down to "Your apps" and click the web icon (</>)
+   - Copy your Firebase configuration
+
+3. **Update `firebase-config.js`:**
+   - Open `firebase-config.js`
+   - Replace the placeholder values with your actual Firebase credentials
+   - **IMPORTANT:** Never commit this file to git - it's already in `.gitignore`
+
+4. **Enable Firebase services:**
+   - In Firebase Console, enable **Authentication** (Email/Password and Google)
+   - Enable **Cloud Firestore** database
+   - Update Firestore security rules using the provided `firestore.rules` file
+
+### 2. Run the App
+
+Just open `index.html` in your web browser. No build process needed.
+
 ## Getting Started
-
-Just open `index.html` in your web browser. No setup needed.
-
-## What You Can Do
 
 **Create an Account**
 - Sign up with email and password
