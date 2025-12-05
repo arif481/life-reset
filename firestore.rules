@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Users collection - users can only read/write their own data
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId);
+      allow delete: if isAuthenticated() && isOwner(userId);
+      
+      // User's tasks subcollection
+      match /tasks/{taskId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User's mood entries subcollection
+      match /moodEntries/{entryId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User's journal entries subcollection
+      match /journal/{entryId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User's custom tasks subcollection
+      match /customTasks/{taskId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+  }
+}

@@ -1728,7 +1728,7 @@
     </div>
 
     <script>
-	// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+	// Firebase Configuration
 	const firebaseConfig = {
 	  apiKey: "AIzaSyC1elvm-s3DJkH4o1O_4Vd9TWrvjl-JsuA",
 	  authDomain: "life-reset-e39f4.firebaseapp.com",
@@ -1739,11 +1739,10 @@
 	  measurementId: "G-GXHKRHYEM1"
 	};
 
-	    // 2) Initialize compat SDK
-	    firebase.initializeApp(firebaseConfig);
-	    const auth = firebase.auth();
-	    const db   = firebase.firestore();
-	    console.log("✅ Firebase initialized (compat)", firebase.apps.length);
+	firebase.initializeApp(firebaseConfig);
+	const auth = firebase.auth();
+	const db = firebase.firestore();
+	console.log("Firebase initialized successfully");
         // App state
         let currentUser = null;
         let currentView = 'dashboard';
@@ -1797,14 +1796,18 @@
             // Set up dark mode
             if (isDarkMode) {
                 document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').checked = true;
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
             }
 
             // Set current date display
             updateDateDisplay();
 
-            // Initialize charts
-            initCharts();
+            // Initialize charts only if they don't exist yet
+            if (!moodChart || !completionChart) {
+                initCharts();
+            }
 
             // Set up achievements
             renderAchievements();
@@ -1846,7 +1849,8 @@
             showToast('Theme changed to ' + theme, 'success');
         }
 
-        // Auth functions - DO NOT CHANGE EXISTING ONES
+        // Authentication
+        // Handles all login, signup, and sign-out functionality
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('signupForm').style.display = 'none';
@@ -2290,6 +2294,14 @@
 
         // Analytics functions
         function initCharts() {
+            // Destroy existing charts if they exist
+            if (moodChart) {
+                moodChart.destroy();
+            }
+            if (completionChart) {
+                completionChart.destroy();
+            }
+            
             const moodCtx = document.getElementById('moodChart').getContext('2d');
             moodChart = new Chart(moodCtx, {
                 type: 'line',
@@ -2398,16 +2410,25 @@
                 // Load task completion data
                 const tasksSnapshot = await db.collection('users').doc(currentUser.uid)
                     .collection('tasks')
-                    .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
                     .limit(7)
                     .get();
                 
                 let totalTasksCompleted = 0;
                 const completionLabels = [];
                 const completionData = [];
+                const tasksArray = [];
                 
+                // Collect all tasks first
                 tasksSnapshot.forEach(doc => {
-                    const data = doc.data();
+                    tasksArray.push({ id: doc.id, data: doc.data() });
+                });
+                
+                // Sort by date (document ID) in descending order
+                tasksArray.sort((a, b) => b.id.localeCompare(a.id));
+                
+                // Process sorted tasks
+                tasksArray.forEach(task => {
+                    const data = task.data;
                     let completed = 0;
                     let total = 0;
                     
@@ -2422,8 +2443,8 @@
                     });
                     
                     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-                    completionLabels.unshift(doc.id);
-                    completionData.unshift(percentage);
+                    completionLabels.push(task.id);
+                    completionData.push(percentage);
                 });
                 
                 // Update completion chart
