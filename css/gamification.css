@@ -1,0 +1,264 @@
+/* Gamification: Badges, XP, Health Score, Streaks */
+
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    box-shadow: var(--shadow-lg);
+    margin: 10px 0;
+}
+
+.xp-bar {
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+body.dark-mode .xp-bar {
+    background: #3a3a4e;
+}
+
+.xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success) 0%, var(--primary) 100%);
+    border-radius: 5px;
+    transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.badge-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: var(--bg-card);
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+body.dark-mode .badge {
+    background: #3a3a4e;
+}
+
+.badge:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.badge-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.badge-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.badge.locked {
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+.badge.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+}
+
+.badge-progress {
+    font-size: 10px;
+    color: #777;
+}
+
+body.dark-mode .badge-progress {
+    color: #aaa;
+}
+
+@keyframes unlockAnimation {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.badge.newly-unlocked {
+    animation: unlockAnimation 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes confetti {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+.confetti {
+    position: fixed;
+    pointer-events: none;
+    animation: confetti 1s ease-out forwards;
+}
+
+.streak-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8c42 100%);
+    color: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    margin: 20px 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.streak-flame {
+    font-size: 48px;
+    animation: flameFlicker 2s infinite;
+}
+
+@keyframes flameFlicker {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.streak-info h3 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.streak-info p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+.health-score-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary) 0deg, var(--primary) 240deg, #e0e0e0 240deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    margin: 20px auto;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.health-score-circle::before {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.health-score-value {
+    font-size: 48px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.health-score-label {
+    font-size: 12px;
+    opacity: 0.9;
+    z-index: 1;
+}
+
+.stats-grid-mini {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-mini {
+    background: var(--bg-card);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+body.dark-mode .stat-mini {
+    background: #3a3a4e;
+}
+
+.stat-mini-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.stat-mini-label {
+    font-size: 12px;
+    color: #777;
+}
+
+body.dark-mode .stat-mini-label {
+    color: #aaa;
+}
+
+@keyframes popupAppear {
+    to { transform: translate(-50%, -50%) scale(1); }
+}
+
+.achievement-unlock-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: var(--bg-light);
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 3000;
+    text-align: center;
+    animation: popupAppear 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+body.dark-mode .achievement-unlock-popup {
+    background: var(--bg-card-dark);
+}
+
+.achievement-unlock-popup h2 {
+    color: var(--primary);
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+.achievement-unlock-popup .icon {
+    font-size: 80px;
+    margin: 20px 0;
+}
+
+.achievement-unlock-popup p {
+    margin: 10px 0;
+    color: #777;
+}
+
+body.dark-mode .achievement-unlock-popup p {
+    color: #aaa;
+}

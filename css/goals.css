@@ -1,0 +1,158 @@
+/* Goals and Habits styles */
+
+.goal-item {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+body.dark-mode .goal-item {
+    background: #3a3a4e;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+}
+
+.goal-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.goal-category {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.goal-progress-container {
+    margin: 12px 0;
+}
+
+.goal-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #777;
+}
+
+body.dark-mode .goal-progress-label {
+    color: #aaa;
+}
+
+.milestone-list {
+    list-style: none;
+    padding: 0;
+}
+
+.milestone-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary);
+}
+
+body.dark-mode .milestone-item {
+    background: #3a3a4e;
+}
+
+.milestone-item.completed {
+    border-left-color: var(--success);
+    background: rgba(76, 201, 240, 0.1);
+}
+
+.milestone-icon {
+    font-size: 24px;
+}
+
+.milestone-content {
+    flex: 1;
+}
+
+.milestone-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.milestone-desc {
+    font-size: 12px;
+    color: #777;
+}
+
+body.dark-mode .milestone-desc {
+    color: #aaa;
+}
+
+/* Habit Chain Visualization */
+.habit-chain-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.habit-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--bg-card);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+body.dark-mode .habit-day {
+    background: #3a3a4e;
+}
+
+.habit-day:hover {
+    transform: scale(1.1);
+}
+
+.habit-day.completed {
+    background: linear-gradient(135deg, var(--success) 0%, var(--primary) 100%);
+    color: white;
+}
+
+.habit-day.partial {
+    background: linear-gradient(135deg, var(--warning) 0%, var(--primary) 100%);
+    color: white;
+}
+
+.habit-day.missed {
+    background: #e0e0e0;
+    color: #999;
+}
+
+body.dark-mode .habit-day.missed {
+    background: #4a4a5e;
+    color: #aaa;
+}
+
+@media (max-width: 768px) {
+    .goal-item {
+        padding: 15px;
+    }
+
+    .habit-chain-grid {
+        gap: 6px;
+    }
+}
