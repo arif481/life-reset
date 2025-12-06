@@ -1,0 +1,21 @@
+/* Color and design system variables */
+:root {
+    --primary: #4361ee;
+    --primary-light: #4895ef;
+    --primary-dark: #3a0ca3;
+    --secondary: #7209b7;
+    --accent: #f72585;
+    --success: #4cc9f0;
+    --warning: #f8961e;
+    --danger: #e63946;
+    --text-dark: #2b2d42;
+    --text-light: #f8f9fa;
+    --bg-light: #ffffff;
+    --bg-card: #f8f9fa;
+    --bg-dark: #1a1a2e;
+    --bg-card-dark: #2a2a3e;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --transition: all 0.3s ease;
+}
