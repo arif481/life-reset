@@ -236,7 +236,15 @@ body.dark-mode .stat-mini-label {
     box-shadow: var(--shadow-lg);
     z-index: 3000;
     text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.achievement-unlock-popup.show {
     animation: popupAppear 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 body.dark-mode .achievement-unlock-popup {

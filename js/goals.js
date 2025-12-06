@@ -1,21 +1,27 @@
 // Goals and Habits Management Functions
 
 function showAddGoalModal() {
-    const goalName = prompt('Enter goal name:');
-    if (!goalName) return;
+    const goalName = prompt('Enter goal name (e.g., "Run 100km", "Read 12 books"):');
+    if (!goalName || !goalName.trim()) {
+        showToast('Goal name is required', 'error');
+        return;
+    }
     
-    const goalCategory = prompt('Goal category (Health, Productivity, Personal):', 'Health');
-    const goalTarget = parseInt(prompt('Target (e.g., number of days):', '30'));
+    const goalCategory = prompt('Goal category:\n1. Health\n2. Productivity\n3. Personal\n4. Learning\n\nEnter 1-4 (default: 1):', '1');
+    const categoryMap = { '1': 'Health', '2': 'Productivity', '3': 'Personal', '4': 'Learning' };
+    const category = categoryMap[goalCategory] || 'Health';
     
-    if (isNaN(goalTarget)) {
-        showToast('Invalid target', 'error');
+    const goalTarget = parseInt(prompt('Target (e.g., number of days, kilometers, books):', '30'));
+    
+    if (isNaN(goalTarget) || goalTarget <= 0) {
+        showToast('Please enter a valid target number', 'error');
         return;
     }
     
     const newGoal = {
         id: 'goal_' + Date.now(),
-        name: goalName,
-        category: goalCategory || 'Personal',
+        name: goalName.trim(),
+        category: category,
         progress: 0,
         target: goalTarget,
         createdAt: new Date(),
@@ -25,7 +31,8 @@ function showAddGoalModal() {
     appState.userGoals.push(newGoal);
     saveGoals();
     renderGoals();
-    showToast('Goal added!', 'success');
+    addXP(10);
+    showToast('🎯 Goal created! +10 XP', 'success');
 }
 
 function renderGoals() {
@@ -35,32 +42,47 @@ function renderGoals() {
     container.innerHTML = '';
     
     if (appState.userGoals.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #777; padding: 30px;">No goals yet. Click "Add Goal" to get started!</p>';
+        container.innerHTML = '<div style="text-align: center; padding: 40px; background: var(--bg-card); border-radius: 10px;"><i class="fas fa-clipboard-list" style="font-size: 40px; color: #ccc; margin-bottom: 15px; display: block;"></i><p style="color: #777; font-size: 14px;">No goals yet. Create one to start your journey!</p></div>';
         return;
     }
     
+    const categoryIcons = {
+        'Health': '💪',
+        'Productivity': '🚀',
+        'Personal': '✨',
+        'Learning': '📚'
+    };
+    
     appState.userGoals.forEach(goal => {
-        const percentage = (goal.progress / goal.target) * 100;
+        const percentage = Math.min((goal.progress / goal.target) * 100, 100);
+        const isCompleted = goal.completed || goal.progress >= goal.target;
+        const icon = categoryIcons[goal.category] || '🎯';
+        
         const goalEl = document.createElement('div');
-        goalEl.className = `goal-item ${goal.completed ? 'completed' : ''}`;
+        goalEl.className = `goal-item ${isCompleted ? 'completed' : ''}`;
         goalEl.innerHTML = `
             <div class="goal-header">
-                <div>
-                    <div class="goal-title">${goal.name}</div>
-                    <span class="goal-category">${goal.category}</span>
+                <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
+                    <span style="font-size: 24px;">${icon}</span>
+                    <div>
+                        <div class="goal-title" style="${isCompleted ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${goal.name}</div>
+                        <span class="goal-category" style="font-size: 12px; opacity: 0.7;">${goal.category}</span>
+                    </div>
                 </div>
-                <button class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;" onclick="deleteGoal('${goal.id}')">Delete</button>
+                <button class="action-btn" onclick="deleteGoal('${goal.id}')" title="Delete goal">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
             <div class="goal-progress-container">
                 <div class="goal-progress-label">
-                    <span>Progress</span>
-                    <span>${goal.progress}/${goal.target}</span>
+                    <span>${isCompleted ? '✅ Completed' : 'Progress'}</span>
+                    <span style="font-weight: 600;">${goal.progress}/${goal.target}</span>
                 </div>
                 <input type="range" min="0" max="${goal.target}" value="${goal.progress}" 
-                       onchange="updateGoalProgress('${goal.id}', this.value)" style="width: 100%;">
+                       onchange="updateGoalProgress('${goal.id}', this.value)" style="width: 100%; cursor: pointer;" ${isCompleted ? 'disabled' : ''}>
             </div>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: ${percentage}%"></div>
+                <div class="progress-fill" style="width: ${percentage}%; background: ${isCompleted ? '#4cc9f0' : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'};}"></div>
             </div>
         `;
         container.appendChild(goalEl);
@@ -69,28 +91,36 @@ function renderGoals() {
 
 function updateGoalProgress(goalId, progress) {
     const goal = appState.userGoals.find(g => g.id === goalId);
-    if (goal) {
+    if (goal && !goal.completed) {
         const oldProgress = goal.progress;
         goal.progress = parseInt(progress);
+        
         if (goal.progress > oldProgress) {
-            addXP(5 * (goal.progress - oldProgress));
+            const xpGain = 5 * (goal.progress - oldProgress);
+            addXP(xpGain);
+            showToast(`+${xpGain} XP for goal progress!`, 'success');
         }
-        if (goal.progress >= goal.target) {
+        
+        if (goal.progress >= goal.target && !goal.completed) {
             goal.completed = true;
-            celebrateAchievement('Goal Completed! 🎯', '🏆');
+            celebrateAchievement(`${goal.name} Complete! 🎯`, '🏆');
             addXP(100);
+            showToast('🎉 Goal Completed! +100 XP Bonus!', 'success');
         }
+        
         saveGoals();
         renderGoals();
+        updateGamificationUI();
     }
 }
 
 function deleteGoal(goalId) {
-    if (confirm('Delete this goal?')) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (confirm(`Delete "${goal.name}"? This cannot be undone.`)) {
         appState.userGoals = appState.userGoals.filter(g => g.id !== goalId);
         saveGoals();
         renderGoals();
-        showToast('Goal deleted', 'success');
+        showToast('Goal deleted', 'info');
     }
 }
 

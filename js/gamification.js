@@ -120,10 +120,10 @@ function celebrateAchievement(title, icon) {
     if (popup) {
         document.getElementById('popupTitle').textContent = title;
         document.getElementById('popupIcon').textContent = typeof icon === 'string' ? icon : '🏆';
-        popup.style.display = 'block';
+        popup.classList.add('show');
         
         setTimeout(() => {
-            popup.style.display = 'none';
+            popup.classList.remove('show');
         }, 3000);
     }
     
