@@ -124,7 +124,7 @@
                     <i class="fas fa-chart-bar"></i> <span>Analytics</span>
                 </a>
                 <a href="#" class="nav-item" onclick="navigateTo('goals')">
-                    <i class="fas fa-target"></i> <span>Goals</span>
+                    <i class="fas fa-bullseye"></i> <span>Goals</span>
                 </a>
                 <a href="#" class="nav-item" onclick="navigateTo('resources')">
                     <i class="fas fa-phone"></i> <span>Resources</span>
@@ -349,12 +349,13 @@
 
             document.getElementById('goals-view').innerHTML = `
                 <div class="section">
-                    <h2>🎯 Goals & Habits</h2>
-                    <button class="btn btn-primary" onclick="showAddGoalModal()"><i class="fas fa-plus"></i> Add Goal</button>
+                    <h2><i class="fas fa-bullseye"></i> Goals & Habits</h2>
+                    <button class="btn btn-primary" onclick="showAddGoalModal()" style="margin-bottom: 15px;"><i class="fas fa-plus"></i> Add New Goal</button>
                     <div id="goalsContainer" style="margin-top: 20px;"></div>
                 </div>
                 <div class="section">
-                    <div id="habitChain"></div>
+                    <h2><i class="fas fa-fire"></i> 30-Day Habit Chain</h2>
+                    <div id="habitChain" style="margin-top: 15px;"></div>
                 </div>
             `;
 
