@@ -3,7 +3,13 @@
 function selectMood(mood) {
     appState.selectedMood = mood;
     document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
-    event.target.closest('.mood-btn').classList.add('selected');
+    // Find and select the mood button
+    const moodButtons = document.querySelectorAll('.mood-btn');
+    moodButtons.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(mood)) {
+            btn.classList.add('selected');
+        }
+    });
 }
 
 async function saveMoodEntry() {

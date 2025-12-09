@@ -42,6 +42,29 @@ body.dark-mode .btn-secondary {
     color: var(--text-light);
 }
 
+select.form-control {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: var(--transition);
+    background: white;
+    cursor: pointer;
+}
+
+body.dark-mode select.form-control {
+    background: var(--bg-card-dark);
+    border-color: #4a4a5e;
+    color: var(--text-light);
+}
+
+select.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
 .textarea {
     width: 100%;
     min-height: 120px;
@@ -167,6 +190,10 @@ body.dark-mode .modal-close {
     color: #aaa;
 }
 
+.modal-close:hover {
+    color: var(--danger);
+}
+
 /* Progress bars */
 .progress-bar {
     height: 8px;
@@ -185,4 +212,24 @@ body.dark-mode .progress-bar {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-radius: 4px;
     transition: width 0.5s ease;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    .toast {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        font-size: 14px;
+    }
 }

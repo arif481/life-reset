@@ -1,13 +1,18 @@
 // Analytics and Charts Functions
 
 function initCharts() {
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded. Charts will not be available.');
+        return;
+    }
     initMoodChart();
     initCompletionChart();
 }
 
 function initMoodChart() {
     const ctx = document.getElementById('moodChart');
-    if (!ctx) return;
+    if (!ctx || typeof Chart === 'undefined') return;
     
     const moodData = [8, 7, 9, 8, 6, 7, 9];
     const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -57,7 +62,7 @@ function initMoodChart() {
 
 function initCompletionChart() {
     const ctx = document.getElementById('completionChart');
-    if (!ctx) return;
+    if (!ctx || typeof Chart === 'undefined') return;
     
     const completionData = [85, 90, 78, 88, 92, 80, 87];
     const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
