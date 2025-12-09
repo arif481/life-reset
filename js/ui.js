@@ -73,7 +73,9 @@ function navigateTo(view) {
     // Close mobile sidebar after navigation
     if (window.innerWidth <= 768) {
         const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
         if (sidebar) sidebar.classList.remove('show');
+        if (overlay) overlay.style.display = 'none';
     }
 }
 
@@ -132,5 +134,9 @@ function updateDateDisplay() {
 
 function toggleMobileSidebar() {
     const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
     sidebar.classList.toggle('show');
+    if (overlay) {
+        overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+    }
 }

@@ -270,3 +270,55 @@ body.dark-mode .achievement-unlock-popup {
 body.dark-mode .achievement-unlock-popup p {
     color: #aaa;
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .badge-container {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+
+    .badge {
+        padding: 10px;
+    }
+
+    .badge-icon {
+        font-size: 24px;
+    }
+
+    .badge-name {
+        font-size: 11px;
+    }
+
+    .health-score-circle {
+        width: 150px;
+        height: 150px;
+    }
+
+    .health-score-circle::before {
+        width: 130px;
+        height: 130px;
+    }
+
+    .health-score-value {
+        font-size: 36px;
+    }
+
+    .achievement-unlock-popup {
+        padding: 30px 20px;
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .achievement-unlock-popup .icon {
+        font-size: 60px;
+    }
+
+    .achievement-unlock-popup h2 {
+        font-size: 20px;
+    }
+
+    .stats-grid-mini {
+        grid-template-columns: 1fr;
+    }
+}
