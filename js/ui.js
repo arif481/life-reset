@@ -43,6 +43,7 @@ function navigateTo(view) {
     const titles = {
         'dashboard': 'Dashboard',
         'tracker': 'Daily Tracker',
+        'mood': 'Mood & Journal',
         'journal': 'Journal',
         'analytics': 'Analytics',
         'resources': 'Crisis Resources',
@@ -68,6 +69,12 @@ function navigateTo(view) {
     }
     
     closeUserMenu();
+    
+    // Close mobile menu after navigation
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('show');
 }
 
 function toggleDarkMode() {
@@ -84,6 +91,17 @@ function toggleDarkMode() {
         db.collection('users').doc(appState.currentUser.uid).update(
             { darkMode: appState.isDarkMode }
         ).catch(err => console.log('Dark mode save error:', err));
+    }
+}
+
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+    }
+    if (backdrop) {
+        backdrop.classList.toggle('show');
     }
 }
 
