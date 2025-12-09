@@ -238,9 +238,11 @@ body.dark-mode .dropdown-item:hover {
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
         z-index: 150;
+        transition: opacity 0.3s;
     }
 
-    .sidebar.show ~ .sidebar-overlay {
+    .sidebar.show + .sidebar-overlay,
+    .app-container .sidebar.show ~ .sidebar-overlay {
         display: block;
     }
 
