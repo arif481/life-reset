@@ -129,3 +129,26 @@ body.dark-mode .auth-error {
     align-items: center;
     gap: 8px;
 }
+
+@media (max-width: 480px) {
+    .auth-screen {
+        padding: 10px;
+    }
+
+    .auth-container {
+        padding: 25px;
+    }
+
+    .auth-header h1 {
+        font-size: 28px;
+    }
+
+    .auth-header p {
+        font-size: 13px;
+    }
+
+    .form-control {
+        padding: 12px;
+        font-size: 13px;
+    }
+}

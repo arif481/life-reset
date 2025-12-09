@@ -105,6 +105,9 @@
 
     <!-- Main App -->
     <div class="app-container" id="appContainer">
+        <!-- Mobile Sidebar Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMobileMenu()"></div>
+        
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
@@ -143,7 +146,12 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-header">
-                <h1 id="pageTitle">Dashboard</h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()" title="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
                 <div class="header-actions">
                     <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
                     <div class="user-menu">
@@ -200,6 +208,31 @@
         <div class="icon" id="popupIcon"></div>
         <p><strong id="popupTitle">Title</strong></p>
         <p id="popupDesc">Description</p>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Custom Task</h3>
+                <button class="modal-close" onclick="closeAddTaskModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label for="customTaskName">Task Name</label>
+                <input type="text" id="customTaskName" class="form-control" placeholder="Enter task name">
+            </div>
+            <div class="form-group">
+                <label for="taskCategory">Category</label>
+                <select id="taskCategory" class="form-control">
+                    <option value="morning">Morning Routine</option>
+                    <option value="health">Health & Wellness</option>
+                    <option value="productivity">Productivity</option>
+                    <option value="evening">Evening Routine</option>
+                    <option value="custom">Custom Tasks</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="addCustomTask()">Add Task</button>
+        </div>
     </div>
 
     <!-- Firebase Configuration -->
@@ -296,11 +329,11 @@
                 <div class="mood-section">
                     <h2>😊 How are you feeling?</h2>
                     <div class="mood-tracker">
-                        <button class="mood-btn" onclick="selectMood('very-sad')"><span>😢</span><span class="mood-label">Very Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('sad')"><span>😞</span><span class="mood-label">Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('okay')"><span>😐</span><span class="mood-label">Okay</span></button>
-                        <button class="mood-btn" onclick="selectMood('good')"><span>😊</span><span class="mood-label">Good</span></button>
-                        <button class="mood-btn" onclick="selectMood('great')"><span>😄</span><span class="mood-label">Great</span></button>
+                        <button class="mood-btn" onclick="selectMood('very-sad', event)"><span>😢</span><span class="mood-label">Very Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('sad', event)"><span>😞</span><span class="mood-label">Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('okay', event)"><span>😐</span><span class="mood-label">Okay</span></button>
+                        <button class="mood-btn" onclick="selectMood('good', event)"><span>😊</span><span class="mood-label">Good</span></button>
+                        <button class="mood-btn" onclick="selectMood('great', event)"><span>😄</span><span class="mood-label">Great</span></button>
                     </div>
                     <textarea class="textarea" id="moodNote" placeholder="Add a note about your mood..."></textarea>
                     <button class="btn btn-primary" onclick="saveMoodEntry()"><i class="fas fa-save"></i> Save Mood</button>
