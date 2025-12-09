@@ -2,11 +2,12 @@
 
 function selectMood(mood) {
     appState.selectedMood = mood;
-    document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
-    // Find and select the mood button
-    const moodButtons = document.querySelectorAll('.mood-btn');
-    moodButtons.forEach(btn => {
-        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(mood)) {
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        // Check if this button matches the selected mood using data attribute or onclick
+        const btnMood = btn.getAttribute('data-mood') || 
+                       (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${mood}'`));
+        if (btnMood) {
             btn.classList.add('selected');
         }
     });
