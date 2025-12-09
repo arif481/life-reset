@@ -1,6 +1,6 @@
 // Mood and Journal Functions
 
-function selectMood(mood) {
+function selectMood(mood, event) {
     appState.selectedMood = mood;
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.classList.remove('selected');

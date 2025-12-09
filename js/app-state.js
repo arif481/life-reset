@@ -29,10 +29,12 @@ function initializeFirebase() {
             return true;
         } catch (error) {
             console.error('Error initializing Firebase:', error);
+            showToast('Firebase connection issue - some features may be limited', 'warning');
             return false;
         }
     } else {
         console.error('Firebase SDK not loaded');
+        showToast('Unable to connect to database - using offline mode', 'warning');
         return false;
     }
 }

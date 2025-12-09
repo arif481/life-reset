@@ -90,3 +90,19 @@ body.dark-mode .action-btn {
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 480px) {
+    .journal-editor,
+    .journal-history {
+        padding: 15px;
+    }
+
+    .journal-history {
+        max-height: 400px;
+    }
+
+    .entry-header {
+        flex-direction: column;
+        gap: 5px;
+    }
+}

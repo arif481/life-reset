@@ -254,7 +254,7 @@ body.dark-mode .dropdown-item:hover {
         z-index: 200;
     }
 
-    .sidebar.show {
+    .sidebar.mobile-open {
         left: 0;
         box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
     }

@@ -180,3 +180,19 @@ body.dark-mode .action-btn {
         gap: 10px;
     }
 }
+
+@media (max-width: 480px) {
+    .goal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .habit-chain-grid {
+        gap: 4px;
+    }
+
+    .habit-day {
+        font-size: 10px;
+    }
+}
