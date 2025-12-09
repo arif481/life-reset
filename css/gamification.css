@@ -271,10 +271,23 @@ body.dark-mode .achievement-unlock-popup p {
     color: #aaa;
 }
 
+/* Mobile responsive */
 @media (max-width: 768px) {
     .badge-container {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 10px;
+    }
+
+    .badge {
+        padding: 10px;
+    }
+
+    .badge-icon {
+        font-size: 24px;
+    }
+
+    .badge-name {
+        font-size: 11px;
     }
 
     .health-score-circle {
@@ -290,39 +303,11 @@ body.dark-mode .achievement-unlock-popup p {
     .health-score-value {
         font-size: 36px;
     }
-}
-
-@media (max-width: 480px) {
-    .badge-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .badge {
-        padding: 10px;
-    }
-
-    .badge-icon {
-        font-size: 24px;
-    }
-
-    .badge-name {
-        font-size: 10px;
-    }
-
-    .level-badge {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-
-    .stat-mini-value {
-        font-size: 20px;
-    }
 
     .achievement-unlock-popup {
-        padding: 25px;
+        padding: 30px 20px;
         width: 90%;
-        max-width: 300px;
+        max-width: 350px;
     }
 
     .achievement-unlock-popup .icon {
@@ -331,5 +316,9 @@ body.dark-mode .achievement-unlock-popup p {
 
     .achievement-unlock-popup h2 {
         font-size: 20px;
+    }
+
+    .stats-grid-mini {
+        grid-template-columns: 1fr;
     }
 }

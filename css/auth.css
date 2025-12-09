@@ -130,25 +130,23 @@ body.dark-mode .auth-error {
     gap: 8px;
 }
 
+/* Mobile responsive */
 @media (max-width: 480px) {
-    .auth-screen {
-        padding: 10px;
-    }
-
     .auth-container {
-        padding: 25px;
+        padding: 30px 20px;
     }
 
     .auth-header h1 {
-        font-size: 28px;
-    }
-
-    .auth-header p {
-        font-size: 13px;
+        font-size: 26px;
     }
 
     .form-control {
         padding: 12px;
-        font-size: 13px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .btn {
+        padding: 12px 16px;
+        font-size: 15px;
     }
 }

@@ -79,13 +79,15 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!initializeFirebase()) {
         // Retry if Firebase didn't load yet
         setTimeout(() => {
-            initializeFirebase();
+            if (!initializeFirebase()) {
+                console.warn('Firebase not available. App will work in offline mode.');
+            }
         }, 500);
     }
     
-    // Set up auth listener
+    // Set up auth listener (will retry internally if Firebase not ready)
     initAuthListener();
     
-    // Initialize UI
+    // Initialize UI regardless of Firebase status
     initApp();
 });
