@@ -195,8 +195,24 @@ body.dark-mode .mood-label {
     }
 
     .mood-btn {
-        padding: 10px;
-        font-size: 18px;
+        padding: 12px 8px;
+        font-size: 20px;
+        min-height: 70px;
+    }
+
+    .mood-label {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mood-tracker {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .mood-btn {
+        padding: 15px 10px;
     }
 }
 

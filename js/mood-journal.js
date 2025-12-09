@@ -2,10 +2,15 @@
 
 function selectMood(mood, event) {
     appState.selectedMood = mood;
-    document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
-    if (event && event.target) {
-        event.target.closest('.mood-btn').classList.add('selected');
-    }
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        // Check if this button matches the selected mood using data attribute or onclick
+        const btnMood = btn.getAttribute('data-mood') || 
+                       (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${mood}'`));
+        if (btnMood) {
+            btn.classList.add('selected');
+        }
+    });
 }
 
 async function saveMoodEntry() {

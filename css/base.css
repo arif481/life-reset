@@ -11,11 +11,22 @@ body {
     min-height: 100vh;
     color: var(--text-dark);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body.dark-mode {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: var(--text-light);
+}
+
+/* Improve touch targets on mobile for interactive elements */
+@media (max-width: 768px) {
+    .btn, .nav-item, .mood-btn, .user-btn, .dark-mode-toggle, 
+    .mobile-menu-toggle, .action-btn, .modal-close {
+        min-height: 44px;
+        min-width: 44px;
+    }
 }
 
 @keyframes spin {
