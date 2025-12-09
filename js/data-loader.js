@@ -34,6 +34,9 @@ async function loadUserData() {
                     renderGoals();
                     renderHabitChain();
                 }
+            }, (error) => {
+                console.error('Error loading user data:', error);
+                // Don't let Firestore errors stop the app
             });
         
         // Store unsubscribe function if needed for cleanup
@@ -42,13 +45,47 @@ async function loadUserData() {
         }
         window.firestoreUnsubscribers.push(unsubscribe);
     } catch (error) {
-        console.log('Error loading user data:', error);
+        console.log('Error setting up user data listener:', error);
+    }
+}
+
+async function loadCustomTasks() {
+    if (!appState.currentUser || !db) return;
+    
+    try {
+        const tasksSnapshot = await db.collection('users')
+            .doc(appState.currentUser.uid)
+            .collection('customTasks')
+            .get();
+        
+        tasksSnapshot.forEach(doc => {
+            const task = doc.data();
+            if (!appState.userTasks[task.category]) {
+                appState.userTasks[task.category] = [];
+            }
+            appState.userTasks[task.category].push({
+                id: doc.id,
+                ...task
+            });
+        });
+    } catch (error) {
+        console.log('Error loading custom tasks:', error);
     }
 }
 
 // Initialize app when page loads
 window.addEventListener('DOMContentLoaded', () => {
-    initializeFirebase();
+    // Initialize Firebase first
+    if (!initializeFirebase()) {
+        // Retry if Firebase didn't load yet
+        setTimeout(() => {
+            initializeFirebase();
+        }, 500);
+    }
+    
+    // Set up auth listener
     initAuthListener();
+    
+    // Initialize UI
     initApp();
 });

@@ -14,30 +14,40 @@ service cloud.firestore {
     
     // Users collection - users can only read/write their own data
     match /users/{userId} {
-      allow read: if isAuthenticated() && isOwner(userId);
       allow create: if isAuthenticated() && isOwner(userId);
+      allow read: if isAuthenticated() && isOwner(userId);
       allow update: if isAuthenticated() && isOwner(userId);
       allow delete: if isAuthenticated() && isOwner(userId);
       
       // User's tasks subcollection
       match /tasks/{taskId} {
-        allow read, write: if isAuthenticated() && isOwner(userId);
+        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
       
       // User's mood entries subcollection
       match /moodEntries/{entryId} {
-        allow read, write: if isAuthenticated() && isOwner(userId);
+        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
       
       // User's journal entries subcollection
       match /journal/{entryId} {
-        allow read, write: if isAuthenticated() && isOwner(userId);
+        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
       
       // User's custom tasks subcollection
       match /customTasks/{taskId} {
-        allow read, write: if isAuthenticated() && isOwner(userId);
+        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
+      
+      // User's goals subcollection
+      match /goals/{goalId} {
+        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
+      }
+    }
+    
+    // Analytics collection for aggregated data (read-only)
+    match /analytics/{doc=**} {
+      allow read: if isAuthenticated();
     }
   }
 }
