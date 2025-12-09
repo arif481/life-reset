@@ -215,3 +215,32 @@ body.dark-mode .mood-label {
         padding: 15px 10px;
     }
 }
+
+@media (max-width: 480px) {
+    .date-selector {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .current-date {
+        font-size: 14px;
+        text-align: center;
+        width: 100%;
+        order: -1;
+    }
+
+    .mood-tracker {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .mood-btn {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    .mood-label {
+        font-size: 10px;
+    }
+}

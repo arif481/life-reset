@@ -145,3 +145,23 @@ body.dark-mode .resource-desc {
         gap: 15px;
     }
 }
+
+@media (max-width: 480px) {
+    .setting-card,
+    .resource-card {
+        padding: 15px;
+    }
+
+    .resource-icon {
+        font-size: 32px;
+    }
+
+    .resource-title {
+        font-size: 16px;
+    }
+
+    .emergency-contact {
+        font-size: 14px;
+        padding: 12px;
+    }
+}

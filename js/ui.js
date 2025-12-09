@@ -103,6 +103,17 @@ function toggleDarkMode() {
     }
 }
 
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+    }
+    if (backdrop) {
+        backdrop.classList.toggle('show');
+    }
+}
+
 function toggleDarkModeSetting() {
     toggleDarkMode();
 }

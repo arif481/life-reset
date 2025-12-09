@@ -338,11 +338,11 @@
                 <div class="mood-section">
                     <h2>😊 How are you feeling?</h2>
                     <div class="mood-tracker">
-                        <button class="mood-btn" onclick="selectMood('very-sad')"><span>😢</span><span class="mood-label">Very Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('sad')"><span>😞</span><span class="mood-label">Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('okay')"><span>😐</span><span class="mood-label">Okay</span></button>
-                        <button class="mood-btn" onclick="selectMood('good')"><span>😊</span><span class="mood-label">Good</span></button>
-                        <button class="mood-btn" onclick="selectMood('great')"><span>😄</span><span class="mood-label">Great</span></button>
+                        <button class="mood-btn" onclick="selectMood('very-sad', event)"><span>😢</span><span class="mood-label">Very Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('sad', event)"><span>😞</span><span class="mood-label">Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('okay', event)"><span>😐</span><span class="mood-label">Okay</span></button>
+                        <button class="mood-btn" onclick="selectMood('good', event)"><span>😊</span><span class="mood-label">Good</span></button>
+                        <button class="mood-btn" onclick="selectMood('great', event)"><span>😄</span><span class="mood-label">Great</span></button>
                     </div>
                     <textarea class="textarea" id="moodNote" placeholder="Add a note about your mood..."></textarea>
                     <button class="btn btn-primary" onclick="saveMoodEntry()"><i class="fas fa-save"></i> Save Mood</button>
