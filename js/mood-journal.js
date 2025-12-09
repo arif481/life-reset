@@ -1,9 +1,11 @@
 // Mood and Journal Functions
 
-function selectMood(mood) {
+function selectMood(mood, event) {
     appState.selectedMood = mood;
     document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
-    event.target.closest('.mood-btn').classList.add('selected');
+    if (event && event.target) {
+        event.target.closest('.mood-btn').classList.add('selected');
+    }
 }
 
 async function saveMoodEntry() {

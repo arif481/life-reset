@@ -1,5 +1,10 @@
 // Authentication Functions
 async function login() {
+    if (!auth) {
+        showToast('Firebase is not available. Please check your connection or try again later.', 'error');
+        return;
+    }
+    
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
@@ -20,6 +25,11 @@ async function login() {
 }
 
 async function signup() {
+    if (!auth || !db) {
+        showToast('Firebase is not available. Please check your connection or try again later.', 'error');
+        return;
+    }
+    
     const name = document.getElementById('signupName').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
@@ -77,6 +87,11 @@ async function signup() {
 }
 
 async function googleSignIn() {
+    if (!auth || !db) {
+        showToast('Firebase is not available. Please check your connection or try again later.', 'error');
+        return;
+    }
+    
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
         showAuthLoading(true);
@@ -121,6 +136,11 @@ async function googleSignIn() {
 }
 
 async function guestSignIn() {
+    if (!auth) {
+        showToast('Firebase is not available. Please check your connection or try again later.', 'error');
+        return;
+    }
+    
     try {
         showAuthLoading(true);
         const result = await auth.signInAnonymously();
@@ -180,7 +200,22 @@ function handleUserLoggedIn(user) {
 async function logout() {
     if (confirm('Are you sure you want to logout?')) {
         try {
-            await auth.signOut();
+            // Check if in demo mode
+            if (appState.currentUser && appState.currentUser.isDemo) {
+                appState.currentUser = null;
+                document.getElementById('appContainer').classList.remove('show');
+                document.getElementById('authScreen').style.display = 'flex';
+                showToast('Logged out from demo mode', 'success');
+                
+                // Reset forms
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                return;
+            }
+            
+            if (auth) {
+                await auth.signOut();
+            }
             appState.currentUser = null;
             document.getElementById('appContainer').classList.remove('show');
             document.getElementById('authScreen').style.display = 'flex';
@@ -213,10 +248,28 @@ function showSignup() {
 function initAuthListener() {
     if (!auth || !db) {
         // Retry in 200ms if Firebase isn't ready
-        setTimeout(initAuthListener, 200);
+        let retries = 3;
+        const retryInterval = setInterval(() => {
+            if (auth && db) {
+                clearInterval(retryInterval);
+                setupAuthListener();
+            } else {
+                retries--;
+                if (retries === 0) {
+                    clearInterval(retryInterval);
+                    console.log('Firebase not available - enabling offline demo mode');
+                    // Enable offline demo mode after retries exhausted
+                    enableOfflineDemoMode();
+                }
+            }
+        }, 200);
         return;
     }
     
+    setupAuthListener();
+}
+
+function setupAuthListener() {
     auth.onAuthStateChanged((user) => {
         if (user) {
             handleUserLoggedIn(user);
@@ -230,4 +283,50 @@ function initAuthListener() {
         document.getElementById('appContainer').classList.remove('show');
         document.getElementById('authScreen').style.display = 'flex';
     });
+}
+
+function enableOfflineDemoMode() {
+    // Add demo mode button to auth screen
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer && !document.getElementById('demoModeBtn')) {
+        const demoBtn = document.createElement('button');
+        demoBtn.id = 'demoModeBtn';
+        demoBtn.className = 'btn btn-secondary btn-block';
+        demoBtn.style.marginTop = '10px';
+        demoBtn.innerHTML = '<i class="fas fa-desktop"></i> Try Demo Mode (No Login Required)';
+        demoBtn.onclick = startDemoMode;
+        
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.appendChild(demoBtn);
+        }
+    }
+}
+
+function startDemoMode() {
+    // Create a mock user for demo mode
+    const mockUser = {
+        uid: 'demo_user_' + Date.now(),
+        displayName: 'Demo User',
+        email: 'demo@lifereset.app',
+        isDemo: true
+    };
+    
+    appState.currentUser = mockUser;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('show');
+    
+    // Update user info in settings
+    if (mockUser.displayName) {
+        const userNameElements = document.querySelectorAll('#userName');
+        userNameElements.forEach(el => el.textContent = mockUser.displayName);
+    }
+    if (mockUser.email) {
+        const userEmailEl = document.getElementById('userEmail');
+        if (userEmailEl) userEmailEl.textContent = mockUser.email;
+    }
+    
+    // Initialize app with demo data
+    initApp();
+    showToast('Welcome to Demo Mode! Your data won\'t be saved.', 'info');
 }
