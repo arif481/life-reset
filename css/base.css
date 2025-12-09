@@ -20,9 +20,10 @@ body.dark-mode {
     color: var(--text-light);
 }
 
-/* Improve touch targets on mobile */
+/* Improve touch targets on mobile for interactive elements */
 @media (max-width: 768px) {
-    button, a, input[type="checkbox"], input[type="radio"] {
+    .btn, .nav-item, .mood-btn, .user-btn, .dark-mode-toggle, 
+    .mobile-menu-toggle, .action-btn, .modal-close {
         min-height: 44px;
         min-width: 44px;
     }
