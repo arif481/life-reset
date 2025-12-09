@@ -4,23 +4,30 @@ function initApp() {
     // Set up dark mode
     if (appState.isDarkMode) {
         document.body.classList.add('dark-mode');
-        document.getElementById('darkModeToggle').textContent = '☀️';
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) darkModeToggle.textContent = '☀️';
     }
 
     // Update date display
     updateDateDisplay();
 
-    // Initialize charts if needed
-    if (!moodChart || !completionChart) {
-        initCharts();
+    // Initialize charts if available
+    if (typeof Chart !== 'undefined') {
+        if (!moodChart || !completionChart) {
+            initCharts();
+        }
     }
 
     // Set up task categories and achievements
-    renderTaskCategories();
-    renderAchievements();
-    renderBadges();
+    try {
+        renderTaskCategories();
+        renderAchievements();
+        renderBadges();
+    } catch (error) {
+        console.warn('Error rendering initial UI:', error);
+    }
 
-    // Load user data
+    // Load user data if available
     if (appState.currentUser && db) {
         loadUserData();
     }
@@ -128,13 +135,18 @@ function changeDate(days) {
 }
 
 function updateDateDisplay() {
+    const dateElement = document.getElementById('currentDate');
+    if (!dateElement) return;
+    
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = appState.currentDate.toLocaleDateString('en-US', options);
+    dateElement.textContent = appState.currentDate.toLocaleDateString('en-US', options);
 }
 
 function toggleMobileSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('sidebarOverlay');
+    if (!sidebar) return;
+    
     sidebar.classList.toggle('show');
     if (overlay) {
         overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
