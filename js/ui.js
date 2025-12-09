@@ -43,6 +43,7 @@ function navigateTo(view) {
     const titles = {
         'dashboard': 'Dashboard',
         'tracker': 'Daily Tracker',
+        'mood': 'Mood & Journal',
         'journal': 'Journal',
         'analytics': 'Analytics',
         'resources': 'Crisis Resources',
@@ -68,6 +69,12 @@ function navigateTo(view) {
     }
     
     closeUserMenu();
+    
+    // Close mobile sidebar after navigation
+    if (window.innerWidth <= 768) {
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) sidebar.classList.remove('show');
+    }
 }
 
 function toggleDarkMode() {
@@ -121,4 +128,9 @@ function changeDate(days) {
 function updateDateDisplay() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').textContent = appState.currentDate.toLocaleDateString('en-US', options);
+}
+
+function toggleMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('show');
 }

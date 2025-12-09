@@ -43,17 +43,19 @@
 
             <!-- Login Form -->
             <div id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="Password">
-                </div>
-                <button class="btn btn-primary btn-block" onclick="login()">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
+                <form onsubmit="login(); return false;">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
 
                 <div class="auth-divider"><span>OR</span></div>
 
@@ -65,34 +67,36 @@
                 </button>
 
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    Don't have an account? <a href="#" onclick="showSignup()" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign up</a>
+                    Don't have an account? <a href="#" onclick="showSignup(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign up</a>
                 </p>
             </div>
 
             <!-- Signup Form -->
             <div id="signupForm" style="display: none;">
-                <div class="form-group">
-                    <label for="signupName">Full Name</label>
-                    <input type="text" id="signupName" class="form-control" placeholder="Your name">
-                </div>
-                <div class="form-group">
-                    <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" class="form-control" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="signupPassword">Password</label>
-                    <input type="password" id="signupPassword" class="form-control" placeholder="At least 6 characters">
-                </div>
-                <div class="form-group">
-                    <label for="signupPasswordConfirm">Confirm Password</label>
-                    <input type="password" id="signupPasswordConfirm" class="form-control" placeholder="Confirm password">
-                </div>
-                <button class="btn btn-primary btn-block" onclick="signup()">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </button>
+                <form onsubmit="signup(); return false;">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" class="form-control" placeholder="Your name" autocomplete="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" class="form-control" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPasswordConfirm">Confirm Password</label>
+                        <input type="password" id="signupPasswordConfirm" class="form-control" placeholder="Confirm password" autocomplete="new-password" minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
 
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    Already have an account? <a href="#" onclick="showLogin()" style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
+                    Already have an account? <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
                 </p>
             </div>
 
@@ -105,6 +109,9 @@
 
     <!-- Main App -->
     <div class="app-container" id="appContainer">
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+        
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
@@ -143,7 +150,12 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="content-header">
-                <h1 id="pageTitle">Dashboard</h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()" title="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
                 <div class="header-actions">
                     <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
                     <div class="user-menu">
@@ -200,6 +212,33 @@
         <div class="icon" id="popupIcon"></div>
         <p><strong id="popupTitle">Title</strong></p>
         <p id="popupDesc">Description</p>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Custom Task</h3>
+                <button class="modal-close" onclick="closeAddTaskModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label for="customTaskName">Task Name</label>
+                <input type="text" id="customTaskName" class="form-control" placeholder="Enter task name">
+            </div>
+            <div class="form-group">
+                <label for="taskCategory">Category</label>
+                <select id="taskCategory" class="form-control">
+                    <option value="morning">Morning Routine</option>
+                    <option value="health">Health & Wellness</option>
+                    <option value="productivity">Productivity</option>
+                    <option value="evening">Evening Routine</option>
+                    <option value="custom">Custom Tasks</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="addCustomTask()">
+                <i class="fas fa-plus"></i> Add Task
+            </button>
+        </div>
     </div>
 
     <!-- Firebase Configuration -->

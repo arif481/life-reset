@@ -147,6 +147,25 @@ body.dark-mode .habit-day.missed {
     color: #aaa;
 }
 
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: var(--transition);
+    font-size: 14px;
+}
+
+.action-btn:hover {
+    background: rgba(67, 97, 238, 0.1);
+}
+
+body.dark-mode .action-btn {
+    color: var(--primary);
+}
+
 @media (max-width: 768px) {
     .goal-item {
         padding: 15px;
@@ -154,5 +173,10 @@ body.dark-mode .habit-day.missed {
 
     .habit-chain-grid {
         gap: 6px;
+    }
+
+    .goal-header {
+        flex-direction: column;
+        gap: 10px;
     }
 }
