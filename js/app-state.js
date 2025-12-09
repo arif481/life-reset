@@ -9,11 +9,31 @@ let auth, db;
 
 function initializeFirebase() {
     if (typeof firebase !== 'undefined') {
-        auth = firebase.auth();
-        db = firebase.firestore();
-        console.log('Firebase initialized successfully');
+        try {
+            auth = firebase.auth();
+            db = firebase.firestore();
+            
+            // Enable offline persistence
+            db.enablePersistence()
+                .catch((err) => {
+                    if (err.code == 'failed-precondition') {
+                        // Multiple tabs open
+                        console.log('Multiple tabs open - offline persistence disabled');
+                    } else if (err.code == 'unimplemented') {
+                        // Browser doesn't support
+                        console.log('Browser does not support offline persistence');
+                    }
+                });
+            
+            console.log('Firebase initialized successfully');
+            return true;
+        } catch (error) {
+            console.error('Error initializing Firebase:', error);
+            return false;
+        }
     } else {
         console.error('Firebase SDK not loaded');
+        return false;
     }
 }
 

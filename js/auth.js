@@ -45,18 +45,32 @@ async function signup() {
         // Update profile with name
         await result.user.updateProfile({ displayName: name });
         
-        // Create user document in Firestore
-        await db.collection('users').doc(result.user.uid).set({
-            name: name,
-            email: email,
-            createdAt: new Date(),
-            darkMode: false,
-            stats: appState.userStats
-        });
+        // Create user document in Firestore with retry logic
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                await db.collection('users').doc(result.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: new Date(),
+                    darkMode: false,
+                    stats: appState.userStats
+                });
+                break;
+            } catch (firestoreError) {
+                retries--;
+                if (retries === 0) throw firestoreError;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
         
         handleUserLoggedIn(result.user);
     } catch (error) {
-        showToast('Signup failed: ' + error.message, 'error');
+        let errorMsg = error.message;
+        if (error.code === 'permission-denied') {
+            errorMsg = 'Permission denied. Please check your Firestore rules.';
+        }
+        showToast('Signup failed: ' + errorMsg, 'error');
     } finally {
         showAuthLoading(false);
     }
@@ -68,23 +82,39 @@ async function googleSignIn() {
         showAuthLoading(true);
         const result = await auth.signInWithPopup(provider);
         
-        // Create user document if first time
+        // Create user document if first time - with retry logic
         const userRef = db.collection('users').doc(result.user.uid);
         const userDoc = await userRef.get();
         
         if (!userDoc.exists) {
-            await userRef.set({
-                name: result.user.displayName,
-                email: result.user.email,
-                createdAt: new Date(),
-                darkMode: false,
-                stats: appState.userStats
-            });
+            let retries = 3;
+            while (retries > 0) {
+                try {
+                    await userRef.set({
+                        name: result.user.displayName,
+                        email: result.user.email,
+                        createdAt: new Date(),
+                        darkMode: false,
+                        stats: appState.userStats
+                    });
+                    break;
+                } catch (firestoreError) {
+                    retries--;
+                    if (retries === 0) throw firestoreError;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
         }
         
         handleUserLoggedIn(result.user);
     } catch (error) {
-        showToast('Google sign-in failed: ' + error.message, 'error');
+        let errorMsg = error.message;
+        if (error.code === 'permission-denied') {
+            errorMsg = 'Permission denied. Please check your Firestore rules.';
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMsg = 'Popup was blocked. Please allow popups for this site.';
+        }
+        showToast('Google sign-in failed: ' + errorMsg, 'error');
     } finally {
         showAuthLoading(false);
     }
@@ -95,19 +125,33 @@ async function guestSignIn() {
         showAuthLoading(true);
         const result = await auth.signInAnonymously();
         
-        // Create guest user document
-        await db.collection('users').doc(result.user.uid).set({
-            name: 'Guest User',
-            email: 'guest@lifereset.local',
-            isGuest: true,
-            createdAt: new Date(),
-            darkMode: false,
-            stats: appState.userStats
-        });
+        // Create guest user document with retry logic
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                await db.collection('users').doc(result.user.uid).set({
+                    name: 'Guest User',
+                    email: 'guest@lifereset.local',
+                    isGuest: true,
+                    createdAt: new Date(),
+                    darkMode: false,
+                    stats: appState.userStats
+                });
+                break;
+            } catch (firestoreError) {
+                retries--;
+                if (retries === 0) throw firestoreError;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
         
         handleUserLoggedIn(result.user);
     } catch (error) {
-        showToast('Guest sign-in failed: ' + error.message, 'error');
+        let errorMsg = error.message;
+        if (error.code === 'permission-denied') {
+            errorMsg = 'Permission denied. Please check your Firestore rules.';
+        }
+        showToast('Guest sign-in failed: ' + errorMsg, 'error');
     } finally {
         showAuthLoading(false);
     }
@@ -167,8 +211,9 @@ function showSignup() {
 
 // Initialize auth state listener
 function initAuthListener() {
-    if (!auth) {
-        setTimeout(initAuthListener, 100); // Wait for Firebase to initialize
+    if (!auth || !db) {
+        // Retry in 200ms if Firebase isn't ready
+        setTimeout(initAuthListener, 200);
         return;
     }
     
@@ -179,5 +224,10 @@ function initAuthListener() {
             document.getElementById('appContainer').classList.remove('show');
             document.getElementById('authScreen').style.display = 'flex';
         }
+    }, (error) => {
+        console.error('Auth state listener error:', error);
+        // Allow offline usage even if auth check fails
+        document.getElementById('appContainer').classList.remove('show');
+        document.getElementById('authScreen').style.display = 'flex';
     });
 }
