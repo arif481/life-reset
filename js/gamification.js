@@ -119,7 +119,16 @@ function celebrateAchievement(title, icon) {
     const popup = document.getElementById('achievementPopup');
     if (popup) {
         document.getElementById('popupTitle').textContent = title;
-        document.getElementById('popupIcon').textContent = typeof icon === 'string' ? icon : '🏆';
+        const iconEl = document.getElementById('popupIcon');
+        
+        // Check if icon is a Font Awesome class (contains 'fa-')
+        if (typeof icon === 'string' && icon.includes('fa-')) {
+            iconEl.innerHTML = `<i class="fas ${icon}"></i>`;
+        } else {
+            // Otherwise treat as emoji or text
+            iconEl.textContent = typeof icon === 'string' ? icon : '🏆';
+        }
+        
         popup.classList.add('show');
         
         setTimeout(() => {
@@ -150,11 +159,23 @@ async function saveUserStats() {
     if (!appState.currentUser || !db) return;
     
     try {
+        window.isLocalUpdate = true;
         await db.collection('users').doc(appState.currentUser.uid).update(
             { stats: appState.userStats },
             { merge: true }
         );
+        setTimeout(() => { window.isLocalUpdate = false; }, 100);
     } catch (error) {
         console.log('Error saving stats:', error);
+        window.isLocalUpdate = false;
+    }
+}
+
+// Real-time save wrapper with debouncing
+function saveUserStatsRealtime() {
+    if (typeof debouncedSave === 'function') {
+        debouncedSave('userStats', saveUserStats, 500);
+    } else {
+        saveUserStats();
     }
 }

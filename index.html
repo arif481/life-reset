@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="css/analytics.css">
     <link rel="stylesheet" href="css/gamification.css">
     <link rel="stylesheet" href="css/goals.css">
+    <link rel="stylesheet" href="css/habits.css">
     <link rel="stylesheet" href="css/settings.css">
 </head>
 <body>
@@ -256,7 +257,10 @@
     <script src="js/mood-journal.js"></script>
     <script src="js/analytics.js"></script>
     <script src="js/goals.js"></script>
+    <script src="js/habits.js"></script>
+    <script src="js/settings.js"></script>
     <script src="js/data-loader.js"></script>
+    <script src="js/dashboard.js"></script>
     
     <!-- Fallback Views Script -->
     <script>
@@ -268,52 +272,40 @@
         function initFallbackViews() {
             document.getElementById('dashboard-view').innerHTML = `
                 <div class="section">
-                    <h2>📊 Dashboard</h2>
-                    <div class="dashboard-grid">
-                        <div class="card stat-card">
-                            <div class="stat-number" id="levelBadge">1</div>
-                            <div class="stat-label">Current Level</div>
-                            <div class="stat-icon"><i class="fas fa-star"></i></div>
-                        </div>
-                        <div class="card stat-card">
-                            <div class="stat-number" id="taskCompletionStat">0%</div>
-                            <div class="stat-label">Task Completion</div>
-                            <div class="stat-icon"><i class="fas fa-check"></i></div>
-                        </div>
-                        <div class="card stat-card">
-                            <div class="stat-number" id="journalEntriesStat">0</div>
-                            <div class="stat-label">Journal Entries</div>
-                            <div class="stat-icon"><i class="fas fa-book"></i></div>
-                        </div>
-                        <div class="card stat-card">
-                            <div class="stat-number" id="consistencyStat">0%</div>
-                            <div class="stat-label">Consistency</div>
-                            <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
-                        </div>
-                    </div>
+                    <h2>📊 Advanced Dashboard</h2>
+                    <div id="dashboardOverview"></div>
                 </div>
+                
                 <div class="section">
-                    <h2>🔋 XP & Level Progress</h2>
-                    <div class="level-badge" style="display: inline-flex;">1</div>
-                    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
-                    <p id="xpText">0/100 XP</p>
+                    <div id="weeklyActivityChart"></div>
                 </div>
+                
                 <div class="section">
-                    <h2>🏆 Badges Earned</h2>
-                    <div class="badge-container" id="badgesContainer"></div>
+                    <div id="moodTrendChart"></div>
                 </div>
+                
                 <div class="section">
-                    <h2>🎯 Health Score</h2>
-                    <div class="health-score-circle">
-                        <div class="health-score-value" id="healthScore">0</div>
-                        <div class="health-score-label">Overall Health</div>
-                    </div>
-                    <div class="stats-grid-mini">
-                        <div class="stat-mini">
-                            <div class="stat-mini-value" id="streakDays">0 Days</div>
-                            <div class="stat-mini-label">Current Streak</div>
-                        </div>
-                    </div>
+                    <div id="habitCompletionChart"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="categoryBreakdown"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="quickStats"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="recentActivity"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="insights"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="milestones"></div>
                 </div>
             `;
 
@@ -336,16 +328,60 @@
 
             document.getElementById('mood-view').innerHTML = `
                 <div class="mood-section">
-                    <h2>😊 How are you feeling?</h2>
+                    <h2>😊 How are you feeling today?</h2>
                     <div class="mood-tracker">
-                        <button class="mood-btn" onclick="selectMood('very-sad', event)"><span>😢</span><span class="mood-label">Very Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('sad', event)"><span>😞</span><span class="mood-label">Sad</span></button>
-                        <button class="mood-btn" onclick="selectMood('okay', event)"><span>😐</span><span class="mood-label">Okay</span></button>
-                        <button class="mood-btn" onclick="selectMood('good', event)"><span>😊</span><span class="mood-label">Good</span></button>
-                        <button class="mood-btn" onclick="selectMood('great', event)"><span>😄</span><span class="mood-label">Great</span></button>
+                        <button class="mood-btn" onclick="selectMood('very-sad', event)" data-mood="very-sad" title="Very Sad"><span>😢</span><span class="mood-label">Very Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('sad', event)" data-mood="sad" title="Sad"><span>😞</span><span class="mood-label">Sad</span></button>
+                        <button class="mood-btn" onclick="selectMood('okay', event)" data-mood="okay" title="Okay"><span>😐</span><span class="mood-label">Okay</span></button>
+                        <button class="mood-btn" onclick="selectMood('good', event)" data-mood="good" title="Good"><span>😊</span><span class="mood-label">Good</span></button>
+                        <button class="mood-btn" onclick="selectMood('great', event)" data-mood="great" title="Great"><span>😄</span><span class="mood-label">Great</span></button>
                     </div>
-                    <textarea class="textarea" id="moodNote" placeholder="Add a note about your mood..."></textarea>
-                    <button class="btn btn-primary" onclick="saveMoodEntry()"><i class="fas fa-save"></i> Save Mood</button>
+
+                    <div class="mood-intensity">
+                        <div class="intensity-label">
+                            <span>Intensity Level</span>
+                            <span id="intensityValue">50%</span>
+                        </div>
+                        <input type="range" id="moodIntensity" class="intensity-slider" min="0" max="100" value="50" oninput="updateIntensityDisplay()">
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">What triggered this mood?</h3>
+                    <div class="mood-triggers">
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'work')">💼 Work</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'relationships')">💑 Relationships</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'health')">🏥 Health</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'finances')">💰 Finances</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'social')">👥 Social</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'sleep')">😴 Sleep</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'exercise')">🏃 Exercise</div>
+                        <div class="trigger-tag" onclick="toggleTrigger(this, 'food')">🍽️ Food</div>
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Mood Notes</h3>
+                    <textarea class="textarea" id="moodNote" placeholder="Add a note about your mood, what happened, what you're thinking..."></textarea>
+                    <button class="btn btn-primary" onclick="saveMoodEntry()" style="margin-top: 15px;"><i class="fas fa-save"></i> Save Mood</button>
+                </div>
+
+                <div class="mood-trends">
+                    <h2>📊 Your Mood Trends</h2>
+                    <div class="mood-stats">
+                        <div class="mood-stat-card">
+                            <div class="mood-stat-value" id="averageMood">--</div>
+                            <div class="mood-stat-label">Today's Average</div>
+                        </div>
+                        <div class="mood-stat-card">
+                            <div class="mood-stat-value" id="bestMood">😄</div>
+                            <div class="mood-stat-label">Best Mood This Week</div>
+                        </div>
+                        <div class="mood-stat-card">
+                            <div class="mood-stat-value" id="moodStreak">0</div>
+                            <div class="mood-stat-label">Logging Streak</div>
+                        </div>
+                        <div class="mood-stat-card">
+                            <div class="mood-stat-value" id="commonTrigger">--</div>
+                            <div class="mood-stat-label">Common Trigger</div>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -355,35 +391,178 @@
                     <div class="journal-container">
                         <div class="journal-editor">
                             <h3>Write Your Thoughts</h3>
-                            <textarea class="textarea" id="journalEntry" placeholder="Write what's on your mind..."></textarea>
-                            <button class="btn btn-primary" onclick="saveJournalEntry()"><i class="fas fa-save"></i> Save Entry</button>
+                            <div class="editor-toolbar">
+                                <button class="toolbar-btn" onclick="formatText('bold')" title="Bold"><b>B</b></button>
+                                <button class="toolbar-btn" onclick="formatText('italic')" title="Italic"><i>I</i></button>
+                                <button class="toolbar-btn" onclick="formatText('underline')" title="Underline"><u>U</u></button>
+                                <span style="margin: 0 5px; opacity: 0.3;">|</span>
+                                <input type="color" id="textColor" class="toolbar-btn" onchange="formatText('color')" title="Text Color" style="width: 40px; padding: 2px; cursor: pointer;">
+                            </div>
+                            <textarea class="textarea" id="journalEntry" placeholder="Write what's on your mind..." style="min-height: 200px;"></textarea>
+                            
+                            <div style="margin-top: 15px;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: 500;">Add Tags</label>
+                                <input type="text" id="journalTags" placeholder="E.g., #motivation #growth #challenge (press Enter to add)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <div class="entry-tags" id="journalTagsDisplay"></div>
+                            </div>
+
+                            <div style="margin-top: 15px;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: 500;">Mood for this entry</label>
+                                <div class="mood-tracker" style="gap: 5px;">
+                                    <button class="mood-btn" onclick="selectJournalMood('very-sad', event)" data-mood="very-sad" style="min-width: auto; padding: 10px;"><span>😢</span></button>
+                                    <button class="mood-btn" onclick="selectJournalMood('sad', event)" data-mood="sad" style="min-width: auto; padding: 10px;"><span>😞</span></button>
+                                    <button class="mood-btn" onclick="selectJournalMood('okay', event)" data-mood="okay" style="min-width: auto; padding: 10px;"><span>😐</span></button>
+                                    <button class="mood-btn" onclick="selectJournalMood('good', event)" data-mood="good" style="min-width: auto; padding: 10px;"><span>😊</span></button>
+                                    <button class="mood-btn" onclick="selectJournalMood('great', event)" data-mood="great" style="min-width: auto; padding: 10px;"><span>😄</span></button>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="saveJournalEntry()" style="margin-top: 15px; width: 100%;"><i class="fas fa-save"></i> Save Entry</button>
                         </div>
                         <div class="journal-history" id="journalHistory">
                             <h3>Recent Entries</h3>
+                            <div class="filter-controls" style="margin-top: 15px;">
+                                <button class="filter-btn active" onclick="filterJournalEntries('all', this)">All</button>
+                                <button class="filter-btn" onclick="filterJournalEntries('week', this)">This Week</button>
+                                <button class="filter-btn" onclick="filterJournalEntries('month', this)">This Month</button>
+                                <input type="text" id="journalSearch" placeholder="Search entries..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; flex: 1; max-width: 200px;">
+                            </div>
+                            <div id="journalEntriesContainer" style="margin-top: 15px;"></div>
                         </div>
                     </div>
                 </div>
             `;
 
             document.getElementById('analytics-view').innerHTML = `
-                <div class="analytics-grid">
-                    <div class="chart-container"><canvas id="moodChart"></canvas></div>
-                    <div class="chart-container"><canvas id="completionChart"></canvas></div>
+                <!-- Analytics Header -->
+                <div class="analytics-header">
+                    <h1><i class="fas fa-chart-line"></i> Analytics & Insights</h1>
+                    <div class="time-range-controls">
+                        <button class="time-range-btn active" onclick="changeTimeRange('7days')">7 Days</button>
+                        <button class="time-range-btn" onclick="changeTimeRange('30days')">30 Days</button>
+                        <button class="time-range-btn" onclick="changeTimeRange('90days')">90 Days</button>
+                        <button class="time-range-btn" onclick="changeTimeRange('all')">All Time</button>
+                    </div>
                 </div>
-                <div class="section">
-                    <h2>📈 Insights</h2>
+
+                <!-- Statistics Overview -->
+                <div class="analytics-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <div class="stat-label">Total XP</div>
+                        <div class="stat-value" id="totalXPStat">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-smile"></i></div>
+                        <div class="stat-label">Avg Mood</div>
+                        <div class="stat-value" id="avgMoodStat">N/A</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                        <div class="stat-label">Streak</div>
+                        <div class="stat-value" id="currentStreakStat">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-label">Tasks Done</div>
+                        <div class="stat-value" id="tasksCompletedStat">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="stat-label">Goals</div>
+                        <div class="stat-value" id="goalsProgressStat">0/0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-book"></i></div>
+                        <div class="stat-label">Journals</div>
+                        <div class="stat-value" id="journalEntriesStat">0</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="analytics-charts-grid">
+                    <!-- Mood Trend Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-heart"></i> Mood Trend</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="moodTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Completion Rate Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-tasks"></i> Completion Rate</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="completionRateChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Category Performance Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-chart-pie"></i> Category Performance</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="categoryPerformanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- XP Progress Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-trophy"></i> XP Progress</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="xpProgressChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Habit Streak Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-calendar-check"></i> Habit Streaks</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="habitStreakChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Activity Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="fas fa-chart-area"></i> Weekly Activity</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="weeklyActivityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Section -->
+                <div class="insights-section">
+                    <h2><i class="fas fa-lightbulb"></i> Smart Insights</h2>
                     <div class="insights-grid">
                         <div class="insight-card">
-                            <div class="insight-value" id="bestTaskInsight">---</div>
+                            <div class="insight-icon">🏆</div>
                             <div class="insight-label">Best Category</div>
+                            <div class="insight-value" id="bestCategoryInsight">---</div>
+                            <div class="insight-description">Your top performing task category</div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-value" id="moodImpactInsight">---</div>
-                            <div class="insight-label">Mood Score</div>
+                            <div class="insight-icon">📊</div>
+                            <div class="insight-label">Avg Completion</div>
+                            <div class="insight-value" id="avgCompletionInsight">---</div>
+                            <div class="insight-description">Average daily completion rate</div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-value" id="consistencyInsight">---</div>
-                            <div class="insight-label">Consistency</div>
+                            <div class="insight-icon">⚡</div>
+                            <div class="insight-label">Productivity Score</div>
+                            <div class="insight-value" id="productivityScoreInsight">---</div>
+                            <div class="insight-description">Overall productivity rating</div>
                         </div>
                     </div>
                 </div>
@@ -392,14 +571,64 @@
             document.getElementById('goals-view').innerHTML = `
                 <div class="section">
                     <h2><i class="fas fa-bullseye"></i> Goals & Habits</h2>
-                    <button class="btn btn-primary" onclick="showAddGoalModal()" style="margin-bottom: 15px;"><i class="fas fa-plus"></i> Add New Goal</button>
-                    <div id="goalsContainer" style="margin-top: 20px;"></div>
+                    
+                    <!-- Goal Statistics -->
+                    <div class="goal-stats">
+                        <div class="goal-stat-card">
+                            <div class="goal-stat-value" id="totalGoalsCount">0</div>
+                            <div class="goal-stat-label">Total Goals</div>
+                        </div>
+                        <div class="goal-stat-card">
+                            <div class="goal-stat-value" id="completedGoalsCount">0</div>
+                            <div class="goal-stat-label">Completed</div>
+                        </div>
+                        <div class="goal-stat-card">
+                            <div class="goal-stat-value" id="activeGoalsCount">0</div>
+                            <div class="goal-stat-label">In Progress</div>
+                        </div>
+                        <div class="goal-stat-card">
+                            <div class="goal-stat-value" id="successRateGoals">0%</div>
+                            <div class="goal-stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Add Goal Button -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showAddGoalModal()"><i class="fas fa-plus"></i> Add New Goal</button>
+                        <button class="btn btn-secondary" onclick="showAdvancedGoalModal()"><i class="fas fa-cog"></i> Advanced Goal</button>
+                    </div>
+
+                    <!-- Goal Filters -->
+                    <div class="goal-filters">
+                        <button class="filter-btn active" onclick="filterGoals('all', this)">All</button>
+                        <button class="filter-btn" onclick="filterGoals('active', this)">Active</button>
+                        <button class="filter-btn" onclick="filterGoals('completed', this)">Completed</button>
+                        <button class="filter-btn" onclick="filterGoals('health', this)">💪 Health</button>
+                        <button class="filter-btn" onclick="filterGoals('productivity', this)">🚀 Productivity</button>
+                        <button class="filter-btn" onclick="filterGoals('learning', this)">📚 Learning</button>
+                        <button class="filter-btn" onclick="filterGoals('personal', this)">✨ Personal</button>
+                    </div>
+
+                    <!-- Goals Container -->
+                    <div class="goals-grid" id="goalsContainer"></div>
                 </div>
-                <div class="section">
-                    <h2><i class="fas fa-fire"></i> 30-Day Habit Chain</h2>
-                    <div id="habitChain" style="margin-top: 15px;"></div>
+
+                <!-- Bad Habits Breaking Section -->
+                <div class="bad-habits-section">
+                    <div class="bad-habits-header">
+                        <h2><i class="fas fa-heart"></i> Quit Bad Habits</h2>
+                        <button class="btn btn-primary" onclick="showAddBadHabitModal()"><i class="fas fa-plus"></i> Track a Bad Habit</button>
+                    </div>
+                    <div class="bad-habits-grid" id="badHabitsContainer"></div>
                 </div>
+
+                <!-- Advanced Habit Chain Section -->
+                <div id="advancedHabitChain"></div>
             `;
+
+            renderGoals();
+            renderBadHabits();
+            renderAdvancedHabitChain();
 
             document.getElementById('resources-view').innerHTML = `
                 <div class="section">
@@ -427,27 +656,12 @@
                 </div>
             `;
 
-            document.getElementById('settings-view').innerHTML = `
-                <div class="settings-grid">
-                    <div class="setting-card">
-                        <div class="setting-title">Preferences</div>
-                        <div class="setting-group">
-                            <div class="toggle-label">
-                                <span>Dark Mode</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" onchange="toggleDarkModeSetting()">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="setting-card">
-                        <div class="setting-title">Account</div>
-                        <p><strong>Name:</strong> <span id="userName">User</span></p>
-                        <p><strong>Email:</strong> <span id="userEmail">user@example.com</span></p>
-                    </div>
-                </div>
-            `;
+            document.getElementById('settings-view').innerHTML = ``;
+            
+            // Initialize settings
+            if (typeof initSettings === 'function') {
+                initSettings();
+            }
         }
     </script>
 </body>

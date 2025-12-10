@@ -1,51 +1,102 @@
 // Data Loading Functions
 
-async function loadUserData() {
+// Debounce helper for real-time saves
+let saveTimers = {};
+function debouncedSave(key, saveFunction, delay = 500) {
+    if (saveTimers[key]) clearTimeout(saveTimers[key]);
+    saveTimers[key] = setTimeout(() => {
+        saveFunction();
+        delete saveTimers[key];
+    }, delay);
+}
+
+// Load all user data once on login
+async function loadAllUserData() {
     if (!appState.currentUser || !db) return;
     
     try {
+        const userDoc = await db.collection('users').doc(appState.currentUser.uid).get();
+        
+        if (userDoc.exists) {
+            const data = userDoc.data();
+            
+            // Load stats
+            if (data.stats) {
+                appState.userStats = { ...appState.userStats, ...data.stats };
+            }
+            
+            // Load goals
+            if (data.goals) {
+                appState.userGoals = data.goals;
+            }
+            
+            // Load bad habits
+            if (data.badHabits) {
+                appState.badHabits = data.badHabits;
+            }
+            
+            // Load dark mode preference
+            if (data.darkMode !== undefined) {
+                appState.isDarkMode = data.darkMode;
+                if (appState.isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            // Update UI
+            updateGamificationUI();
+            renderBadges();
+            renderGoals();
+            renderHabitChain();
+            if (typeof initDashboard === 'function') {
+                initDashboard();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading user data:', error);
+    }
+}
+
+// Setup real-time listeners for collaborative features (optional)
+function setupRealtimeListeners() {
+    if (!appState.currentUser || !db) return;
+    
+    try {
+        // Listen for changes made from other devices/sessions
         const unsubscribe = db.collection('users').doc(appState.currentUser.uid)
             .onSnapshot((doc) => {
-                if (doc.exists) {
+                if (doc.exists && !window.isLocalUpdate) {
                     const data = doc.data();
                     
-                    // Load stats
+                    // Update from remote changes
                     if (data.stats) {
                         appState.userStats = { ...appState.userStats, ...data.stats };
+                        updateGamificationUI();
                     }
                     
-                    // Load goals
                     if (data.goals) {
                         appState.userGoals = data.goals;
+                        renderGoals();
                     }
                     
-                    // Load dark mode preference
-                    if (data.darkMode !== undefined) {
-                        appState.isDarkMode = data.darkMode;
-                        if (appState.isDarkMode) {
-                            document.body.classList.add('dark-mode');
-                        } else {
-                            document.body.classList.remove('dark-mode');
-                        }
+                    if (data.badHabits) {
+                        appState.badHabits = data.badHabits;
+                        renderBadHabits();
                     }
-                    
-                    updateGamificationUI();
-                    renderBadges();
-                    renderGoals();
-                    renderHabitChain();
                 }
             }, (error) => {
-                console.error('Error loading user data:', error);
-                // Don't let Firestore errors stop the app
+                console.error('Error in real-time listener:', error);
             });
         
-        // Store unsubscribe function if needed for cleanup
+        // Store unsubscribe function for cleanup
         if (!window.firestoreUnsubscribers) {
             window.firestoreUnsubscribers = [];
         }
         window.firestoreUnsubscribers.push(unsubscribe);
     } catch (error) {
-        console.log('Error setting up user data listener:', error);
+        console.log('Error setting up real-time listener:', error);
     }
 }
 
@@ -70,6 +121,54 @@ async function loadCustomTasks() {
         });
     } catch (error) {
         console.log('Error loading custom tasks:', error);
+    }
+}
+
+// Load journal entries
+async function loadJournalEntries(daysBack = 30) {
+    if (!appState.currentUser || !db) return;
+    
+    try {
+        const entriesSnapshot = await db.collection('users')
+            .doc(appState.currentUser.uid)
+            .collection('journal')
+            .orderBy('timestamp', 'desc')
+            .limit(daysBack)
+            .get();
+        
+        appState.journalEntries = [];
+        entriesSnapshot.forEach(doc => {
+            appState.journalEntries.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+    } catch (error) {
+        console.log('Error loading journal entries:', error);
+    }
+}
+
+// Load mood statistics for analytics
+async function loadMoodStats(daysBack = 30) {
+    if (!appState.currentUser || !db) return;
+    
+    try {
+        const moodSnapshot = await db.collection('users')
+            .doc(appState.currentUser.uid)
+            .collection('mood')
+            .orderBy('timestamp', 'desc')
+            .limit(daysBack)
+            .get();
+        
+        appState.moodHistory = [];
+        moodSnapshot.forEach(doc => {
+            appState.moodHistory.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+    } catch (error) {
+        console.log('Error loading mood stats:', error);
     }
 }
 

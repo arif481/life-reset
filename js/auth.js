@@ -177,24 +177,46 @@ async function guestSignIn() {
     }
 }
 
-function handleUserLoggedIn(user) {
+async function handleUserLoggedIn(user) {
     appState.currentUser = user;
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('appContainer').classList.add('show');
     
-    // Update user info in settings
-    if (user.displayName) {
-        document.getElementById('userName').textContent = user.displayName;
-    }
-    if (user.email) {
-        document.getElementById('userEmail').textContent = user.email;
-    }
+    // Show loading state
+    showToast('Loading your data...', 'info');
     
-    // Load custom tasks and user data
-    loadCustomTasks();
-    loadUserData();
-    initApp();
-    showToast('Welcome back!', 'success');
+    try {
+        // Load all user data in parallel for faster loading
+        await Promise.all([
+            loadAllUserData(),
+            loadCustomTasks(),
+            loadTasksForDate(),
+            loadJournalEntries(),
+            loadMoodStats()
+        ]);
+        
+        // Update UI
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('appContainer').classList.add('show');
+        
+        // Update user info in settings
+        if (user.displayName) {
+            document.getElementById('userName').textContent = user.displayName;
+        }
+        if (user.email) {
+            document.getElementById('userEmail').textContent = user.email;
+        }
+        
+        // Initialize app UI
+        initApp();
+        
+        // Setup real-time listeners
+        setupRealtimeListeners();
+        
+        showToast('Welcome back! 🎉', 'success');
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        showToast('Data loaded with some errors. Refreshing...', 'warning');
+        initApp();
+    }
 }
 
 async function logout() {
