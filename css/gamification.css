@@ -260,6 +260,16 @@ body.dark-mode .achievement-unlock-popup {
 .achievement-unlock-popup .icon {
     font-size: 80px;
     margin: 20px 0;
+    color: var(--primary);
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-unlock-popup .icon i {
+    font-size: 80px;
+    color: var(--primary);
 }
 
 .achievement-unlock-popup p {

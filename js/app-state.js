@@ -48,6 +48,9 @@ const appState = {
     isDarkMode: localStorage.getItem('darkMode') === 'true',
     userTasks: {},
     userGoals: [],
+    journalEntries: [],
+    moodHistory: [],
+    badHabits: {},
     userStats: {
         level: 1,
         xp: 0,
@@ -94,14 +97,14 @@ const defaultTasks = {
 
 // Badges System Data
 const badgesData = [
-    { id: 'first_task', name: 'First Step', icon: '👣', description: 'Complete your first task', condition: 'tasksCompleted >= 1' },
-    { id: 'task_master', name: 'Task Master', icon: '✅', description: 'Complete 50 tasks', condition: 'tasksCompleted >= 50' },
-    { id: 'mood_tracker', name: 'Mood Watcher', icon: '🎯', description: 'Log mood 10 times', condition: 'moodLogged >= 10' },
-    { id: 'journal_starter', name: 'Story Teller', icon: '📖', description: 'Write 5 journal entries', condition: 'journalEntries >= 5' },
-    { id: 'week_warrior', name: 'Week Warrior', icon: '⚔️', description: 'Maintain 7-day streak', condition: 'streak >= 7' },
-    { id: 'month_champion', name: 'Month Champion', icon: '👑', description: 'Maintain 30-day streak', condition: 'streak >= 30' },
-    { id: 'health_guru', name: 'Health Guru', icon: '🧘', description: 'Reach 80+ health score', condition: 'healthScore >= 80' },
-    { id: 'consistency_king', name: 'Consistency King', icon: '⭐', description: 'Maintain 90% consistency', condition: 'consistency >= 90' }
+    { id: 'first_task', name: 'First Step', icon: '👣', description: 'Complete your first task', condition: 'appState.userStats.tasksCompleted >= 1' },
+    { id: 'task_master', name: 'Task Master', icon: '✅', description: 'Complete 50 tasks', condition: 'appState.userStats.tasksCompleted >= 50' },
+    { id: 'mood_tracker', name: 'Mood Watcher', icon: '🎯', description: 'Log mood 10 times', condition: 'appState.userStats.moodLogged >= 10' },
+    { id: 'journal_starter', name: 'Story Teller', icon: '📖', description: 'Write 5 journal entries', condition: 'appState.userStats.journalEntries >= 5' },
+    { id: 'week_warrior', name: 'Week Warrior', icon: '⚔️', description: 'Maintain 7-day streak', condition: 'appState.userStats.streak >= 7' },
+    { id: 'month_champion', name: 'Month Champion', icon: '👑', description: 'Maintain 30-day streak', condition: 'appState.userStats.streak >= 30' },
+    { id: 'health_guru', name: 'Health Guru', icon: '🧘', description: 'Reach 80+ health score', condition: 'appState.userStats.healthScore >= 80' },
+    { id: 'consistency_king', name: 'Consistency King', icon: '⭐', description: 'Maintain 90% consistency', condition: 'appState.userStats.consistency >= 90' }
 ];
 
 // Utility function: Show toast notifications

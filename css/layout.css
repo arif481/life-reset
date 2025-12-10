@@ -241,11 +241,6 @@ body.dark-mode .dropdown-item:hover {
         transition: opacity 0.3s;
     }
 
-    .sidebar.show + .sidebar-overlay,
-    .app-container .sidebar.show ~ .sidebar-overlay {
-        display: block;
-    }
-
     .sidebar {
         position: fixed;
         left: -250px;

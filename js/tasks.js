@@ -57,7 +57,7 @@ function toggleTask(taskId) {
                 appState.userStats.tasksCompleted++;
                 addXP(10);
             }
-            saveTaskCompletion(taskId, task.completed);
+            saveTaskCompletionRealtime(taskId, task.completed);
             updateProgress();
             checkAndUnlockBadges();
             break;
@@ -103,6 +103,16 @@ async function saveTaskCompletion(taskId, completed) {
         } catch (error) {
             console.log('Error saving task:', error);
         }
+    }
+}
+
+// Real-time task save with debouncing
+function saveTaskCompletionRealtime(taskId, completed) {
+    const key = `task_${taskId}`;
+    if (typeof debouncedSave === 'function') {
+        debouncedSave(key, () => saveTaskCompletion(taskId, completed), 300);
+    } else {
+        saveTaskCompletion(taskId, completed);
     }
 }
 

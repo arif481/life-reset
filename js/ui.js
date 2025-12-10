@@ -13,15 +13,15 @@ function initApp() {
 
     // Initialize charts if available
     if (typeof Chart !== 'undefined') {
-        if (!moodChart || !completionChart) {
-            initCharts();
+        if (!moodTrendChart && !completionRateChart) {
+            // Charts will be initialized when analytics view is opened
+            console.log('Chart.js loaded and ready');
         }
     }
 
     // Set up task categories and achievements
     try {
         renderTaskCategories();
-        renderAchievements();
         renderBadges();
     } catch (error) {
         console.warn('Error rendering initial UI:', error);
@@ -29,7 +29,14 @@ function initApp() {
 
     // Load user data if available
     if (appState.currentUser && db) {
-        loadUserData();
+        loadAllUserData();
+    }
+
+    // Initialize dashboard
+    try {
+        initDashboard();
+    } catch (error) {
+        console.warn('Dashboard initialization warning:', error);
     }
 
     // Update gamification UI
@@ -64,8 +71,17 @@ function navigateTo(view) {
     document.getElementById(view + '-view').style.display = 'block';
     
     // Load specific data for the view
+    if (view === 'dashboard') {
+        initDashboard();
+    }
     if (view === 'analytics') {
-        loadAnalyticsData();
+        // Initialize advanced analytics
+        setTimeout(() => {
+            initAnalytics();
+        }, 100);
+    }
+    if (view === 'mood') {
+        loadMoodStats();
     }
     if (view === 'journal') {
         loadJournalEntries();
@@ -73,6 +89,12 @@ function navigateTo(view) {
     if (view === 'goals') {
         renderGoals();
         renderHabitChain();
+    }
+    if (view === 'settings') {
+        // Initialize advanced settings
+        if (typeof initSettings === 'function') {
+            initSettings();
+        }
     }
     
     closeUserMenu();
@@ -158,8 +180,8 @@ function toggleMobileSidebar() {
     const overlay = document.getElementById('sidebarOverlay');
     if (!sidebar) return;
     
-    sidebar.classList.toggle('show');
+    sidebar.classList.toggle('mobile-open');
     if (overlay) {
-        overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+        overlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';
     }
 }
