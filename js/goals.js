@@ -1,5 +1,142 @@
-// Goals and Habits Management Functions
+// Advanced Goals and Habits Management Functions
 
+const categoryIcons = {
+    'Health': '💪',
+    'Productivity': '🚀',
+    'Personal': '✨',
+    'Learning': '📚'
+};
+
+const priorityColors = {
+    'high': '#ff6b6b',
+    'medium': '#ffc107',
+    'low': '#4cc9f0'
+};
+
+let currentGoalFilter = 'all';
+
+// Show advanced goal modal
+function showAdvancedGoalModal() {
+    const modal = document.createElement('div');
+    modal.id = 'advancedGoalModal';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: flex; align-items: center;
+        justify-content: center; z-index: 1000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <h2 style="margin-bottom: 20px;">Create Advanced Goal</h2>
+            <form onsubmit="saveAdvancedGoal(event)">
+                <div class="form-group">
+                    <label>Goal Name *</label>
+                    <input type="text" id="advGoalName" class="form-control" placeholder="E.g., Run a 5K" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="advGoalDesc" class="form-control" placeholder="Why is this goal important?" rows="3"></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="advGoalCategory" class="form-control" required>
+                            <option value="Health">💪 Health</option>
+                            <option value="Productivity">🚀 Productivity</option>
+                            <option value="Learning">📚 Learning</option>
+                            <option value="Personal">✨ Personal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select id="advGoalPriority" class="form-control" required>
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Target Value *</label>
+                        <input type="number" id="advGoalTarget" class="form-control" placeholder="E.g., 5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit of Measurement *</label>
+                        <input type="text" id="advGoalUnit" class="form-control" placeholder="E.g., km, books, days" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deadline (optional)</label>
+                    <input type="date" id="advGoalDeadline" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Sub-goals (one per line)</label>
+                    <textarea id="advGoalMilestones" class="form-control" placeholder="Break down your goal&#10;E.g. Complete 10k run&#10;Complete 5k run" rows="3"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Create Goal</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAdvancedModal()" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function saveAdvancedGoal(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('advGoalName').value.trim();
+    const description = document.getElementById('advGoalDesc').value.trim();
+    const category = document.getElementById('advGoalCategory').value;
+    const priority = document.getElementById('advGoalPriority').value;
+    const target = parseInt(document.getElementById('advGoalTarget').value);
+    const unit = document.getElementById('advGoalUnit').value.trim();
+    const deadline = document.getElementById('advGoalDeadline').value;
+    const milestonesText = document.getElementById('advGoalMilestones').value;
+    
+    if (!name || !target || !unit) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    const milestones = milestonesText
+        .split('\n')
+        .filter(m => m.trim())
+        .map((m, i) => ({ id: `ms_${i}`, text: m.trim(), completed: false }));
+    
+    const newGoal = {
+        id: 'goal_' + Date.now(),
+        name: name,
+        description: description,
+        category: category,
+        priority: priority,
+        progress: 0,
+        target: target,
+        unit: unit,
+        deadline: deadline || null,
+        milestones: milestones,
+        createdAt: new Date().toISOString(),
+        completed: false,
+        startDate: getDateString(new Date())
+    };
+    
+    appState.userGoals.push(newGoal);
+    saveGoalsRealtime();
+    renderGoals();
+    addXP(25);
+    showToast('🎯 Advanced goal created! +25 XP', 'success');
+    closeAdvancedModal();
+}
+
+function closeAdvancedModal() {
+    const modal = document.getElementById('advancedGoalModal');
+    if (modal) modal.remove();
+}
+
+// Show simple goal modal
 function showAddGoalModal() {
     const goalName = prompt('Enter goal name (e.g., "Run 100km", "Read 12 books"):');
     if (!goalName || !goalName.trim()) {
@@ -7,8 +144,8 @@ function showAddGoalModal() {
         return;
     }
     
-    const goalCategory = prompt('Goal category:\n1. Health\n2. Productivity\n3. Personal\n4. Learning\n\nEnter 1-4 (default: 1):', '1');
-    const categoryMap = { '1': 'Health', '2': 'Productivity', '3': 'Personal', '4': 'Learning' };
+    const goalCategory = prompt('Goal category:\n1. Health (💪)\n2. Productivity (🚀)\n3. Learning (📚)\n4. Personal (✨)\n\nEnter 1-4 (default: 1):', '1');
+    const categoryMap = { '1': 'Health', '2': 'Productivity', '3': 'Learning', '4': 'Personal' };
     const category = categoryMap[goalCategory] || 'Health';
     
     const goalTarget = parseInt(prompt('Target (e.g., number of days, kilometers, books):', '30'));
@@ -18,82 +155,190 @@ function showAddGoalModal() {
         return;
     }
     
+    const unit = prompt('Unit of measurement (e.g., days, km, books):', 'units');
+    
     const newGoal = {
         id: 'goal_' + Date.now(),
         name: goalName.trim(),
         category: category,
+        priority: 'medium',
         progress: 0,
         target: goalTarget,
-        createdAt: new Date(),
-        completed: false
+        unit: unit,
+        milestone: [],
+        createdAt: new Date().toISOString(),
+        completed: false,
+        startDate: getDateString(new Date())
     };
     
     appState.userGoals.push(newGoal);
-    saveGoals();
+    saveGoalsRealtime();
     renderGoals();
     addXP(10);
     showToast('🎯 Goal created! +10 XP', 'success');
 }
 
+// Render all goals
 function renderGoals() {
     const container = document.getElementById('goalsContainer');
     if (!container) return;
     
     container.innerHTML = '';
     
-    if (appState.userGoals.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; background: var(--bg-card); border-radius: 10px;"><i class="fas fa-clipboard-list" style="font-size: 40px; color: #ccc; margin-bottom: 15px; display: block;"></i><p style="color: #777; font-size: 14px;">No goals yet. Create one to start your journey!</p></div>';
+    // Calculate statistics
+    const completed = appState.userGoals.filter(g => g.completed || g.progress >= g.target).length;
+    const active = appState.userGoals.filter(g => !g.completed && g.progress < g.target).length;
+    const total = appState.userGoals.length;
+    const successRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    // Update stats display
+    const statsIds = {
+        'totalGoalsCount': total,
+        'completedGoalsCount': completed,
+        'activeGoalsCount': active,
+        'successRateGoals': successRate + '%'
+    };
+    
+    Object.entries(statsIds).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    });
+    
+    // Filter goals
+    let goalsToShow = appState.userGoals;
+    if (currentGoalFilter === 'active') {
+        goalsToShow = appState.userGoals.filter(g => !g.completed && g.progress < g.target);
+    } else if (currentGoalFilter === 'completed') {
+        goalsToShow = appState.userGoals.filter(g => g.completed || g.progress >= g.target);
+    } else if (['Health', 'Productivity', 'Learning', 'Personal'].includes(currentGoalFilter)) {
+        goalsToShow = appState.userGoals.filter(g => g.category === currentGoalFilter);
+    }
+    
+    if (goalsToShow.length === 0) {
+        container.innerHTML = `
+            <div class="empty-goals-state">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">No goals found. Create one to get started!</div>
+            </div>
+        `;
         return;
     }
     
-    const categoryIcons = {
-        'Health': '💪',
-        'Productivity': '🚀',
-        'Personal': '✨',
-        'Learning': '📚'
-    };
-    
-    appState.userGoals.forEach(goal => {
+    goalsToShow.forEach(goal => {
         const percentage = Math.min((goal.progress / goal.target) * 100, 100);
         const isCompleted = goal.completed || goal.progress >= goal.target;
         const icon = categoryIcons[goal.category] || '🎯';
+        const daysLeft = goal.deadline ? Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24)) : null;
         
         const goalEl = document.createElement('div');
         goalEl.className = `goal-item ${isCompleted ? 'completed' : ''}`;
+        goalEl.setAttribute('data-category', goal.category);
+        goalEl.setAttribute('data-status', isCompleted ? 'completed' : 'active');
+        
+        const milestonesHTML = goal.milestones && goal.milestones.length > 0 ? `
+            <div class="milestones-section">
+                <div class="milestones-title">Sub-Goals</div>
+                <ul class="milestone-list">
+                    ${goal.milestones.map((m, i) => `
+                        <li class="milestone-item ${m.completed ? 'completed' : ''}">
+                            <input type="checkbox" class="milestone-checkbox" ${m.completed ? 'checked' : ''} 
+                                   onchange="toggleMilestone('${goal.id}', ${i}, this.checked)">
+                            <span class="milestone-text">${m.text}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        ` : '';
+        
+        const deadlineHTML = goal.deadline ? `
+            <span style="font-size: 11px; color: ${daysLeft < 0 ? '#ff6b6b' : daysLeft < 7 ? '#ffc107' : '#4cc9f0'};">
+                ${daysLeft < 0 ? '⏰ Overdue' : daysLeft === 0 ? '🔥 Today' : `📅 ${daysLeft}d left`}
+            </span>
+        ` : '';
+        
         goalEl.innerHTML = `
             <div class="goal-header">
-                <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
-                    <span style="font-size: 24px;">${icon}</span>
-                    <div>
-                        <div class="goal-title" style="${isCompleted ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${goal.name}</div>
-                        <span class="goal-category" style="font-size: 12px; opacity: 0.7;">${goal.category}</span>
+                <div class="goal-header-left">
+                    <div class="goal-icon">${icon}</div>
+                    <div class="goal-meta">
+                        <div class="goal-title">${goal.name}</div>
+                        <div class="goal-tags">
+                            <span class="goal-category">${goal.category}</span>
+                            <span class="goal-priority ${goal.priority || 'medium'}">${(goal.priority || 'medium').toUpperCase()}</span>
+                            ${deadlineHTML}
+                        </div>
+                        ${goal.description ? `<div class="goal-description">${goal.description}</div>` : ''}
                     </div>
                 </div>
-                <button class="action-btn" onclick="deleteGoal('${goal.id}')" title="Delete goal">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="goal-progress-container">
-                <div class="goal-progress-label">
-                    <span>${isCompleted ? '✅ Completed' : 'Progress'}</span>
-                    <span style="font-weight: 600;">${goal.progress}/${goal.target}</span>
+                <div class="goal-actions">
+                    <button class="goal-action-btn" onclick="editGoal('${goal.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="goal-action-btn" onclick="deleteGoal('${goal.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                 </div>
-                <input type="range" min="0" max="${goal.target}" value="${goal.progress}" 
-                       onchange="updateGoalProgress('${goal.id}', this.value)" style="width: 100%; cursor: pointer;" ${isCompleted ? 'disabled' : ''}>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${percentage}%; background: ${isCompleted ? '#4cc9f0' : 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'};}"></div>
+            
+            <div class="goal-details">
+                <div class="goal-progress-container">
+                    <div class="goal-progress-header">
+                        <span class="goal-progress-label">${isCompleted ? '✅ Completed' : 'Progress'}</span>
+                        <div class="goal-progress-stats">
+                            <span>${goal.progress}/${goal.target} ${goal.unit}</span>
+                            <span>${Math.round(percentage)}%</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%; ${isCompleted ? 'background: linear-gradient(90deg, #4cc9f0 0%, #00d9ff 100%);' : ''}"></div>
+                    </div>
+                    ${!isCompleted ? `
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="number" id="progress_${goal.id}" value="${goal.progress}" min="0" max="${goal.target}" 
+                                   class="goal-progress-input" placeholder="Enter progress">
+                            <button class="btn btn-primary" onclick="updateGoalProgress('${goal.id}')" style="flex-shrink: 0;">Update</button>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                ${milestonesHTML}
             </div>
         `;
+        
         container.appendChild(goalEl);
     });
 }
 
-function updateGoalProgress(goalId, progress) {
+// Toggle milestone completion
+function toggleMilestone(goalId, index, completed) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (goal && goal.milestones && goal.milestones[index]) {
+        goal.milestones[index].completed = completed;
+        saveGoalsRealtime();
+        renderGoals();
+    }
+}
+
+// Edit goal
+function editGoal(goalId) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) return;
+    
+    const newName = prompt('Edit goal name:', goal.name);
+    if (newName && newName.trim()) {
+        goal.name = newName.trim();
+        saveGoalsRealtime();
+        renderGoals();
+        showToast('Goal updated', 'success');
+    }
+}
+
+// Update goal progress
+function updateGoalProgress(goalId) {
+    const input = document.getElementById(`progress_${goalId}`);
+    if (!input) return;
+    
     const goal = appState.userGoals.find(g => g.id === goalId);
     if (goal && !goal.completed) {
+        const newProgress = Math.min(parseInt(input.value) || goal.progress, goal.target);
         const oldProgress = goal.progress;
-        goal.progress = parseInt(progress);
+        goal.progress = newProgress;
         
         if (goal.progress > oldProgress) {
             const xpGain = 5 * (goal.progress - oldProgress);
@@ -108,101 +353,171 @@ function updateGoalProgress(goalId, progress) {
             showToast('🎉 Goal Completed! +100 XP Bonus!', 'success');
         }
         
-        saveGoals();
+        saveGoalsRealtime();
         renderGoals();
         updateGamificationUI();
     }
 }
 
+// Delete goal
 function deleteGoal(goalId) {
     const goal = appState.userGoals.find(g => g.id === goalId);
     if (confirm(`Delete "${goal.name}"? This cannot be undone.`)) {
         appState.userGoals = appState.userGoals.filter(g => g.id !== goalId);
-        saveGoals();
+        saveGoalsRealtime();
         renderGoals();
         showToast('Goal deleted', 'info');
     }
 }
 
+// Filter goals
+function filterGoals(filter, element) {
+    currentGoalFilter = filter;
+    document.querySelectorAll('.goal-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    renderGoals();
+}
+
+// Save goals to Firebase
 async function saveGoals() {
     if (!appState.currentUser || !db) return;
     
     try {
+        window.isLocalUpdate = true;
         await db.collection('users').doc(appState.currentUser.uid).update(
             { goals: appState.userGoals },
             { merge: true }
         );
+        setTimeout(() => { window.isLocalUpdate = false; }, 100);
     } catch (error) {
         console.log('Error saving goals:', error);
+        window.isLocalUpdate = false;
     }
 }
 
-function loadGoals() {
-    // Loaded in loadUserData
+// Real-time save wrapper with debouncing
+function saveGoalsRealtime() {
+    if (typeof debouncedSave === 'function') {
+        debouncedSave('goals', saveGoals, 500);
+    } else {
+        saveGoals();
+    }
 }
 
+// Render habit chain
 function renderHabitChain() {
     const container = document.getElementById('habitChain');
     if (!container) return;
     
-    container.innerHTML = '<h3>30-Day Habit Chain</h3>';
-    
     const gridContainer = document.createElement('div');
     gridContainer.className = 'habit-chain-grid';
     
-    for (let i = 0; i < 30; i++) {
-        const day = document.createElement('div');
-        const status = Math.random() > 0.3 ? 'completed' : (Math.random() > 0.5 ? 'partial' : 'missed');
-        day.className = `habit-day ${status}`;
-        day.textContent = (i + 1);
-        gridContainer.appendChild(day);
-    }
+    const today = new Date();
+    const streakData = calculateHabitStreak();
     
-    container.appendChild(gridContainer);
-}
-
-async function updateUserStats() {
-    if (!appState.currentUser || !db) return;
-    
-    try {
-        const today = new Date();
-        const dateString = getDateString(today);
+    for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = getDateString(date);
         
-        // Update streak and total days
-        const userDoc = await db.collection('users').doc(appState.currentUser.uid).get();
-        if (userDoc.exists) {
-            const lastActivityDate = userDoc.data().lastActivityDate;
-            const today = new Date();
+        const dayEl = document.createElement('div');
+        const isToday = i === 0;
+        const taskData = appState.userTasks[dateStr];
+        
+        let status = 'missed';
+        let progress = '0%';
+        
+        if (taskData) {
+            const completed = Object.values(taskData).filter(t => t.completed).length;
+            const total = Object.keys(taskData).length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
             
-            if (lastActivityDate) {
-                const lastDate = new Date(lastActivityDate);
-                const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-                
-                if (daysDiff === 1) {
-                    appState.userStats.streak++;
-                } else if (daysDiff > 1) {
-                    appState.userStats.streak = 1;
-                }
-            } else {
-                appState.userStats.streak = 1;
-            }
+            if (percentage === 100) status = 'completed';
+            else if (percentage > 0) status = 'partial';
             
-            appState.userStats.totalDays++;
-            
-            await db.collection('users').doc(appState.currentUser.uid).update(
-                {
-                    lastActivityDate: dateString,
-                    stats: appState.userStats
-                },
-                { merge: true }
-            );
+            progress = Math.round(percentage) + '%';
         }
-    } catch (error) {
-        console.log('Error updating stats:', error);
+        
+        dayEl.className = `habit-day ${status} ${isToday ? 'today' : ''}`;
+        dayEl.textContent = (date.getDate());
+        dayEl.title = `${date.toLocaleDateString()}: ${progress}`;
+        
+        gridContainer.appendChild(dayEl);
     }
+    
+    container.innerHTML = '';
+    container.appendChild(gridContainer);
+    
+    // Update habit stats
+    updateHabitStats(streakData);
 }
 
-// Settings
-async function updateSettings() {
-    showToast('Settings saved!', 'success');
+// Calculate habit streak
+function calculateHabitStreak() {
+    const today = new Date();
+    let streak = 0;
+    let bestStreak = 0;
+    let currentStreak = 0;
+    
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = getDateString(date);
+        const taskData = appState.userTasks[dateStr];
+        
+        if (taskData) {
+            const completed = Object.values(taskData).filter(t => t.completed).length;
+            const total = Object.keys(taskData).length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            
+            if (percentage === 100) {
+                currentStreak++;
+                if (i === 0) streak = currentStreak;
+            } else {
+                bestStreak = Math.max(bestStreak, currentStreak);
+                currentStreak = 0;
+            }
+        } else {
+            bestStreak = Math.max(bestStreak, currentStreak);
+            currentStreak = 0;
+        }
+    }
+    
+    bestStreak = Math.max(bestStreak, currentStreak);
+    
+    return { current: streak, best: bestStreak };
+}
+
+// Update habit statistics
+function updateHabitStats(streakData) {
+    const today = new Date();
+    let completedDays = 0;
+    
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = getDateString(date);
+        const taskData = appState.userTasks[dateStr];
+        
+        if (taskData) {
+            const completed = Object.values(taskData).filter(t => t.completed).length;
+            const total = Object.keys(taskData).length;
+            if (total > 0 && (completed / total) === 1) {
+                completedDays++;
+            }
+        }
+    }
+    
+    const completionRate = Math.round((completedDays / 30) * 100);
+    
+    const els = {
+        'habitStreak': streakData.current,
+        'bestHabitStreak': streakData.best,
+        'habitCompletion': completionRate + '%'
+    };
+    
+    Object.entries(els).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    });
 }
