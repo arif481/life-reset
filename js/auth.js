@@ -197,12 +197,14 @@ async function handleUserLoggedIn(user) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('appContainer').classList.add('show');
         
-        // Update user info in settings
+        // Update user info in settings (guard missing elements)
         if (user.displayName) {
-            document.getElementById('userName').textContent = user.displayName;
+            const nameEl = document.getElementById('userName');
+            if (nameEl) nameEl.textContent = user.displayName;
         }
         if (user.email) {
-            document.getElementById('userEmail').textContent = user.email;
+            const emailEl = document.getElementById('userEmail');
+            if (emailEl) emailEl.textContent = user.email;
         }
         
         // Initialize app UI

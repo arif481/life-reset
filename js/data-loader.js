@@ -74,20 +74,63 @@ function setupRealtimeListeners() {
                     if (data.stats) {
                         appState.userStats = { ...appState.userStats, ...data.stats };
                         updateGamificationUI();
+                        if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                            initAnalytics();
+                        }
                     }
                     
                     if (data.goals) {
                         appState.userGoals = data.goals;
                         renderGoals();
+                        if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                            initAnalytics();
+                        }
                     }
                     
                     if (data.badHabits) {
                         appState.badHabits = data.badHabits;
                         renderBadHabits();
+                        if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                            initAnalytics();
+                        }
                     }
                 }
             }, (error) => {
                 console.error('Error in real-time listener:', error);
+                // Fallback: start polling if onSnapshot is blocked (e.g., adblock in localhost)
+                if (!window.firestorePollingInterval) {
+                    window.firestorePollingInterval = setInterval(async () => {
+                        try {
+                            const doc = await db.collection('users').doc(appState.currentUser.uid).get();
+                            if (doc.exists && !window.isLocalUpdate) {
+                                const data = doc.data();
+                                if (data.stats) {
+                                    appState.userStats = { ...appState.userStats, ...data.stats };
+                                    updateGamificationUI();
+                                    if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                                        initAnalytics();
+                                    }
+                                }
+                                if (data.goals) {
+                                    appState.userGoals = data.goals;
+                                    renderGoals();
+                                    if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                                        initAnalytics();
+                                    }
+                                }
+                                if (data.badHabits) {
+                                    appState.badHabits = data.badHabits;
+                                    renderBadHabits();
+                                    if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') {
+                                        initAnalytics();
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Polling fallback failed:', e);
+                        }
+                    }, 5000);
+                }
             });
         
         // Store unsubscribe function for cleanup
