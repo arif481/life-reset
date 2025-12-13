@@ -103,10 +103,56 @@ function navigateTo(view) {
     if (window.innerWidth <= 768) {
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('sidebarOverlay');
-        if (sidebar) sidebar.classList.remove('show');
+        if (sidebar) sidebar.classList.remove('mobile-open');
         if (overlay) overlay.style.display = 'none';
     }
 }
+
+// Accessibility: close sidebar on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.style.display = 'none';
+        }
+    }
+});
+
+// Close sidebar on swipe-left (basic)
+let touchStartX = null;
+document.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+    }
+});
+document.addEventListener('touchmove', (e) => {
+    if (touchStartX !== null && e.touches && e.touches.length === 1) {
+        const currentX = e.touches[0].clientX;
+        const deltaX = currentX - touchStartX;
+        if (deltaX < -50) { // swipe left
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar && sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.style.display = 'none';
+            }
+            touchStartX = null;
+        }
+    }
+});
+document.addEventListener('touchend', () => { touchStartX = null; });
+
+// Ensure sidebar resets when resizing to desktop
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (overlay) overlay.style.display = 'none';
+    }
+});
 
 function toggleDarkMode() {
     appState.isDarkMode = !appState.isDarkMode;

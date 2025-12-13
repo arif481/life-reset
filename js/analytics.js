@@ -84,7 +84,7 @@ function changeTimeRange(range) {
 // 1. Mood Trend Chart (Line chart with area fill)
 function initMoodTrendChart() {
     const ctx = document.getElementById('moodTrendChart');
-    if (!ctx) return;
+    if (!ctx || ctx.tagName !== 'CANVAS') return;
     
     const { labels, data } = getMoodTrendData();
     
@@ -170,7 +170,7 @@ function initMoodTrendChart() {
 // 2. Completion Rate Chart (Bar chart)
 function initCompletionRateChart() {
     const ctx = document.getElementById('completionRateChart');
-    if (!ctx) return;
+    if (!ctx || ctx.tagName !== 'CANVAS') return;
     
     const { labels, data } = getCompletionRateData();
     
@@ -248,7 +248,7 @@ function initCompletionRateChart() {
 // 3. Category Performance Chart (Doughnut chart)
 function initCategoryPerformanceChart() {
     const ctx = document.getElementById('categoryPerformanceChart');
-    if (!ctx) return;
+    if (!ctx || ctx.tagName !== 'CANVAS') return;
     
     const categoryData = getCategoryPerformanceData();
     
@@ -305,17 +305,17 @@ function initCategoryPerformanceChart() {
 
 // 4. XP Progress Chart (Line chart with gradient)
 function initXPProgressChart() {
-    const ctx = document.getElementById('xpProgressChart');
-    if (!ctx) return;
+    const canvas = document.getElementById('xpProgressChart');
+    if (!canvas || canvas.tagName !== 'CANVAS') return;
     
     const { labels, data } = getXPProgressData();
     
     // Create gradient
-    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+    const gradient = canvas.getContext('2d').createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(114, 9, 183, 0.3)');
     gradient.addColorStop(1, 'rgba(114, 9, 183, 0.05)');
     
-    xpProgressChart = new Chart(ctx, {
+    xpProgressChart = new Chart(canvas, {
         type: 'line',
         data: {
             labels: labels,
@@ -386,7 +386,7 @@ function initXPProgressChart() {
 // 5. Habit Streak Chart (Mixed bar and line)
 function initHabitStreakChart() {
     const ctx = document.getElementById('habitStreakChart');
-    if (!ctx) return;
+    if (!ctx || ctx.tagName !== 'CANVAS') return;
     
     const { labels, streakData, targetData } = getHabitStreakData();
     
@@ -462,7 +462,7 @@ function initHabitStreakChart() {
 // 6. Weekly Activity Heatmap Chart (Polar area)
 function initWeeklyActivityChart() {
     const ctx = document.getElementById('weeklyActivityChart');
-    if (!ctx) return;
+    if (!ctx || ctx.tagName !== 'CANVAS') return;
     
     const activityData = getWeeklyActivityData();
     
