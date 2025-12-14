@@ -150,8 +150,7 @@ async function guestSignIn() {
         while (retries > 0) {
             try {
                 await db.collection('users').doc(result.user.uid).set({
-                    name: 'Guest User',
-                    email: 'guest@lifereset.local',
+                    name: 'Guest',
                     isGuest: true,
                     createdAt: new Date(),
                     darkMode: false,
@@ -184,13 +183,17 @@ async function handleUserLoggedIn(user) {
     showToast('Loading your data...', 'info');
     
     try {
-        // Load all user data in parallel for faster loading
+        // Load data in the correct order (tasks list must exist before applying completion state)
+        await loadAllUserData();
+        await loadCustomTasks();
+        await loadTasksForDate();
+
+        // Remaining independent loads
         await Promise.all([
-            loadAllUserData(),
-            loadCustomTasks(),
-            loadTasksForDate(),
-            loadJournalEntries(),
-            loadMoodStats()
+            (typeof loadJournalEntriesState === 'function' ? loadJournalEntriesState(50) : Promise.resolve()),
+            (typeof loadMoodHistoryState === 'function' ? loadMoodHistoryState(120) : Promise.resolve()),
+            (typeof loadTasksHistory === 'function' ? loadTasksHistory(30) : Promise.resolve()),
+            (typeof loadXPDailyHistory === 'function' ? loadXPDailyHistory(30) : Promise.resolve())
         ]);
         
         // Update UI
@@ -212,6 +215,17 @@ async function handleUserLoggedIn(user) {
         
         // Setup real-time listeners
         setupRealtimeListeners();
+
+        // Tasks-specific realtime + midnight refresh (defined in tasks.js)
+        if (typeof setupTasksRealtimeListener === 'function') {
+            setupTasksRealtimeListener();
+        }
+        if (typeof setupCustomTasksRealtimeListener === 'function') {
+            setupCustomTasksRealtimeListener();
+        }
+        if (typeof scheduleMidnightTrackerRefresh === 'function') {
+            scheduleMidnightTrackerRefresh();
+        }
         
         showToast('Welcome back! 🎉', 'success');
     } catch (error) {
@@ -224,19 +238,6 @@ async function handleUserLoggedIn(user) {
 async function logout() {
     if (confirm('Are you sure you want to logout?')) {
         try {
-            // Check if in demo mode
-            if (appState.currentUser && appState.currentUser.isDemo) {
-                appState.currentUser = null;
-                document.getElementById('appContainer').classList.remove('show');
-                document.getElementById('authScreen').style.display = 'flex';
-                showToast('Logged out from demo mode', 'success');
-                
-                // Reset forms
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                return;
-            }
-            
             if (auth) {
                 await auth.signOut();
             }
@@ -281,9 +282,8 @@ function initAuthListener() {
                 retries--;
                 if (retries === 0) {
                     clearInterval(retryInterval);
-                    console.log('Firebase not available - enabling offline demo mode');
-                    // Enable offline demo mode after retries exhausted
-                    enableOfflineDemoMode();
+                    console.log('Firebase not available');
+                    showToast('Firebase not available. Please refresh and check your connection/config.', 'error');
                 }
             }
         }, 200);
@@ -307,50 +307,4 @@ function setupAuthListener() {
         document.getElementById('appContainer').classList.remove('show');
         document.getElementById('authScreen').style.display = 'flex';
     });
-}
-
-function enableOfflineDemoMode() {
-    // Add demo mode button to auth screen
-    const authContainer = document.querySelector('.auth-container');
-    if (authContainer && !document.getElementById('demoModeBtn')) {
-        const demoBtn = document.createElement('button');
-        demoBtn.id = 'demoModeBtn';
-        demoBtn.className = 'btn btn-secondary btn-block';
-        demoBtn.style.marginTop = '10px';
-        demoBtn.innerHTML = '<i class="fas fa-desktop"></i> Try Demo Mode (No Login Required)';
-        demoBtn.onclick = startDemoMode;
-        
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.appendChild(demoBtn);
-        }
-    }
-}
-
-function startDemoMode() {
-    // Create a mock user for demo mode
-    const mockUser = {
-        uid: 'demo_user_' + Date.now(),
-        displayName: 'Demo User',
-        email: 'demo@lifereset.app',
-        isDemo: true
-    };
-    
-    appState.currentUser = mockUser;
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('appContainer').classList.add('show');
-    
-    // Update user info in settings
-    if (mockUser.displayName) {
-        const userNameElements = document.querySelectorAll('#userName');
-        userNameElements.forEach(el => el.textContent = mockUser.displayName);
-    }
-    if (mockUser.email) {
-        const userEmailEl = document.getElementById('userEmail');
-        if (userEmailEl) userEmailEl.textContent = mockUser.email;
-    }
-    
-    // Initialize app with demo data
-    initApp();
-    showToast('Welcome to Demo Mode! Your data won\'t be saved.', 'info');
 }

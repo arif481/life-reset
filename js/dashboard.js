@@ -95,7 +95,7 @@ function renderDashboardOverview() {
                     <button class="btn-icon" onclick="showChallengeDetails()">🎯</button>
                 </div>
                 <div class="challenges-list">
-                    ${stats.activeChallenges.map(challenge => `
+                    ${stats.activeChallenges.length ? stats.activeChallenges.map(challenge => `
                         <div class="challenge-item">
                             <div class="challenge-header">
                                 <span class="challenge-name">${challenge.name}</span>
@@ -109,7 +109,7 @@ function renderDashboardOverview() {
                                 <span class="challenge-days">${challenge.daysLeft} days left</span>
                             </div>
                         </div>
-                    `).join('')}
+                    `).join('') : '<div class="empty-state">No challenges yet.</div>'}
                 </div>
             </div>
         </div>
@@ -117,11 +117,11 @@ function renderDashboardOverview() {
 }
 
 function renderWeeklyActivityChart() {
-    const container = document.getElementById('weeklyActivityChart');
+    const container = document.getElementById('dashboardWeeklyActivityChart');
     if (!container) return;
 
     const weekData = getWeeklyActivityData();
-    const maxValue = Math.max(...weekData.values);
+    const maxValue = Math.max(...weekData.values, 0) || 1;
     
     container.innerHTML = `
         <div class="chart-header">
@@ -154,7 +154,7 @@ function renderWeeklyActivityChart() {
 }
 
 function renderMoodTrendChart() {
-    const container = document.getElementById('moodTrendChart');
+    const container = document.getElementById('dashboardMoodTrendChart');
     if (!container) return;
 
     const moodData = getMoodTrendData();
@@ -168,7 +168,7 @@ function renderMoodTrendChart() {
         <div class="mood-chart">
             ${moodData.map((entry, idx) => `
                 <div class="mood-data-point" onclick="showMoodDetail('${entry.date}')">
-                    <div class="mood-value">${moodEmojis[entry.mood] || '😐'}</div>
+                    <div class="mood-value">${entry.mood ? (moodEmojis[entry.mood] || '😐') : '—'}</div>
                     <div class="mood-label">${entry.dateShort}</div>
                     <div class="mood-intensity">Intensity: ${entry.intensity || 'N/A'}</div>
                 </div>
@@ -186,6 +186,16 @@ function renderHabitCompletionChart() {
     if (!container) return;
 
     const habitData = getHabitCompletionData();
+
+    if (!habitData.length) {
+        container.innerHTML = `
+            <div class="chart-header">
+                <h3>✅ Habit Completion Rate</h3>
+            </div>
+            <div class="empty-state">No habits tracked yet.</div>
+        `;
+        return;
+    }
     
     container.innerHTML = `
         <div class="chart-header">
@@ -235,7 +245,7 @@ function renderCategoryBreakdown() {
                         </div>
                     </div>
                     <div class="category-stat">
-                        <span class="percentage">${Math.round(cat.count / total * 100)}%</span>
+                        <span class="percentage">${total ? Math.round(cat.count / total * 100) : 0}%</span>
                         <span class="completion-rate">${cat.completionRate}% done</span>
                     </div>
                 </div>
@@ -331,7 +341,7 @@ function renderRecentActivity() {
             <button class="btn-icon" onclick="showAllActivities()">→</button>
         </div>
         <div class="activity-list">
-            ${activities.slice(0, 5).map(activity => `
+            ${activities.length ? activities.slice(0, 5).map(activity => `
                 <div class="activity-item" data-time="${activity.timestamp}">
                     <div class="activity-icon">${activity.icon}</div>
                     <div class="activity-content">
@@ -340,7 +350,7 @@ function renderRecentActivity() {
                     </div>
                     <div class="activity-time">${formatTimeAgo(activity.timestamp)}</div>
                 </div>
-            `).join('')}
+            `).join('') : '<div class="empty-state">No recent activity yet.</div>'}
         </div>
         <div class="activity-footer">
             <a href="#" onclick="showAllActivities(); return false;">View all activities →</a>
@@ -360,7 +370,7 @@ function renderInsights() {
             <button class="btn-icon" onclick="refreshInsights()">🔄</button>
         </div>
         <div class="insights-list">
-            ${insights.map(insight => `
+            ${insights.length ? insights.map(insight => `
                 <div class="insight-card" data-type="${insight.type}">
                     <div class="insight-icon">${insight.icon}</div>
                     <div class="insight-content">
@@ -371,7 +381,7 @@ function renderInsights() {
                         </div>
                     </div>
                 </div>
-            `).join('')}
+            `).join('') : '<div class="empty-state">No insights yet.</div>'}
         </div>
     `;
 }
@@ -412,12 +422,10 @@ function renderMilestones() {
 // Helper Functions
 
 function calculateDashboardStats() {
-    const taskScore = appState.userStats.tasksCompleted > 0 ? 
-        Math.min((appState.userStats.consistency || 0), 100) : 0;
-    const moodScore = (appState.userStats.moodLogged || 0) > 0 ? 
-        Math.min((appState.userStats.moodLogged / 7) * 100, 100) : 0;
+    const taskScore = Math.min((appState.userStats.consistency || 0), 100);
+    const moodScore = (appState.moodHistory && appState.moodHistory.length) ? 100 : 0;
     const habitScore = calculateHabitScore();
-    
+
     const overallScore = Math.round((taskScore + moodScore + habitScore) / 3);
     
     const scoreColor = overallScore >= 80 ? '#06ffa5' : 
@@ -425,10 +433,10 @@ function calculateDashboardStats() {
                        overallScore >= 40 ? '#f72585' : '#ff006e';
 
     const weekData = getWeeklyActivityData();
-    const weeklyTasksCompleted = appState.userStats.tasksCompleted;
-    const weeklyTasksTotal = Math.max(appState.userStats.tasksCompleted, 1);
-    const weeklyTaskPercent = Math.round((weeklyTasksCompleted / weeklyTasksTotal) * 100);
-    const weeklyMoodEntries = appState.userStats.moodLogged || 0;
+    const weeklyTasksCompleted = weekData.values.reduce((a, b) => a + b, 0);
+    const weeklyTasksTotal = Math.max(weekData.totalTasks, 0);
+    const weeklyTaskPercent = weeklyTasksTotal > 0 ? Math.round((weeklyTasksCompleted / weeklyTasksTotal) * 100) : 0;
+    const weeklyMoodEntries = getMoodTrendData().filter(e => !!e.mood).length;
 
     return {
         overallScore,
@@ -446,42 +454,132 @@ function calculateDashboardStats() {
 }
 
 function getWeeklyActivityData() {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const values = [12, 19, 5, 8, 14, 10, 15]; // Placeholder data
-    return { labels: days, values };
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const values = [0, 0, 0, 0, 0, 0, 0];
+    let totalTasks = 0;
+
+    const history = appState.tasksHistory || {};
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const id = getDateString(d);
+        const day = history[id];
+        const completed = (day && typeof day.completed === 'number') ? day.completed : 0;
+        const total = (day && typeof day.total === 'number') ? day.total : 0;
+        totalTasks += total;
+
+        const dayIndex = d.getDay();
+        const idx = dayIndex === 0 ? 6 : dayIndex - 1;
+        values[idx] += completed;
+    }
+
+    return { labels, values, totalTasks };
 }
 
 function getMoodTrendData() {
-    // Placeholder mood trend data
-    const moods = [
-        { date: new Date(Date.now() - 6*24*60*60*1000), dateShort: '6d ago', mood: 'good', intensity: 7, mostCommon: 'Good 😊', trend: 'Stable' },
-        { date: new Date(Date.now() - 5*24*60*60*1000), dateShort: '5d ago', mood: 'great', intensity: 8 },
-        { date: new Date(Date.now() - 4*24*60*60*1000), dateShort: '4d ago', mood: 'okay', intensity: 5 },
-        { date: new Date(Date.now() - 3*24*60*60*1000), dateShort: '3d ago', mood: 'good', intensity: 7 },
-        { date: new Date(Date.now() - 2*24*60*60*1000), dateShort: '2d ago', mood: 'good', intensity: 6 },
-        { date: new Date(Date.now() - 1*24*60*60*1000), dateShort: '1d ago', mood: 'great', intensity: 8 },
-        { date: new Date(), dateShort: 'Today', mood: 'good', intensity: 7 }
-    ];
+    const moods = [];
+    const moodHistory = appState.moodHistory || [];
+    const byDate = {};
+    moodHistory.forEach(e => {
+        if (e && e.date) byDate[e.date] = e;
+    });
+
+    const moodScore = { 'very-sad': 1, 'sad': 2, 'okay': 3, 'good': 4, 'great': 5 };
+
+    const scores = [];
+    const moodCounts = {};
+
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const id = getDateString(d);
+        const entry = byDate[id];
+        const isToday = i === 0;
+
+        if (entry && entry.mood) {
+            moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+            scores.push(moodScore[entry.mood] || 0);
+        }
+
+        moods.push({
+            date: id,
+            dateShort: isToday ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' }),
+            mood: entry ? entry.mood : null,
+            intensity: entry && typeof entry.intensity === 'number' ? entry.intensity : null
+        });
+    }
+
+    const mostCommon = Object.keys(moodCounts).length
+        ? Object.keys(moodCounts).reduce((a, b) => (moodCounts[a] > moodCounts[b] ? a : b))
+        : null;
+
+    let trend = 'Stable';
+    if (scores.length >= 4) {
+        const mid = Math.floor(scores.length / 2);
+        const first = scores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+        const second = scores.slice(mid).reduce((a, b) => a + b, 0) / Math.max(1, scores.length - mid);
+        if (second > first + 0.3) trend = 'Improving';
+        else if (second < first - 0.3) trend = 'Declining';
+    }
+
+    if (moods.length) {
+        moods[0].mostCommon = mostCommon ? mostCommon.replace('-', ' ') : 'Not tracked';
+        moods[0].trend = trend;
+    }
+
     return moods;
 }
 
 function getHabitCompletionData() {
-    return [
-        { name: 'Morning Exercise', completionRate: 85, streak: 12, thisWeek: 5, total: 7, color: '#4361ee' },
-        { name: 'Read Daily', completionRate: 70, streak: 8, thisWeek: 5, total: 7, color: '#7209b7' },
-        { name: 'Meditation', completionRate: 60, streak: 5, thisWeek: 4, total: 7, color: '#f72585' },
-        { name: 'Healthy Eating', completionRate: 75, streak: 10, thisWeek: 5, total: 7, color: '#06ffa5' }
-    ];
+    const habits = Object.values(appState.badHabits || {});
+    if (!habits.length) return [];
+
+    const palette = ['#4361ee', '#7209b7', '#f72585', '#06ffa5', '#4cc9f0'];
+    const targetDays = 30;
+
+    return habits.slice(0, 6).map((h, idx) => {
+        const quit = h.quitDate ? new Date(h.quitDate) : null;
+        const streak = quit ? Math.floor((new Date() - quit) / (1000 * 60 * 60 * 24)) : 0;
+        const completionRate = Math.min(100, Math.round((streak / targetDays) * 100));
+        return {
+            name: h.name || 'Habit',
+            completionRate,
+            streak,
+            thisWeek: Math.min(7, streak),
+            total: 7,
+            color: palette[idx % palette.length]
+        };
+    });
 }
 
 function getCategoryData() {
-    const categories = appState.taskCategories || [];
-    return categories.map(cat => ({
-        name: cat.name,
-        icon: cat.icon || '📋',
-        count: appState.userTasks.filter(t => t.category === cat.id && t.completed).length,
-        completionRate: 75
-    }));
+    const iconMap = {
+        morning: '🌅',
+        health: '❤️',
+        productivity: '🚀',
+        evening: '🌙',
+        custom: '⭐'
+    };
+    const nameMap = {
+        morning: 'Morning',
+        health: 'Health',
+        productivity: 'Productivity',
+        evening: 'Evening',
+        custom: 'Custom'
+    };
+
+    return Object.keys(appState.userTasks || {}).map(key => {
+        const tasks = appState.userTasks[key] || [];
+        const total = tasks.length;
+        const done = tasks.filter(t => t && t.completed).length;
+        const completionRate = total ? Math.round((done / total) * 100) : 0;
+        return {
+            name: nameMap[key] || key,
+            icon: iconMap[key] || '📋',
+            count: total,
+            completionRate
+        };
+    });
 }
 
 function calculateHabitScore() {
@@ -491,61 +589,93 @@ function calculateHabitScore() {
 }
 
 function getActiveChallenges() {
-    return [
-        { name: 'Complete 50 Tasks', progress: 75, current: 37, target: 50, daysLeft: 10 },
-        { name: '30-Day Consistency', progress: 60, current: 18, target: 30, daysLeft: 12 },
-        { name: 'Perfect Health Week', progress: 80, current: 4, target: 5, daysLeft: 3 }
-    ];
+    // Challenge system is not implemented; avoid showing fake/demo data.
+    return [];
 }
 
 function getRecentActivities() {
-    return [
-        { icon: '✅', title: 'Task Completed', description: 'Finished "Morning Exercise"', timestamp: Date.now() - 1000 * 60 * 5 },
-        { icon: '🎯', title: 'Mood Logged', description: 'Great mood recorded', timestamp: Date.now() - 1000 * 60 * 30 },
-        { icon: '📖', title: 'Journal Entry', description: 'Wrote about daily progress', timestamp: Date.now() - 1000 * 60 * 60 },
-        { icon: '🏆', title: 'Badge Earned', description: 'Unlocked "Week Warrior"', timestamp: Date.now() - 1000 * 60 * 120 },
-        { icon: '⭐', title: 'Level Up!', description: 'Reached Level 5', timestamp: Date.now() - 1000 * 60 * 180 }
-    ];
+    const activities = [];
+
+    (appState.journalEntries || []).slice(0, 3).forEach(e => {
+        const ts = e.timestamp && e.timestamp.seconds ? (e.timestamp.seconds * 1000) : (e.timestamp ? new Date(e.timestamp).getTime() : null);
+        if (!ts) return;
+        activities.push({
+            icon: '📖',
+            title: 'Journal Entry',
+            description: e.content ? `Wrote ${Math.min(200, e.content.length)} chars` : 'New entry',
+            timestamp: ts
+        });
+    });
+
+    (appState.moodHistory || []).slice(0, 3).forEach(e => {
+        const ts = e.timestamp && e.timestamp.seconds ? (e.timestamp.seconds * 1000) : (e.timestamp ? new Date(e.timestamp).getTime() : null);
+        if (!ts) return;
+        activities.push({
+            icon: '🎯',
+            title: 'Mood Logged',
+            description: e.mood ? `Mood: ${e.mood}` : 'Mood logged',
+            timestamp: ts
+        });
+    });
+
+    return activities.sort((a, b) => b.timestamp - a.timestamp);
 }
 
 function generateInsights() {
-    const now = new Date();
-    const hour = now.getHours();
-    
-    return [
-        {
-            id: 'daily-routine',
-            icon: '⏰',
+    const insights = [];
+
+    // Today's completion
+    let total = 0;
+    let done = 0;
+    for (const category in (appState.userTasks || {})) {
+        (appState.userTasks[category] || []).forEach(t => {
+            total++;
+            if (t && t.completed) done++;
+        });
+    }
+    if (total) {
+        const pct = Math.round((done / total) * 100);
+        insights.push({
+            id: 'daily-completion',
+            icon: '✅',
             type: 'routine',
-            title: 'Daily Routine Check',
-            message: 'You have completed 75% of your daily tasks. Keep up the consistency!',
+            title: 'Today’s Completion',
+            message: `You’ve completed ${pct}% of today’s tasks.`,
             action: 'View Tasks'
-        },
-        {
-            id: 'mood-pattern',
-            icon: '📈',
+        });
+    }
+
+    // Mood tracking
+    const mood7 = getMoodTrendData().filter(e => !!e.mood);
+    if (mood7.length) {
+        insights.push({
+            id: 'mood-tracking',
+            icon: '💭',
             type: 'mood',
-            title: 'Mood Trend',
-            message: 'Your mood has improved over the past week. Great job maintaining positivity!',
+            title: 'Mood Tracking',
+            message: `You logged mood ${mood7.length} time(s) in the last 7 days.`,
             action: 'Details'
-        },
-        {
-            id: 'health-suggestion',
-            icon: '💪',
-            type: 'health',
-            title: 'Health Tip',
-            message: `It's ${hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening'}. ${hour < 12 ? 'Start with a morning exercise!' : 'Time for a quick workout!'}`,
-            action: 'Log Activity'
-        }
-    ];
+        });
+    }
+
+    return insights;
 }
 
 function getUpcomingMilestones() {
-    return [
-        { title: 'Complete 100 Tasks', current: 75, target: 100, progress: 75, reached: false, reward: 500 },
-        { title: 'Reach Level 10', current: 5, target: 10, progress: 50, reached: false, reward: 1000 },
-        { title: 'Perfect Month', current: 18, target: 30, progress: 60, reached: false, reward: 2000 }
+    const tasks = appState.userStats.tasksCompleted || 0;
+    const level = appState.userStats.level || 1;
+    const streak = appState.userStats.streak || 0;
+
+    const list = [
+        { title: 'Complete 100 Tasks', current: tasks, target: 100, reward: 500 },
+        { title: 'Reach Level 10', current: level, target: 10, reward: 1000 },
+        { title: '30-Day Streak', current: streak, target: 30, reward: 2000 }
     ];
+
+    return list.map(m => {
+        const progress = m.target > 0 ? Math.min(100, Math.round((m.current / m.target) * 100)) : 0;
+        return { ...m, progress, reached: m.current >= m.target };
+    });
 }
 
 function calculateNextMilestone() {

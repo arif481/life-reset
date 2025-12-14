@@ -1,5 +1,40 @@
 // Gamification System Functions
 
+let pendingDailyXP = 0;
+
+function queueDailyXP(amount) {
+    if (!db || !appState.currentUser || !firebase || !firebase.firestore) return;
+    pendingDailyXP += amount;
+
+    const flush = async () => {
+        const delta = pendingDailyXP;
+        if (!delta) return;
+        pendingDailyXP = 0;
+        try {
+            const dateString = getDateString(new Date());
+            await db.collection('users').doc(appState.currentUser.uid)
+                .collection('xpDaily').doc(dateString)
+                .set({
+                    xp: firebase.firestore.FieldValue.increment(delta),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+            // Update in-memory history for analytics
+            appState.xpDailyHistory[dateString] = (appState.xpDailyHistory[dateString] || 0) + delta;
+        } catch (error) {
+            console.log('Error saving daily XP:', error);
+            // Put it back so it can retry next time
+            pendingDailyXP += delta;
+        }
+    };
+
+    if (typeof debouncedSave === 'function') {
+        debouncedSave('xpDaily', flush, 1000);
+    } else {
+        flush();
+    }
+}
+
 function addXP(amount) {
     appState.userStats.xp += amount;
     
@@ -9,7 +44,16 @@ function addXP(amount) {
     }
     
     updateGamificationUI();
-    saveUserStats();
+
+    // Persist stats smoothly
+    if (typeof saveUserStatsRealtime === 'function') {
+        saveUserStatsRealtime();
+    } else {
+        saveUserStats();
+    }
+
+    // Record real XP for analytics/history
+    queueDailyXP(amount);
 }
 
 function levelUp() {
@@ -74,6 +118,36 @@ function calculateHealthScore() {
     score += Math.min(appState.userStats.consistency, 25);
     
     appState.userStats.healthScore = Math.min(score, 100);
+}
+
+async function loadXPDailyHistory(daysBack = 30) {
+    if (!db || !appState.currentUser || !firebase || !firebase.firestore) return;
+
+    try {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - Math.max(0, daysBack - 1));
+
+        const startId = getDateString(start);
+        const endId = getDateString(end);
+
+        const snap = await db.collection('users').doc(appState.currentUser.uid)
+            .collection('xpDaily')
+            .where(firebase.firestore.FieldPath.documentId(), '>=', startId)
+            .where(firebase.firestore.FieldPath.documentId(), '<=', endId)
+            .orderBy(firebase.firestore.FieldPath.documentId())
+            .get();
+
+        appState.xpDailyHistory = appState.xpDailyHistory || {};
+        snap.forEach(doc => {
+            const data = doc.data() || {};
+            if (typeof data.xp === 'number') {
+                appState.xpDailyHistory[doc.id] = data.xp;
+            }
+        });
+    } catch (error) {
+        console.log('Error loading XP daily history:', error);
+    }
 }
 
 function renderBadges() {
