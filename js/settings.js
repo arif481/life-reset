@@ -647,6 +647,16 @@ function applySavedSettings() {
     if (appSettings.appearance.compactMode) {
         document.body.classList.add('compact-mode');
     }
+
+    // Apply theme
+    applyTheme(appSettings.appearance.theme);
+}
+
+function applyTheme(theme) {
+    const allowed = ['default', 'ocean', 'sunset', 'forest'];
+    const safeTheme = allowed.includes(theme) ? theme : 'default';
+    appSettings.appearance.theme = safeTheme;
+    document.body.setAttribute('data-theme', safeTheme);
 }
 
 // Toggle setting
@@ -698,9 +708,9 @@ function selectTheme(theme) {
     
     document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
     document.querySelector(`.theme-option[data-theme="${theme}"]`).classList.add('active');
-    
-    // Apply theme colors (can be expanded)
-    showToast(`Theme changed to ${theme}`, 'success');
+
+    applyTheme(theme);
+    showToast('Theme updated', 'success');
 }
 
 // Update reminder time

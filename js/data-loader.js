@@ -1,5 +1,40 @@
 // Data Loading Functions
 
+let moodRealtimeUnsubscribe = null;
+let journalRealtimeUnsubscribe = null;
+let xpDailyRealtimeUnsubscribe = null;
+
+let moodPollingInterval = null;
+let journalPollingInterval = null;
+let xpDailyPollingInterval = null;
+
+function cleanupRealtimeListeners() {
+    try {
+        if (moodRealtimeUnsubscribe) moodRealtimeUnsubscribe();
+        if (journalRealtimeUnsubscribe) journalRealtimeUnsubscribe();
+        if (xpDailyRealtimeUnsubscribe) xpDailyRealtimeUnsubscribe();
+    } catch (_) {
+        // ignore
+    }
+    moodRealtimeUnsubscribe = null;
+    journalRealtimeUnsubscribe = null;
+    xpDailyRealtimeUnsubscribe = null;
+
+    if (moodPollingInterval) clearInterval(moodPollingInterval);
+    if (journalPollingInterval) clearInterval(journalPollingInterval);
+    if (xpDailyPollingInterval) clearInterval(xpDailyPollingInterval);
+    moodPollingInterval = null;
+    journalPollingInterval = null;
+    xpDailyPollingInterval = null;
+
+    if (window.firestoreUnsubscribers && Array.isArray(window.firestoreUnsubscribers)) {
+        window.firestoreUnsubscribers.forEach(fn => {
+            try { if (typeof fn === 'function') fn(); } catch (_) {}
+        });
+    }
+    window.firestoreUnsubscribers = [];
+}
+
 // Debounce helper for real-time saves
 let saveTimers = {};
 function debouncedSave(key, saveFunction, delay = 500) {
@@ -62,6 +97,8 @@ async function loadAllUserData() {
 // Setup real-time listeners for collaborative features (optional)
 function setupRealtimeListeners() {
     if (!appState.currentUser || !db) return;
+
+    cleanupRealtimeListeners();
     
     try {
         // Listen for changes made from other devices/sessions
@@ -141,34 +178,112 @@ function setupRealtimeListeners() {
     } catch (error) {
         console.log('Error setting up real-time listener:', error);
     }
+
+    setupMoodRealtimeListener();
+    setupJournalRealtimeListener();
+    setupXPDailyRealtimeListener();
 }
 
-async function loadCustomTasks() {
+function setupMoodRealtimeListener(limitCount = 120) {
     if (!appState.currentUser || !db) return;
-    
+
+    const query = db.collection('users').doc(appState.currentUser.uid)
+        .collection('mood')
+        .orderBy('date', 'desc')
+        .limit(limitCount);
+
     try {
-        const tasksSnapshot = await db.collection('users')
-            .doc(appState.currentUser.uid)
-            .collection('customTasks')
-            .get();
-        
-        tasksSnapshot.forEach(doc => {
-            const task = doc.data();
-            if (!appState.userTasks[task.category]) {
-                appState.userTasks[task.category] = [];
+        moodRealtimeUnsubscribe = query.onSnapshot((snapshot) => {
+            const items = [];
+            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+            // Keep most-recent first like the query
+            appState.moodHistory = items;
+
+            if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') initAnalytics();
+            if (appState.currentView === 'dashboard' && typeof initDashboard === 'function') initDashboard();
+            if (appState.currentView === 'mood' && typeof window.loadMoodStats === 'function') window.loadMoodStats();
+        }, (error) => {
+            console.error('Error in mood real-time listener:', error);
+            if (!moodPollingInterval) {
+                moodPollingInterval = setInterval(() => {
+                    loadMoodHistoryState(limitCount);
+                }, 5000);
             }
-            appState.userTasks[task.category].push({
-                id: doc.id,
-                ...task
-            });
         });
+        window.firestoreUnsubscribers.push(moodRealtimeUnsubscribe);
     } catch (error) {
-        console.log('Error loading custom tasks:', error);
+        console.log('Error setting up mood real-time listener:', error);
     }
 }
 
-// Load journal entries
-async function loadJournalEntries(daysBack = 30) {
+function setupJournalRealtimeListener(limitCount = 50) {
+    if (!appState.currentUser || !db) return;
+
+    const query = db.collection('users').doc(appState.currentUser.uid)
+        .collection('journal')
+        .orderBy('timestamp', 'desc')
+        .limit(limitCount);
+
+    try {
+        journalRealtimeUnsubscribe = query.onSnapshot((snapshot) => {
+            const items = [];
+            snapshot.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+            appState.journalEntries = items;
+
+            if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') initAnalytics();
+            if (appState.currentView === 'dashboard' && typeof initDashboard === 'function') initDashboard();
+            if (appState.currentView === 'journal' && typeof window.loadJournalEntries === 'function') window.loadJournalEntries();
+        }, (error) => {
+            console.error('Error in journal real-time listener:', error);
+            if (!journalPollingInterval) {
+                journalPollingInterval = setInterval(() => {
+                    loadJournalEntriesState(limitCount);
+                }, 5000);
+            }
+        });
+        window.firestoreUnsubscribers.push(journalRealtimeUnsubscribe);
+    } catch (error) {
+        console.log('Error setting up journal real-time listener:', error);
+    }
+}
+
+function setupXPDailyRealtimeListener(limitCount = 120) {
+    if (!appState.currentUser || !db || !firebase || !firebase.firestore) return;
+
+    const idPath = firebase.firestore.FieldPath.documentId();
+    const query = db.collection('users').doc(appState.currentUser.uid)
+        .collection('xpDaily')
+        .orderBy(idPath, 'desc')
+        .limit(limitCount);
+
+    try {
+        xpDailyRealtimeUnsubscribe = query.onSnapshot((snapshot) => {
+            appState.xpDailyHistory = appState.xpDailyHistory || {};
+            snapshot.forEach(doc => {
+                const data = doc.data() || {};
+                if (typeof data.xp === 'number') {
+                    appState.xpDailyHistory[doc.id] = data.xp;
+                }
+            });
+
+            if (appState.currentView === 'analytics' && typeof initAnalytics === 'function') initAnalytics();
+            if (appState.currentView === 'dashboard' && typeof initDashboard === 'function') initDashboard();
+        }, (error) => {
+            console.error('Error in xpDaily real-time listener:', error);
+            if (!xpDailyPollingInterval) {
+                xpDailyPollingInterval = setInterval(() => {
+                    if (typeof loadXPDailyHistory === 'function') loadXPDailyHistory(30);
+                }, 5000);
+            }
+        });
+        window.firestoreUnsubscribers.push(xpDailyRealtimeUnsubscribe);
+    } catch (error) {
+        console.log('Error setting up xpDaily real-time listener:', error);
+    }
+}
+
+// Load journal entries into appState for analytics/dashboard (does not render UI)
+async function loadJournalEntriesState(limitCount = 50) {
     if (!appState.currentUser || !db) return;
     
     try {
@@ -176,7 +291,7 @@ async function loadJournalEntries(daysBack = 30) {
             .doc(appState.currentUser.uid)
             .collection('journal')
             .orderBy('timestamp', 'desc')
-            .limit(daysBack)
+            .limit(limitCount)
             .get();
         
         appState.journalEntries = [];
@@ -191,16 +306,16 @@ async function loadJournalEntries(daysBack = 30) {
     }
 }
 
-// Load mood statistics for analytics
-async function loadMoodStats(daysBack = 30) {
+// Load mood history into appState for analytics/dashboard (does not render UI)
+async function loadMoodHistoryState(limitCount = 120) {
     if (!appState.currentUser || !db) return;
     
     try {
         const moodSnapshot = await db.collection('users')
             .doc(appState.currentUser.uid)
             .collection('mood')
-            .orderBy('timestamp', 'desc')
-            .limit(daysBack)
+            .orderBy('date', 'desc')
+            .limit(limitCount)
             .get();
         
         appState.moodHistory = [];

@@ -47,6 +47,9 @@ const appState = {
     selectedMood: null,
     isDarkMode: localStorage.getItem('darkMode') === 'true',
     userTasks: {},
+    // Computed/loaded history maps for analytics
+    tasksHistory: {}, // { 'YYYY-MM-DD': { completed: number, total: number, rate: number } }
+    xpDailyHistory: {}, // { 'YYYY-MM-DD': number }
     userGoals: [],
     journalEntries: [],
     moodHistory: [],
