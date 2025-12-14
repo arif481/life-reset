@@ -19,3 +19,32 @@
     --radius: 12px;
     --transition: all 0.3s ease;
 }
+
+/* Theme palettes (applied via body[data-theme]) */
+body[data-theme="default"] {
+    /* Intentionally blank: uses :root defaults */
+}
+
+body[data-theme="ocean"] {
+    --primary: #06b6d4;
+    --primary-light: #22d3ee;
+    --primary-dark: #0284c7;
+    --secondary: #0284c7;
+    --accent: #4cc9f0;
+}
+
+body[data-theme="sunset"] {
+    --primary: #f97316;
+    --primary-light: #fb923c;
+    --primary-dark: #dc2626;
+    --secondary: #dc2626;
+    --accent: #f72585;
+}
+
+body[data-theme="forest"] {
+    --primary: #10b981;
+    --primary-light: #34d399;
+    --primary-dark: #059669;
+    --secondary: #059669;
+    --accent: #4cc9f0;
+}

@@ -75,10 +75,37 @@ function changeTimeRange(range) {
     document.querySelectorAll('.time-range-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    event.target.classList.add('active');
+    const evt = (typeof event !== 'undefined') ? event : null;
+    if (evt && evt.target) evt.target.classList.add('active');
     
     // Refresh analytics
     initAnalytics();
+}
+
+function listDays(startDate, endDate) {
+    const days = [];
+    const cursor = new Date(startDate);
+    cursor.setHours(0, 0, 0, 0);
+
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
+
+    while (cursor <= end) {
+        days.push(new Date(cursor));
+        cursor.setDate(cursor.getDate() + 1);
+    }
+    return days;
+}
+
+function moodScoreFromEntry(entry) {
+    const moodToScore10 = { 'very-sad': 2, 'sad': 4, 'okay': 6, 'good': 8, 'great': 10 };
+    if (!entry) return null;
+    if (typeof entry.intensity === 'number') {
+        // Stored as 0-100; normalize to 0-10
+        return Math.max(0, Math.min(10, entry.intensity / 10));
+    }
+    if (entry.mood && moodToScore10[entry.mood] !== undefined) return moodToScore10[entry.mood];
+    return null;
 }
 
 // 1. Mood Trend Chart (Line chart with area fill)
@@ -136,6 +163,7 @@ function initMoodTrendChart() {
                     displayColors: true,
                     callbacks: {
                         label: function(context) {
+                            if (context.parsed.y === null || typeof context.parsed.y === 'undefined') return 'Mood: N/A';
                             return 'Mood: ' + context.parsed.y + '/10';
                         }
                     }
@@ -293,6 +321,7 @@ function initCategoryPerformanceChart() {
                     callbacks: {
                         label: function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            if (!total) return context.label + ': ' + context.parsed + ' tasks';
                             const percentage = ((context.parsed / total) * 100).toFixed(1);
                             return context.label + ': ' + context.parsed + ' tasks (' + percentage + '%)';
                         }
@@ -530,35 +559,18 @@ function getMoodTrendData() {
     const { startDate, endDate } = getDateRange();
     const labels = [];
     const data = [];
-    
-    // Get mood history from appState
-    if (appState.moodHistory && appState.moodHistory.length > 0) {
-        const moodMap = { '😊': 10, '😃': 9, '🙂': 7, '😐': 5, '😔': 3, '😢': 1 };
-        
-        appState.moodHistory
-            .filter(entry => {
-                const entryDate = new Date(entry.timestamp);
-                return entryDate >= startDate && entryDate <= endDate;
-            })
-            .reverse()
-            .forEach(entry => {
-                const date = new Date(entry.timestamp);
-                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                data.push(moodMap[entry.mood] || entry.intensity / 10 || 5);
-            });
-    }
-    
-    // If no data, generate sample data
-    if (labels.length === 0) {
-        const daysToShow = analyticsTimeRange === '7days' ? 7 : analyticsTimeRange === '30days' ? 30 : 7;
-        for (let i = daysToShow - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-            data.push(Math.floor(Math.random() * 4) + 6); // 6-10 range
-        }
-    }
-    
+
+    const moodByDate = {};
+    (appState.moodHistory || []).forEach(entry => {
+        if (entry && entry.date) moodByDate[entry.date] = entry;
+    });
+
+    listDays(startDate, endDate).forEach(date => {
+        const dateId = getDateString(date);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        data.push(moodScoreFromEntry(moodByDate[dateId]));
+    });
+
     return { labels, data };
 }
 
@@ -566,29 +578,22 @@ function getCompletionRateData() {
     const { startDate, endDate } = getDateRange();
     const labels = [];
     const data = [];
-    
-    const daysToShow = analyticsTimeRange === '7days' ? 7 : analyticsTimeRange === '30days' ? 30 : 7;
-    
-    for (let i = daysToShow - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-        
-        // Calculate actual completion rate from tasks
-        let totalTasks = 0;
-        let completedTasks = 0;
-        
-        for (const category in appState.userTasks) {
-            appState.userTasks[category].forEach(task => {
-                totalTasks++;
-                if (task.completed) completedTasks++;
-            });
-        }
-        
-        const rate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : Math.floor(Math.random() * 30) + 60;
+
+    const history = appState.tasksHistory || {};
+    const fallbackTotal = (typeof getTotalTaskCount === 'function') ? getTotalTaskCount() : null;
+
+    listDays(startDate, endDate).forEach(date => {
+        const dateId = getDateString(date);
+        const day = history[dateId];
+
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+        const total = (day && typeof day.total === 'number') ? day.total : (fallbackTotal || 0);
+        const completed = (day && typeof day.completed === 'number') ? day.completed : 0;
+        const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
         data.push(rate);
-    }
-    
+    });
+
     return { labels, data };
 }
 
@@ -612,28 +617,30 @@ function getCategoryPerformanceData() {
     
     return {
         labels: Object.keys(categories),
-        values: Object.values(categories).map(v => v > 0 ? v : Math.floor(Math.random() * 10) + 1)
+        values: Object.values(categories)
     };
 }
 
 function getXPProgressData() {
+    const { startDate, endDate } = getDateRange();
     const labels = [];
     const data = [];
-    const daysToShow = analyticsTimeRange === '7days' ? 7 : 14;
-    
-    let cumulativeXP = 0;
-    for (let i = daysToShow - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
-        cumulativeXP += Math.floor(Math.random() * 50) + 20;
-        data.push(cumulativeXP);
-    }
-    
-    // Add current XP
-    data[data.length - 1] = appState.userStats.xp;
-    
+
+    const xpDaily = appState.xpDailyHistory || {};
+    const days = listDays(startDate, endDate);
+    const xpInRange = days.reduce((sum, d) => sum + (xpDaily[getDateString(d)] || 0), 0);
+    const currentXP = (appState.userStats && typeof appState.userStats.xp === 'number') ? appState.userStats.xp : 0;
+    const baseXP = Math.max(0, currentXP - xpInRange);
+
+    let cumulative = baseXP;
+    days.forEach(d => {
+        const id = getDateString(d);
+        const gained = xpDaily[id] || 0;
+        cumulative += gained;
+        labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        data.push(cumulative);
+    });
+
     return { labels, data };
 }
 
@@ -649,36 +656,24 @@ function getHabitStreakData() {
     }).slice(0, 5);
     const targetData = Array(labels.length).fill(30);
     
-    // If no habits, show sample data
-    if (labels.length === 0) {
-        return {
-            labels: ['Habit 1', 'Habit 2', 'Habit 3'],
-            streakData: [15, 8, 23],
-            targetData: [30, 30, 30]
-        };
-    }
-    
     return { labels, streakData, targetData };
 }
 
 function getWeeklyActivityData() {
     const weekData = [0, 0, 0, 0, 0, 0, 0];
-    
-    // Count tasks completed by day of week
-    for (const category in appState.userTasks) {
-        appState.userTasks[category].forEach(task => {
-            if (task.completed) {
-                const dayIndex = new Date().getDay();
-                weekData[dayIndex === 0 ? 6 : dayIndex - 1]++;
-            }
-        });
+    const history = appState.tasksHistory || {};
+
+    // Use last 7 days of history (real data only)
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const id = getDateString(d);
+        const completed = (history[id] && typeof history[id].completed === 'number') ? history[id].completed : 0;
+        const dayIndex = d.getDay();
+        const idx = dayIndex === 0 ? 6 : dayIndex - 1; // Monday=0
+        weekData[idx] += completed;
     }
-    
-    // If no real data, generate sample
-    if (weekData.every(v => v === 0)) {
-        return [12, 15, 18, 14, 20, 10, 8];
-    }
-    
+
     return weekData;
 }
 

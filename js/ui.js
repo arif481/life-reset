@@ -1,6 +1,11 @@
 // UI Navigation and Layout Functions
 
 function initApp() {
+    // Apply saved theme early
+    if (typeof applyTheme === 'function') {
+        applyTheme(localStorage.getItem('theme') || 'default');
+    }
+
     // Set up dark mode
     if (appState.isDarkMode) {
         document.body.classList.add('dark-mode');
