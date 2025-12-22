@@ -1,0 +1,11 @@
+{
+  "appId": "com.lifereset.app",
+  "appName": "Life Reset",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
