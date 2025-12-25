@@ -24,6 +24,55 @@ async function login() {
     }
 }
 
+// Forgot Password Functions
+function showForgotPassword() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+    // Pre-fill email if already entered
+    const loginEmail = document.getElementById('loginEmail').value;
+    if (loginEmail) {
+        document.getElementById('resetEmail').value = loginEmail;
+    }
+}
+
+async function resetPassword() {
+    if (!auth) {
+        showToast('Firebase is not available. Please check your connection.', 'error');
+        return;
+    }
+    
+    const email = document.getElementById('resetEmail').value;
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+
+    try {
+        showAuthLoading(true);
+        await auth.sendPasswordResetEmail(email);
+        showToast('Password reset email sent! Check your inbox.', 'success');
+        // Go back to login after success
+        setTimeout(() => {
+            showLogin();
+            document.getElementById('loginEmail').value = email;
+        }, 2000);
+    } catch (error) {
+        let errorMsg = error.message;
+        if (error.code === 'auth/user-not-found') {
+            errorMsg = 'No account found with this email address.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMsg = 'Please enter a valid email address.';
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMsg = 'Too many attempts. Please try again later.';
+        }
+        showToast(errorMsg, 'error');
+    } finally {
+        showAuthLoading(false);
+    }
+}
+
 async function signup() {
     if (!auth || !db) {
         showToast('Firebase is not available. Please check your connection or try again later.', 'error');
@@ -87,6 +136,9 @@ async function signup() {
 }
 
 async function googleSignIn() {
+    const ua = navigator.userAgent.toLowerCase();
+    const isAndroid = ua.includes('android');
+    
     if (!auth || !db) {
         showToast('Connecting to server...', 'info');
         await new Promise(r => setTimeout(r, 1000));
@@ -96,54 +148,51 @@ async function googleSignIn() {
         }
     }
     
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({
-        prompt: 'select_account'
-    });
-    
-    // Detect environment
-    const ua = navigator.userAgent.toLowerCase();
-    const isAndroid = ua.includes('android');
-    
     try {
         showAuthLoading(true);
         
-        // Always try popup first - it's faster and stays in app
-        try {
-            const result = await auth.signInWithPopup(provider);
-            await handleGoogleSignInResult(result);
-            return;
-        } catch (popupError) {
-            console.log('Popup failed, trying redirect:', popupError.code);
-            
-            // Only fall back to redirect for specific errors
-            if (popupError.code === 'auth/popup-blocked' ||
-                popupError.code === 'auth/popup-closed-by-user' ||
-                popupError.code === 'auth/cancelled-popup-request' ||
-                popupError.code === 'auth/operation-not-supported-in-this-environment') {
+        // Check if native Google Auth is available (Android app with plugin)
+        if (isAndroid && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
+            // Use native Google Sign-In
+            try {
+                const GoogleAuth = window.Capacitor.Plugins.GoogleAuth;
+                const googleUser = await GoogleAuth.signIn();
                 
-                if (isAndroid) {
-                    showToast('Opening Google Sign-In...', 'info');
+                // Create Firebase credential from Google ID token
+                const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
+                const result = await auth.signInWithCredential(credential);
+                await handleGoogleSignInResult(result);
+                return;
+            } catch (nativeError) {
+                console.error('Native Google Sign-In error:', nativeError);
+                if (nativeError.message && nativeError.message.includes('canceled')) {
+                    showToast('Sign-in cancelled', 'info');
+                } else {
+                    showToast('Google Sign-In failed. Please try again.', 'error');
                 }
-                localStorage.setItem('googleSignInPending', 'true');
-                await auth.signInWithRedirect(provider);
                 return;
             }
-            throw popupError;
         }
+        
+        // Web browser - use popup
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        
+        const result = await auth.signInWithPopup(provider);
+        await handleGoogleSignInResult(result);
+        
     } catch (error) {
         console.error('Google Sign-In error:', error);
         let errorMsg = 'Sign-in failed. ';
         
         if (error.code === 'auth/popup-blocked') {
-            // Try redirect as fallback
+            const provider = new firebase.auth.GoogleAuthProvider();
             localStorage.setItem('googleSignInPending', 'true');
             await auth.signInWithRedirect(provider);
             return;
         } else if (error.code === 'auth/popup-closed-by-user') {
             errorMsg = 'Sign-in cancelled.';
         } else if (error.code === 'auth/cancelled-popup-request') {
-            // Another popup was opened, ignore this error
             return;
         } else if (error.code === 'auth/network-request-failed') {
             errorMsg = 'Network error. Please check your connection.';
@@ -339,11 +388,15 @@ function showAuthLoading(show) {
 function showLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('signupForm').style.display = 'none';
+    const forgotForm = document.getElementById('forgotPasswordForm');
+    if (forgotForm) forgotForm.style.display = 'none';
 }
 
 function showSignup() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('signupForm').style.display = 'block';
+    const forgotForm = document.getElementById('forgotPasswordForm');
+    if (forgotForm) forgotForm.style.display = 'none';
 }
 
 // Initialize auth state listener
