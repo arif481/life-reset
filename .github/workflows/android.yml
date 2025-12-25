@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/real-time-sync-analytics-settings ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
