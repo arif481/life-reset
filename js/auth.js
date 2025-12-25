@@ -88,143 +88,129 @@ async function signup() {
 
 async function googleSignIn() {
     if (!auth || !db) {
-        showToast('Firebase is not available. Please check your connection or try again later.', 'error');
-        return;
+        showToast('Connecting to server...', 'info');
+        await new Promise(r => setTimeout(r, 1000));
+        if (!auth || !db) {
+            showToast('Unable to connect. Please check your internet connection.', 'error');
+            return;
+        }
     }
     
     const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
     
-    // Check if we're in a WebView or Capacitor environment
-    const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-    const isWebView = !isCapacitor && (
-        navigator.userAgent.includes('wv') || 
-        navigator.userAgent.includes('WebView') ||
-        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-    );
+    // Detect environment
+    const ua = navigator.userAgent.toLowerCase();
+    const isAndroid = ua.includes('android');
     
     try {
         showAuthLoading(true);
         
-        let result;
-        
-        // If Capacitor native app, use native Google Sign-In plugin
-        if (isCapacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
-            try {
-                const googleUser = await window.Capacitor.Plugins.GoogleAuth.signIn();
-                const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
-                result = await auth.signInWithCredential(credential);
-            } catch (nativeError) {
-                console.error('Native Google Sign-In failed:', nativeError);
-                // Fall back to redirect method
+        // Always try popup first - it's faster and stays in app
+        try {
+            const result = await auth.signInWithPopup(provider);
+            await handleGoogleSignInResult(result);
+            return;
+        } catch (popupError) {
+            console.log('Popup failed, trying redirect:', popupError.code);
+            
+            // Only fall back to redirect for specific errors
+            if (popupError.code === 'auth/popup-blocked' ||
+                popupError.code === 'auth/popup-closed-by-user' ||
+                popupError.code === 'auth/cancelled-popup-request' ||
+                popupError.code === 'auth/operation-not-supported-in-this-environment') {
+                
+                if (isAndroid) {
+                    showToast('Opening Google Sign-In...', 'info');
+                }
+                localStorage.setItem('googleSignInPending', 'true');
                 await auth.signInWithRedirect(provider);
                 return;
             }
-        } else if (isWebView) {
-            // WebView - use redirect method (popup often blocked)
-            await auth.signInWithRedirect(provider);
-            return; // Will continue in handleRedirectResult
-        } else {
-            // Regular browser - try popup first
-            try {
-                result = await auth.signInWithPopup(provider);
-            } catch (popupError) {
-                if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user') {
-                    // Fall back to redirect
-                    await auth.signInWithRedirect(provider);
-                    return;
-                }
-                throw popupError;
-            }
-        }
-        
-        if (result && result.user) {
-            // Create user document if first time - with retry logic
-            const userRef = db.collection('users').doc(result.user.uid);
-            const userDoc = await userRef.get();
-            
-            if (!userDoc.exists) {
-                let retries = 3;
-                while (retries > 0) {
-                    try {
-                        await userRef.set({
-                            name: result.user.displayName,
-                            email: result.user.email,
-                            createdAt: new Date(),
-                            darkMode: false,
-                            stats: appState.userStats
-                        });
-                        break;
-                    } catch (firestoreError) {
-                        retries--;
-                        if (retries === 0) throw firestoreError;
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-                }
-            }
-            
-            handleUserLoggedIn(result.user);
+            throw popupError;
         }
     } catch (error) {
-        let errorMsg = error.message;
-        if (error.code === 'permission-denied') {
-            errorMsg = 'Permission denied. Please check your Firestore rules.';
-        } else if (error.code === 'auth/popup-blocked') {
-            errorMsg = 'Popup was blocked. Trying alternative method...';
+        console.error('Google Sign-In error:', error);
+        let errorMsg = 'Sign-in failed. ';
+        
+        if (error.code === 'auth/popup-blocked') {
             // Try redirect as fallback
-            try {
-                await auth.signInWithRedirect(provider);
-                return;
-            } catch (redirectError) {
-                errorMsg = 'Google sign-in not available in this environment. Please use email/password or continue as guest.';
-            }
-        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
-            errorMsg = 'Google sign-in is not available. Please use email/password or continue as guest.';
+            localStorage.setItem('googleSignInPending', 'true');
+            await auth.signInWithRedirect(provider);
+            return;
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            errorMsg = 'Sign-in cancelled.';
+        } else if (error.code === 'auth/cancelled-popup-request') {
+            // Another popup was opened, ignore this error
+            return;
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMsg = 'Network error. Please check your connection.';
+        } else {
+            errorMsg += error.message;
         }
-        showToast('Google sign-in failed: ' + errorMsg, 'error');
+        
+        showToast(errorMsg, 'error');
     } finally {
         showAuthLoading(false);
     }
 }
 
-// Handle redirect result (for WebView environments)
-async function handleRedirectResult() {
-    if (!auth) return;
-    
-    try {
-        const result = await auth.getRedirectResult();
-        if (result && result.user) {
-            showAuthLoading(true);
-            
-            // Create user document if first time
-            const userRef = db.collection('users').doc(result.user.uid);
-            const userDoc = await userRef.get();
-            
-            if (!userDoc.exists) {
-                await userRef.set({
-                    name: result.user.displayName,
-                    email: result.user.email,
-                    createdAt: new Date(),
-                    darkMode: false,
-                    stats: appState.userStats
-                });
-            }
-            
-            handleUserLoggedIn(result.user);
+// Handle Google Sign-In result (used by both popup and redirect)
+async function handleGoogleSignInResult(result) {
+    if (result && result.user) {
+        const userRef = db.collection('users').doc(result.user.uid);
+        const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+            await userRef.set({
+                name: result.user.displayName,
+                email: result.user.email,
+                createdAt: new Date(),
+                darkMode: false,
+                stats: appState.userStats
+            });
         }
-    } catch (error) {
-        console.error('Redirect result error:', error);
-        if (error.code !== 'auth/null-result') {
-            showToast('Sign-in failed: ' + error.message, 'error');
-        }
-    } finally {
-        showAuthLoading(false);
+        
+        handleUserLoggedIn(result.user);
     }
 }
 
 // Check for redirect result on page load
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => handleRedirectResult(), 500);
-});
+async function checkGoogleRedirectResult() {
+    if (localStorage.getItem('googleSignInPending') === 'true') {
+        localStorage.removeItem('googleSignInPending');
+        
+        try {
+            showAuthLoading(true);
+            const result = await auth.getRedirectResult();
+            if (result && result.user) {
+                await handleGoogleSignInResult(result);
+            }
+        } catch (error) {
+            console.error('Redirect result error:', error);
+            if (error.code !== 'auth/null-result') {
+                showToast('Sign-in failed: ' + error.message, 'error');
+            }
+        } finally {
+            showAuthLoading(false);
+        }
+    }
+}
+
+// Run redirect check when auth is ready
+if (auth) {
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            checkGoogleRedirectResult();
+        }
+    });
+} else {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(checkGoogleRedirectResult, 500);
+    });
+}
 
 async function guestSignIn() {
     if (!auth) {
