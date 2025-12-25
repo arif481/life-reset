@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/real-time-sync-analytics-settings ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -21,11 +21,11 @@ jobs:
         node-version: '20'
         cache: 'npm'
     
-    - name: Setup JDK 21
+    - name: Setup JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '21'
+        java-version: '17'
     
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -46,6 +46,13 @@ jobs:
       run: |
         cd android
         ./gradlew assembleDebug --no-daemon
+    
+    - name: Print Debug Keystore SHA-1 (for Firebase)
+      run: |
+        echo "=== SHA-1 Fingerprint for Firebase ==="
+        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android 2>/dev/null | grep SHA1 || \
+        keytool -list -v -keystore /home/runner/.android/debug.keystore -alias androiddebugkey -storepass android | grep SHA1
+        echo "=== Add this SHA-1 to Firebase Console ==="
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

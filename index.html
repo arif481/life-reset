@@ -63,7 +63,15 @@
                     });
             });
         }
-    </script>>
+        
+        // Initialize native Google Auth plugin on Android
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
+                window.Capacitor.Plugins.GoogleAuth.initialize();
+                console.log('[GoogleAuth] Native plugin initialized');
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Auth Screen -->
@@ -86,6 +94,7 @@
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                        <a href="#" onclick="showForgotPassword(); return false;" style="display: block; text-align: right; margin-top: 8px; font-size: 13px; color: var(--primary); text-decoration: none;">Forgot Password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-sign-in-alt"></i> Login
@@ -94,7 +103,7 @@
 
                 <div class="auth-divider"><span>OR</span></div>
 
-                <button class="btn btn-block" style="background: #4285f4; color: white;" onclick="googleSignIn()">
+                <button id="googleSignInBtn" class="btn btn-block" style="background: #4285f4; color: white;" onclick="googleSignIn()">
                     <i class="fab fa-google"></i> Sign in with Google
                 </button>
                 <button class="btn btn-secondary btn-block" onclick="guestSignIn()">
@@ -132,6 +141,26 @@
 
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
                     Already have an account? <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
+                </p>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <div id="forgotPasswordForm" style="display: none;">
+                <h3 style="text-align: center; margin-bottom: 20px;"><i class="fas fa-key"></i> Reset Password</h3>
+                <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 14px;">
+                    Enter your email address and we'll send you a link to reset your password.
+                </p>
+                <form onsubmit="resetPassword(); return false;">
+                    <div class="form-group">
+                        <label for="resetEmail">Email</label>
+                        <input type="email" id="resetEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-paper-plane"></i> Send Reset Link
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 15px; font-size: 14px;">
+                    <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;"><i class="fas fa-arrow-left"></i> Back to Login</a>
                 </p>
             </div>
 
