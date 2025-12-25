@@ -1,0 +1,482 @@
+/* Mobile Optimizations for Life Reset App */
+
+/* Offline Indicator */
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, #ff6b6b, #ff8787);
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 10000;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.offline-indicator.show {
+    transform: translateY(0);
+}
+
+.offline-indicator i {
+    font-size: 14px;
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .auth-screen,
+    .app-container {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    .sidebar {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .offline-indicator {
+        padding-top: calc(8px + env(safe-area-inset-top));
+    }
+}
+
+/* Touch-optimized interactions */
+.btn,
+.nav-item,
+.card,
+.task-item,
+.goal-card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    .nav-item {
+        min-height: 48px;
+        padding: 14px 16px;
+    }
+    
+    .form-control {
+        min-height: 48px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+    }
+    
+    /* Checkbox and radio touch targets */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+    }
+    
+    /* Task item improvements */
+    .task-item {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .task-checkbox {
+        width: 28px;
+        height: 28px;
+    }
+    
+    /* Card spacing */
+    .stat-card,
+    .dashboard-card,
+    .card {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    
+    /* Header adjustments */
+    .content-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .content-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    /* Stats grid mobile layout */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    /* XP bar mobile */
+    .xp-section {
+        padding: 12px;
+    }
+    
+    /* Tab navigation */
+    .tracker-tabs,
+    .mood-tabs,
+    .goal-filters {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 8px;
+        padding-bottom: 8px;
+    }
+    
+    .tracker-tabs::-webkit-scrollbar,
+    .mood-tabs::-webkit-scrollbar,
+    .goal-filters::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .tracker-tab,
+    .mood-tab,
+    .filter-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 10px 16px;
+    }
+    
+    /* Modal improvements */
+    .modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+        border-radius: 16px;
+    }
+    
+    .modal-header {
+        padding: 16px 20px;
+    }
+    
+    .modal-body {
+        padding: 16px 20px;
+        max-height: calc(80vh - 120px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Toast positioning */
+    .toast {
+        left: 16px;
+        right: 16px;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        max-width: none;
+    }
+    
+    /* Section headers */
+    .section h2 {
+        font-size: 1.25rem;
+    }
+    
+    /* Resource cards */
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .resource-card {
+        padding: 20px;
+    }
+    
+    .emergency-contact {
+        font-size: 1.1rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .stat-icon {
+        font-size: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .auth-container {
+        padding: 20px;
+    }
+    
+    .auth-header {
+        margin-bottom: 15px;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+    }
+}
+
+/* Pull-to-refresh indicator (visual only, JS handles the logic) */
+.pull-refresh-indicator {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 0 0 20px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+}
+
+.pull-refresh-indicator.visible {
+    transform: translateX(-50%) translateY(0);
+}
+
+.pull-refresh-indicator .spinner {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+}
+
+/* Swipe action hints */
+.swipe-hint {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 12px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.task-item.swiping .swipe-hint {
+    opacity: 1;
+}
+
+/* Loading skeleton for mobile */
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--card-bg) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Improve scroll performance */
+.main-content,
+.sidebar,
+.modal-body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Disable text selection on interactive elements */
+.btn,
+.nav-item,
+.tab,
+.tracker-tab,
+.mood-tab,
+.filter-btn {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Active states for touch feedback */
+.btn:active {
+    transform: scale(0.98);
+}
+
+.nav-item:active,
+.card:active,
+.task-item:active {
+    opacity: 0.8;
+}
+
+/* Haptic feedback simulation via visual feedback */
+@keyframes tap-feedback {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.97);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn.tapped {
+    animation: tap-feedback 0.15s ease;
+}
+
+/* Fix for 100vh on mobile browsers */
+.auth-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.app-container {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* Smooth momentum scrolling */
+* {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbars on mobile but keep functionality */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+}
+
+/* Focus styles for accessibility */
+.btn:focus-visible,
+.nav-item:focus-visible,
+.form-control:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Loading overlay for actions */
+.action-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.action-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    margin-bottom: 20px;
+}
+
+/* Network reconnection animation */
+@keyframes pulse-online {
+    0%, 100% {
+        background-color: #4caf50;
+    }
+    50% {
+        background-color: #81c784;
+    }
+}
+
+.reconnecting {
+    animation: pulse-online 1s ease infinite;
+}
+
+/* Syncing indicator */
+.syncing-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9998;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100px);
+    transition: transform 0.3s ease;
+}
+
+.syncing-indicator.show {
+    transform: translateY(0);
+}
+
+.syncing-indicator .spinner {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
