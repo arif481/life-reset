@@ -9,7 +9,8 @@
   "android": {
     "allowMixedContent": false,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "webContentsDebuggingEnabled": false,
+    "appendUserAgent": "LifeResetApp"
   },
   "plugins": {
     "SplashScreen": {
@@ -18,6 +19,9 @@
       "backgroundColor": "#4361ee",
       "showSpinner": true,
       "spinnerColor": "#ffffff"
+    },
+    "Browser": {
+      "androidToolbarColor": "#4361ee"
     }
   }
 }

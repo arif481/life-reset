@@ -88,8 +88,7 @@ async function signup() {
 
 async function googleSignIn() {
     if (!auth || !db) {
-        showToast('Please wait, connecting to server...', 'info');
-        // Wait a moment and retry
+        showToast('Connecting to server...', 'info');
         await new Promise(r => setTimeout(r, 1000));
         if (!auth || !db) {
             showToast('Unable to connect. Please check your internet connection.', 'error');
@@ -102,25 +101,35 @@ async function googleSignIn() {
         prompt: 'select_account'
     });
     
-    // Detect Android WebView
+    // Detect environment
     const ua = navigator.userAgent.toLowerCase();
     const isAndroid = ua.includes('android');
-    const isWebView = ua.includes('wv') || (isAndroid && ua.includes('version/'));
     
     try {
         showAuthLoading(true);
         
-        if (isWebView || isAndroid) {
-            // On Android WebView, use signInWithRedirect
-            // Store a flag so we know to check for redirect result
-            localStorage.setItem('googleSignInPending', 'true');
-            await auth.signInWithRedirect(provider);
-            // Page will redirect, then come back
-            return;
-        } else {
-            // Desktop/regular browser - use popup
+        // Always try popup first - it's faster and stays in app
+        try {
             const result = await auth.signInWithPopup(provider);
             await handleGoogleSignInResult(result);
+            return;
+        } catch (popupError) {
+            console.log('Popup failed, trying redirect:', popupError.code);
+            
+            // Only fall back to redirect for specific errors
+            if (popupError.code === 'auth/popup-blocked' ||
+                popupError.code === 'auth/popup-closed-by-user' ||
+                popupError.code === 'auth/cancelled-popup-request' ||
+                popupError.code === 'auth/operation-not-supported-in-this-environment') {
+                
+                if (isAndroid) {
+                    showToast('Opening Google Sign-In...', 'info');
+                }
+                localStorage.setItem('googleSignInPending', 'true');
+                await auth.signInWithRedirect(provider);
+                return;
+            }
+            throw popupError;
         }
     } catch (error) {
         console.error('Google Sign-In error:', error);
