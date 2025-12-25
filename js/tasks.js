@@ -183,24 +183,44 @@ function updateProgress() {
 }
 
 async function saveTaskCompletion(taskId, completed) {
-    if (db && appState.currentUser) {
+    const dateString = getDateString(appState.currentDate);
+    const data = {
+        [taskId]: completed,
+        _totalTasks: getTotalTaskCount(),
+        _updatedAt: new Date()
+    };
+    
+    // Check if online and Firebase is available
+    const isOnline = navigator.onLine && db && appState.currentUser;
+    
+    if (isOnline) {
         try {
-            const dateString = getDateString(appState.currentDate);
             window.isLocalTaskUpdate = true;
             await db.collection('users').doc(appState.currentUser.uid)
                 .collection('tasks').doc(dateString)
-                .set(
-                    {
-                        [taskId]: completed,
-                        _totalTasks: getTotalTaskCount(),
-                        _updatedAt: new Date()
-                    },
-                    { merge: true }
-                );
+                .set(data, { merge: true });
             setTimeout(() => { window.isLocalTaskUpdate = false; }, 100);
+            
+            // Backup to local storage
+            if (window.OfflineManager) {
+                await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
+            }
         } catch (error) {
-            console.log('Error saving task:', error);
+            console.log('Error saving task online, queuing for offline:', error);
             window.isLocalTaskUpdate = false;
+            
+            // Queue for later sync if online save fails
+            if (window.OfflineManager) {
+                await window.OfflineManager.queueWrite('tasks', dateString, data, 'set');
+                await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
+            }
+        }
+    } else {
+        // Offline: queue the write and cache locally
+        console.log('[Offline] Queuing task save for later sync');
+        if (window.OfflineManager) {
+            await window.OfflineManager.queueWrite('tasks', dateString, data, 'set');
+            await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
         }
     }
 }
@@ -221,10 +241,12 @@ async function loadTasksForDate() {
         appState.userTasks[category].forEach(task => task.completed = false);
     }
     
-    // Load from Firebase
+    const dateString = getDateString(appState.currentDate);
+    let dataLoaded = false;
+    
+    // Try to load from Firebase first
     if (db && appState.currentUser) {
         try {
-            const dateString = getDateString(appState.currentDate);
             const doc = await db.collection('users').doc(appState.currentUser.uid)
                 .collection('tasks').doc(dateString).get();
             
@@ -237,9 +259,34 @@ async function loadTasksForDate() {
                         }
                     });
                 }
+                dataLoaded = true;
+                
+                // Cache the data locally
+                if (window.OfflineManager) {
+                    await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
+                }
             }
         } catch (error) {
-            console.log('Error loading tasks:', error);
+            console.log('Error loading tasks from Firebase:', error);
+        }
+    }
+    
+    // If Firebase failed or offline, try cached data
+    if (!dataLoaded && window.OfflineManager) {
+        try {
+            const cachedData = await window.OfflineManager.getCachedData(`tasks_${dateString}`);
+            if (cachedData) {
+                console.log('[Offline] Using cached task data for', dateString);
+                for (const category in appState.userTasks) {
+                    appState.userTasks[category].forEach(task => {
+                        if (cachedData[task.id] !== undefined) {
+                            task.completed = cachedData[task.id];
+                        }
+                    });
+                }
+            }
+        } catch (cacheError) {
+            console.log('Error loading cached tasks:', cacheError);
         }
     }
     
