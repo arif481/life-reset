@@ -4,40 +4,8 @@ const APP_CONFIG = {
     version: '1.0.0'
 };
 
-// Firebase initialization will happen after firebase-config.js loads
-let auth, db;
-
-function initializeFirebase() {
-    if (typeof firebase !== 'undefined') {
-        try {
-            auth = firebase.auth();
-            db = firebase.firestore();
-            
-            // Enable offline persistence
-            db.enablePersistence()
-                .catch((err) => {
-                    if (err.code == 'failed-precondition') {
-                        // Multiple tabs open
-                        console.log('Multiple tabs open - offline persistence disabled');
-                    } else if (err.code == 'unimplemented') {
-                        // Browser doesn't support
-                        console.log('Browser does not support offline persistence');
-                    }
-                });
-            
-            console.log('Firebase initialized successfully');
-            return true;
-        } catch (error) {
-            console.error('Error initializing Firebase:', error);
-            showToast('Firebase connection issue - some features may be limited', 'warning');
-            return false;
-        }
-    } else {
-        console.error('Firebase SDK not loaded');
-        showToast('Unable to connect to database - using offline mode', 'warning');
-        return false;
-    }
-}
+// Firebase auth and db are initialized in firebase-config.js (loaded first)
+// They are global variables: auth, db
 
 // Global app state
 const appState = {
