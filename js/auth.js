@@ -87,6 +87,20 @@ async function signup() {
 }
 
 async function googleSignIn() {
+    // Check if on Android - Google Sign-In doesn't work in WebView
+    const ua = navigator.userAgent.toLowerCase();
+    const isAndroid = ua.includes('android');
+    
+    if (isAndroid) {
+        showToast('Google Sign-In is not available on Android app. Please use Email or Guest login.', 'info');
+        // Hide the button and show note
+        const btn = document.getElementById('googleSignInBtn');
+        const note = document.getElementById('androidAuthNote');
+        if (btn) btn.style.display = 'none';
+        if (note) note.style.display = 'block';
+        return;
+    }
+    
     if (!auth || !db) {
         showToast('Connecting to server...', 'info');
         await new Promise(r => setTimeout(r, 1000));
@@ -101,36 +115,10 @@ async function googleSignIn() {
         prompt: 'select_account'
     });
     
-    // Detect environment
-    const ua = navigator.userAgent.toLowerCase();
-    const isAndroid = ua.includes('android');
-    
     try {
         showAuthLoading(true);
-        
-        // Always try popup first - it's faster and stays in app
-        try {
-            const result = await auth.signInWithPopup(provider);
-            await handleGoogleSignInResult(result);
-            return;
-        } catch (popupError) {
-            console.log('Popup failed, trying redirect:', popupError.code);
-            
-            // Only fall back to redirect for specific errors
-            if (popupError.code === 'auth/popup-blocked' ||
-                popupError.code === 'auth/popup-closed-by-user' ||
-                popupError.code === 'auth/cancelled-popup-request' ||
-                popupError.code === 'auth/operation-not-supported-in-this-environment') {
-                
-                if (isAndroid) {
-                    showToast('Opening Google Sign-In...', 'info');
-                }
-                localStorage.setItem('googleSignInPending', 'true');
-                await auth.signInWithRedirect(provider);
-                return;
-            }
-            throw popupError;
-        }
+        const result = await auth.signInWithPopup(provider);
+        await handleGoogleSignInResult(result);
     } catch (error) {
         console.error('Google Sign-In error:', error);
         let errorMsg = 'Sign-in failed. ';
