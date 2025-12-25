@@ -24,6 +24,55 @@ async function login() {
     }
 }
 
+// Forgot Password Functions
+function showForgotPassword() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+    // Pre-fill email if already entered
+    const loginEmail = document.getElementById('loginEmail').value;
+    if (loginEmail) {
+        document.getElementById('resetEmail').value = loginEmail;
+    }
+}
+
+async function resetPassword() {
+    if (!auth) {
+        showToast('Firebase is not available. Please check your connection.', 'error');
+        return;
+    }
+    
+    const email = document.getElementById('resetEmail').value;
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+
+    try {
+        showAuthLoading(true);
+        await auth.sendPasswordResetEmail(email);
+        showToast('Password reset email sent! Check your inbox.', 'success');
+        // Go back to login after success
+        setTimeout(() => {
+            showLogin();
+            document.getElementById('loginEmail').value = email;
+        }, 2000);
+    } catch (error) {
+        let errorMsg = error.message;
+        if (error.code === 'auth/user-not-found') {
+            errorMsg = 'No account found with this email address.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMsg = 'Please enter a valid email address.';
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMsg = 'Too many attempts. Please try again later.';
+        }
+        showToast(errorMsg, 'error');
+    } finally {
+        showAuthLoading(false);
+    }
+}
+
 async function signup() {
     if (!auth || !db) {
         showToast('Firebase is not available. Please check your connection or try again later.', 'error');
@@ -327,11 +376,15 @@ function showAuthLoading(show) {
 function showLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('signupForm').style.display = 'none';
+    const forgotForm = document.getElementById('forgotPasswordForm');
+    if (forgotForm) forgotForm.style.display = 'none';
 }
 
 function showSignup() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('signupForm').style.display = 'block';
+    const forgotForm = document.getElementById('forgotPasswordForm');
+    if (forgotForm) forgotForm.style.display = 'none';
 }
 
 // Initialize auth state listener
