@@ -136,19 +136,8 @@ async function signup() {
 }
 
 async function googleSignIn() {
-    // Check if on Android - Google Sign-In doesn't work in WebView
     const ua = navigator.userAgent.toLowerCase();
     const isAndroid = ua.includes('android');
-    
-    if (isAndroid) {
-        showToast('Google Sign-In is not available on Android app. Please use Email or Guest login.', 'info');
-        // Hide the button and show note
-        const btn = document.getElementById('googleSignInBtn');
-        const note = document.getElementById('androidAuthNote');
-        if (btn) btn.style.display = 'none';
-        if (note) note.style.display = 'block';
-        return;
-    }
     
     if (!auth || !db) {
         showToast('Connecting to server...', 'info');
@@ -159,28 +148,51 @@ async function googleSignIn() {
         }
     }
     
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({
-        prompt: 'select_account'
-    });
-    
     try {
         showAuthLoading(true);
+        
+        // Check if native Google Auth is available (Android app with plugin)
+        if (isAndroid && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
+            // Use native Google Sign-In
+            try {
+                const GoogleAuth = window.Capacitor.Plugins.GoogleAuth;
+                const googleUser = await GoogleAuth.signIn();
+                
+                // Create Firebase credential from Google ID token
+                const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
+                const result = await auth.signInWithCredential(credential);
+                await handleGoogleSignInResult(result);
+                return;
+            } catch (nativeError) {
+                console.error('Native Google Sign-In error:', nativeError);
+                if (nativeError.message && nativeError.message.includes('canceled')) {
+                    showToast('Sign-in cancelled', 'info');
+                } else {
+                    showToast('Google Sign-In failed. Please try again.', 'error');
+                }
+                return;
+            }
+        }
+        
+        // Web browser - use popup
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        
         const result = await auth.signInWithPopup(provider);
         await handleGoogleSignInResult(result);
+        
     } catch (error) {
         console.error('Google Sign-In error:', error);
         let errorMsg = 'Sign-in failed. ';
         
         if (error.code === 'auth/popup-blocked') {
-            // Try redirect as fallback
+            const provider = new firebase.auth.GoogleAuthProvider();
             localStorage.setItem('googleSignInPending', 'true');
             await auth.signInWithRedirect(provider);
             return;
         } else if (error.code === 'auth/popup-closed-by-user') {
             errorMsg = 'Sign-in cancelled.';
         } else if (error.code === 'auth/cancelled-popup-request') {
-            // Another popup was opened, ignore this error
             return;
         } else if (error.code === 'auth/network-request-failed') {
             errorMsg = 'Network error. Please check your connection.';

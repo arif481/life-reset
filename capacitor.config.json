@@ -20,8 +20,10 @@
       "showSpinner": true,
       "spinnerColor": "#ffffff"
     },
-    "Browser": {
-      "androidToolbarColor": "#4361ee"
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "214444955038-REPLACE_WITH_WEB_CLIENT_ID.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
     }
   }
 }
