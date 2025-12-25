@@ -11,10 +11,29 @@ const firebaseConfig = {
   appId: "1:214444955038:web:666ab309bdc1171e7c728f",
   measurementId: "G-GXHKRHYEM1"
 };
+
 // Initialize Firebase
 try {
     firebase.initializeApp(firebaseConfig);
     console.log("Firebase initialized successfully");
+    
+    // Enable Firestore offline persistence
+    // This allows the app to work offline and sync when back online
+    firebase.firestore().enablePersistence({ synchronizeTabs: true })
+        .then(() => {
+            console.log("Firestore offline persistence enabled");
+        })
+        .catch((err) => {
+            if (err.code === 'failed-precondition') {
+                // Multiple tabs open, persistence can only be enabled in one tab
+                console.warn("Firestore persistence unavailable: multiple tabs open");
+            } else if (err.code === 'unimplemented') {
+                // The browser doesn't support persistence
+                console.warn("Firestore persistence not supported in this browser");
+            } else {
+                console.error("Error enabling Firestore persistence:", err);
+            }
+        });
 } catch (error) {
     console.error("Error initializing Firebase:", error);
 }

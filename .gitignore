@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+www/
+
+# Firebase config (contains API keys)
+firebase-config.js
+
+# Android build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/captures/
+android/.idea/
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

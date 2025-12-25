@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Life Reset</string>
+    <string name="title_activity_main">Life Reset</string>
+    <string name="package_name">com.lifereset.app</string>
+    <string name="custom_url_scheme">com.lifereset.app</string>
+</resources>
