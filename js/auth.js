@@ -156,19 +156,35 @@ async function googleSignIn() {
             // Use native Google Sign-In
             try {
                 const GoogleAuth = window.Capacitor.Plugins.GoogleAuth;
+                console.log('[GoogleAuth] Starting native sign-in...');
                 const googleUser = await GoogleAuth.signIn();
+                console.log('[GoogleAuth] Got response:', JSON.stringify(googleUser));
                 
+                // The plugin returns idToken directly or in authentication object
+                const idToken = googleUser.authentication?.idToken || googleUser.idToken;
+                
+                if (!idToken) {
+                    console.error('[GoogleAuth] No ID token received:', googleUser);
+                    showToast('Sign-in error: No token received. Please try again.', 'error');
+                    return;
+                }
+                
+                console.log('[GoogleAuth] Creating Firebase credential...');
                 // Create Firebase credential from Google ID token
-                const credential = firebase.auth.GoogleAuthProvider.credential(googleUser.authentication.idToken);
+                const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
                 const result = await auth.signInWithCredential(credential);
+                console.log('[GoogleAuth] Firebase sign-in successful');
                 await handleGoogleSignInResult(result);
                 return;
             } catch (nativeError) {
-                console.error('Native Google Sign-In error:', nativeError);
-                if (nativeError.message && nativeError.message.includes('canceled')) {
+                console.error('[GoogleAuth] Native error:', nativeError);
+                console.error('[GoogleAuth] Error details:', JSON.stringify(nativeError));
+                if (nativeError.message && (nativeError.message.includes('canceled') || nativeError.message.includes('cancelled'))) {
+                    showToast('Sign-in cancelled', 'info');
+                } else if (nativeError.code === 12501) {
                     showToast('Sign-in cancelled', 'info');
                 } else {
-                    showToast('Google Sign-In failed. Please try again.', 'error');
+                    showToast('Google Sign-In failed: ' + (nativeError.message || 'Unknown error'), 'error');
                 }
                 return;
             }
