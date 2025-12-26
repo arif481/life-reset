@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "214444955038",
+    "project_id": "life-reset-e39f4",
+    "storage_bucket": "life-reset-e39f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214444955038:android:94a825691c7296f57c728f",
+        "android_client_info": {
+          "package_name": "com.lifereset.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS8uxqPIvVrDlqaSZGIwcRDkmiPWQzhCE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
