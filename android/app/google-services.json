@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "214444955038-037pkvlcigavj92p1mub526a52d2cg53.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifereset.app",
+            "certificate_hash": "245a34a1196db5b1370517fd654a576c1d1df40e"
+          }
+        },
+        {
           "client_id": "214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com",
           "client_type": 3
         }
