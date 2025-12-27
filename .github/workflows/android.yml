@@ -47,23 +47,14 @@ jobs:
         cd android
         ./gradlew assembleDebug --no-daemon
     
-    - name: Print Debug Keystore SHA-1 (for Firebase)
+    - name: Get Debug Signing SHA-1 (for Firebase)
       run: |
         echo "=== SHA-1 Fingerprint for Firebase ==="
-        echo "Looking for debug keystore..."
-        find /home/runner -name "debug.keystore" 2>/dev/null || true
-        find ~/.android -name "debug.keystore" 2>/dev/null || true
-        # Try common locations
-        if [ -f ~/.android/debug.keystore ]; then
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android | grep -E "SHA1|SHA-1"
-        elif [ -f /home/runner/.android/debug.keystore ]; then
-          keytool -list -v -keystore /home/runner/.android/debug.keystore -alias androiddebugkey -storepass android | grep -E "SHA1|SHA-1"
-        else
-          echo "Debug keystore not found, generating signing report from Gradle..."
-          cd android && ./gradlew signingReport --no-daemon | grep -A5 "Variant: debug"
-        fi
-        echo "=== Add this SHA-1 to Firebase Console ==="
-      continue-on-error: true
+        cd android
+        ./gradlew signingReport --no-daemon 2>&1 | grep -A 10 "Variant: debug" | grep "SHA1" | head -1
+        echo ""
+        echo "=== IMPORTANT: Add this SHA-1 to Firebase Console ===" 
+        echo "Go to: Firebase Console > Project Settings > Your Apps > Android > Add fingerprint"
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
