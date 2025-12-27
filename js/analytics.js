@@ -111,23 +111,30 @@ function moodScoreFromEntry(entry) {
 // 1. Mood Trend Chart (Line chart with area fill)
 function initMoodTrendChart() {
     const ctx = document.getElementById('moodTrendChart');
-    if (!ctx || ctx.tagName !== 'CANVAS') return;
+    if (!ctx || ctx.tagName !== 'CANVAS') {
+        console.log('[Analytics] Mood chart canvas not found');
+        return;
+    }
     
     const { labels, data } = getMoodTrendData();
+    console.log('[Analytics] Mood chart data:', { labels: labels.length, dataPoints: data.filter(d => d !== null).length });
+    
+    // If all data is null, show a message
+    const hasData = data.some(d => d !== null);
     
     moodTrendChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Mood Score',
-                data: data,
-                borderColor: '#4361ee',
-                backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                label: hasData ? 'Mood Score' : 'No mood data yet - log your mood!',
+                data: hasData ? data : labels.map(() => 5), // Show flat line if no data
+                borderColor: hasData ? '#4361ee' : '#ccc',
+                backgroundColor: hasData ? 'rgba(67, 97, 238, 0.1)' : 'rgba(200, 200, 200, 0.1)',
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4,
-                pointBackgroundColor: '#4361ee',
+                pointBackgroundColor: hasData ? '#4361ee' : '#ccc',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
                 pointRadius: 5,
