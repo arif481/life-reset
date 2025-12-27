@@ -70,6 +70,52 @@
                 window.Capacitor.Plugins.GoogleAuth.initialize();
                 console.log('[GoogleAuth] Native plugin initialized');
             }
+            
+            // Handle Android back button
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+                window.Capacitor.Plugins.App.addListener('backButton', function(data) {
+                    // If user dropdown is open, close it
+                    const dropdown = document.getElementById('userDropdown');
+                    if (dropdown && dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                        return;
+                    }
+                    
+                    // If sidebar is open on mobile, close it
+                    const sidebar = document.querySelector('.sidebar');
+                    const overlay = document.getElementById('sidebarOverlay');
+                    if (sidebar && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.classList.remove('show');
+                        return;
+                    }
+                    
+                    // If modal is open, close it
+                    const modals = document.querySelectorAll('.modal');
+                    for (let modal of modals) {
+                        if (modal.style.display === 'flex' || modal.style.display === 'block') {
+                            modal.style.display = 'none';
+                            return;
+                        }
+                    }
+                    
+                    // If not on dashboard, go to dashboard
+                    const currentView = document.querySelector('[id$="-view"]:not([style*="display: none"])');
+                    if (currentView && currentView.id !== 'dashboard-view') {
+                        navigateTo('dashboard');
+                        return;
+                    }
+                    
+                    // If on dashboard, show exit confirmation or minimize
+                    if (data.canGoBack) {
+                        window.history.back();
+                    } else {
+                        // Minimize app (don't exit)
+                        window.Capacitor.Plugins.App.minimizeApp();
+                    }
+                });
+                console.log('[App] Back button handler registered');
+            }
         });
     </script>
 </head>
