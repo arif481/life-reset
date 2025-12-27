@@ -45,7 +45,7 @@ jobs:
     - name: Build Debug APK
       run: |
         cd android
-        ./gradlew assembleDebug -Pandroid.injected.signing.store.file=../debug.keystore -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=androiddebugkey -Pandroid.injected.signing.key.password=android --no-daemon
+        ./gradlew assembleDebug -Pandroid.injected.signing.store.file=${{ github.workspace }}/android/debug.keystore -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=androiddebugkey -Pandroid.injected.signing.key.password=android --no-daemon
     
     - name: Get Debug Signing SHA-1 (for Firebase)
       run: |
