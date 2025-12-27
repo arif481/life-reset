@@ -22,6 +22,15 @@ try {
     auth = firebase.auth();
     db = firebase.firestore();
     
+    // Set auth persistence to LOCAL (survives app restarts)
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            console.log("Firebase auth persistence set to LOCAL");
+        })
+        .catch((error) => {
+            console.warn("Could not set auth persistence:", error);
+        });
+    
     console.log("Firebase initialized successfully");
     
     // Enable Firestore offline persistence
