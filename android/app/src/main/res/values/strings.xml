@@ -4,4 +4,5 @@
     <string name="title_activity_main">Life Reset</string>
     <string name="package_name">com.lifereset.app</string>
     <string name="custom_url_scheme">com.lifereset.app</string>
+    <string name="server_client_id">214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com</string>
 </resources>
