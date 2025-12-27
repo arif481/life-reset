@@ -192,6 +192,7 @@ async function googleSignIn() {
                 console.error('[GoogleAuth] Native error:', nativeError);
                 console.error('[GoogleAuth] Error code:', nativeError.code);
                 console.error('[GoogleAuth] Error message:', nativeError.message);
+                console.error('[GoogleAuth] Full error object:', JSON.stringify(nativeError));
                 
                 // Handle specific error codes
                 const errorCode = nativeError.code || nativeError.error || '';
@@ -201,10 +202,12 @@ async function googleSignIn() {
                     errorMsg.includes('canceled') || errorMsg.includes('cancelled') ||
                     errorMsg.includes('user canceled')) {
                     showToast('Sign-in cancelled', 'info');
-                } else if (errorCode === 10 || errorCode === '10') {
-                    showToast('Google Sign-In configuration error. Please contact support.', 'error');
+                } else if (errorCode === 10 || errorCode === '10' || errorMsg.includes('DEVELOPER_ERROR')) {
+                    // Error 10 = Developer error - SHA-1 or package mismatch
+                    console.error('[GoogleAuth] DEVELOPER_ERROR - Check: 1) SHA-1 in Firebase matches APK, 2) Package name matches, 3) google-services.json is up to date');
+                    showToast('Configuration error (code 10). SHA-1 or package mismatch.', 'error');
                 } else {
-                    showToast('Google Sign-In failed: ' + (errorMsg || 'Unknown error'), 'error');
+                    showToast('Google Sign-In failed: ' + (errorMsg || errorCode || 'Unknown error'), 'error');
                 }
                 return;
             }
