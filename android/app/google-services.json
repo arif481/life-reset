@@ -22,6 +22,30 @@
           }
         },
         {
+          "client_id": "214444955038-1p229h3pfb5asa77vcbgck7tj5koabcp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifereset.app",
+            "certificate_hash": "1284fc52f5a8d26bc0232eec6b49dc4009ab7b44"
+          }
+        },
+        {
+          "client_id": "214444955038-4hlb2b2otvv5f1pg4307cj0reh74t5vf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifereset.app",
+            "certificate_hash": "c12f9ec918fb164885988ebb2c59acd08448fc8d"
+          }
+        },
+        {
+          "client_id": "214444955038-r7mbdi3k07f9obim7r8m2817v6rce443.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifereset.app",
+            "certificate_hash": "8381e6b3e094e8d101120e25339690ef2fc4bbd7"
+          }
+        },
+        {
           "client_id": "214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com",
           "client_type": 3
         }
