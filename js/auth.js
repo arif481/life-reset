@@ -460,15 +460,28 @@ function initAuthListener() {
 }
 
 function setupAuthListener() {
+    // Show loading while checking auth state
+    const authScreen = document.getElementById('authScreen');
+    const authLoading = document.getElementById('authLoading');
+    
+    // Brief loading state while checking persisted auth
+    if (authLoading) authLoading.classList.add('show');
+    
     auth.onAuthStateChanged((user) => {
+        // Hide loading once we get auth state
+        if (authLoading) authLoading.classList.remove('show');
+        
         if (user) {
+            console.log('[Auth] User found:', user.uid);
             handleUserLoggedIn(user);
         } else {
+            console.log('[Auth] No user found, showing login');
             document.getElementById('appContainer').classList.remove('show');
             document.getElementById('authScreen').style.display = 'flex';
         }
     }, (error) => {
         console.error('Auth state listener error:', error);
+        if (authLoading) authLoading.classList.remove('show');
         // Allow offline usage even if auth check fails
         document.getElementById('appContainer').classList.remove('show');
         document.getElementById('authScreen').style.display = 'flex';
