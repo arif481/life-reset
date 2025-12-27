@@ -12,6 +12,7 @@ const firebaseConfig = {
 // Global Firebase references
 var auth = null;
 var db = null;
+var firebaseReady = false;
 
 // Initialize Firebase
 try {
@@ -22,7 +23,7 @@ try {
     auth = firebase.auth();
     db = firebase.firestore();
     
-    // Set auth persistence to LOCAL (survives app restarts)
+    // Set auth persistence to LOCAL (survives browser/app restarts)
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         .then(() => {
             console.log("Firebase auth persistence set to LOCAL");
@@ -45,6 +46,8 @@ try {
                 console.warn("Firestore persistence not supported in this browser");
             }
         });
+    
+    firebaseReady = true;
 } catch (error) {
     console.error("Error initializing Firebase:", error);
 }
