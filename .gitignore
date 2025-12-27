@@ -16,7 +16,7 @@ android/.idea/
 *.apk
 *.aab
 *.jks
-*.keystore
+# *.keystore  # Removed to allow debug.keystore
 
 # IDE
 .idea/
