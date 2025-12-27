@@ -67,8 +67,12 @@
         // Initialize native Google Auth plugin on Android
         document.addEventListener('DOMContentLoaded', function() {
             if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
-                window.Capacitor.Plugins.GoogleAuth.initialize();
-                console.log('[GoogleAuth] Native plugin initialized');
+                window.Capacitor.Plugins.GoogleAuth.initialize({
+                    clientId: '214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com',
+                    scopes: ['profile', 'email'],
+                    grantOfflineAccess: true
+                });
+                console.log('[GoogleAuth] Native plugin initialized with config');
             }
             
             // Handle Android back button

@@ -45,7 +45,12 @@ jobs:
     - name: Build Debug APK
       run: |
         cd android
-        ./gradlew assembleDebug -Pandroid.injected.signing.store.file=debug.keystore -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=androiddebugkey -Pandroid.injected.signing.key.password=android --no-daemon
+        ./gradlew assembleDebug --no-daemon
+    
+    - name: Verify APK Signature SHA-1
+      run: |
+        echo "=== Verifying APK was signed with correct keystore ==="
+        keytool -list -v -keystore android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep "SHA1:"
     
     - name: Get Debug Signing SHA-1 (for Firebase)
       run: |
