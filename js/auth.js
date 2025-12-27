@@ -160,31 +160,51 @@ async function googleSignIn() {
                 const googleUser = await GoogleAuth.signIn();
                 console.log('[GoogleAuth] Got response:', JSON.stringify(googleUser));
                 
-                // The plugin returns idToken directly or in authentication object
-                const idToken = googleUser.authentication?.idToken || googleUser.idToken;
+                // The plugin can return idToken in different places depending on version
+                const idToken = googleUser.authentication?.idToken || 
+                               googleUser.idToken || 
+                               googleUser.credential?.idToken;
+                const accessToken = googleUser.authentication?.accessToken || 
+                                   googleUser.accessToken;
                 
-                if (!idToken) {
-                    console.error('[GoogleAuth] No ID token received:', googleUser);
-                    showToast('Sign-in error: No token received. Please try again.', 'error');
+                console.log('[GoogleAuth] idToken exists:', !!idToken);
+                console.log('[GoogleAuth] accessToken exists:', !!accessToken);
+                
+                let credential;
+                if (idToken) {
+                    console.log('[GoogleAuth] Creating credential with idToken...');
+                    credential = firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
+                } else if (accessToken) {
+                    console.log('[GoogleAuth] Creating credential with accessToken only...');
+                    credential = firebase.auth.GoogleAuthProvider.credential(null, accessToken);
+                } else {
+                    // If no tokens, try to use the email to sign in directly
+                    console.error('[GoogleAuth] No tokens received. Full response:', googleUser);
+                    showToast('Sign-in error: Authentication failed. Please try again.', 'error');
                     return;
                 }
                 
-                console.log('[GoogleAuth] Creating Firebase credential...');
-                // Create Firebase credential from Google ID token
-                const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
                 const result = await auth.signInWithCredential(credential);
                 console.log('[GoogleAuth] Firebase sign-in successful');
                 await handleGoogleSignInResult(result);
                 return;
             } catch (nativeError) {
                 console.error('[GoogleAuth] Native error:', nativeError);
-                console.error('[GoogleAuth] Error details:', JSON.stringify(nativeError));
-                if (nativeError.message && (nativeError.message.includes('canceled') || nativeError.message.includes('cancelled'))) {
+                console.error('[GoogleAuth] Error code:', nativeError.code);
+                console.error('[GoogleAuth] Error message:', nativeError.message);
+                
+                // Handle specific error codes
+                const errorCode = nativeError.code || nativeError.error || '';
+                const errorMsg = nativeError.message || '';
+                
+                if (errorCode === 12501 || errorCode === '12501' || 
+                    errorMsg.includes('canceled') || errorMsg.includes('cancelled') ||
+                    errorMsg.includes('user canceled')) {
                     showToast('Sign-in cancelled', 'info');
-                } else if (nativeError.code === 12501) {
-                    showToast('Sign-in cancelled', 'info');
+                } else if (errorCode === 10 || errorCode === '10') {
+                    showToast('Google Sign-In configuration error. Please contact support.', 'error');
                 } else {
-                    showToast('Google Sign-In failed: ' + (nativeError.message || 'Unknown error'), 'error');
+                    showToast('Google Sign-In failed: ' + (errorMsg || 'Unknown error'), 'error');
                 }
                 return;
             }
