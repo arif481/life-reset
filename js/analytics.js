@@ -565,7 +565,8 @@ function getMoodTrendData() {
         if (entry && entry.date) moodByDate[entry.date] = entry;
     });
 
-    listDays(startDate, endDate).forEach(date => {
+    const days = listDays(startDate, endDate) || [];
+    days.forEach(date => {
         const dateId = getDateString(date);
         labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
         data.push(moodScoreFromEntry(moodByDate[dateId]));
@@ -582,7 +583,8 @@ function getCompletionRateData() {
     const history = appState.tasksHistory || {};
     const fallbackTotal = (typeof getTotalTaskCount === 'function') ? getTotalTaskCount() : null;
 
-    listDays(startDate, endDate).forEach(date => {
+    const days = listDays(startDate, endDate) || [];
+    days.forEach(date => {
         const dateId = getDateString(date);
         const day = history[dateId];
 

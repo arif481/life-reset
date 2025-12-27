@@ -332,11 +332,12 @@ async function loadMoodHistoryState(limitCount = 120) {
 
 // Initialize app when page loads
 window.addEventListener('DOMContentLoaded', () => {
-    // Initialize Firebase first
-    if (!initializeFirebase()) {
-        // Retry if Firebase didn't load yet
+    // Firebase is initialized in firebase-config.js
+    // Just check if it's ready
+    if (!auth || !db) {
+        console.warn('Firebase not ready yet, retrying...');
         setTimeout(() => {
-            if (!initializeFirebase()) {
+            if (!auth || !db) {
                 console.warn('Firebase not available. App will work in offline mode.');
             }
         }, 500);
