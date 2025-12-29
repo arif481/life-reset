@@ -8,6 +8,12 @@ let dashboardCharts = {
 };
 
 function initDashboard() {
+    // Destroy old chart instances to prevent memory leaks
+    if (dashboardCharts.weeklyActivity) { dashboardCharts.weeklyActivity.destroy(); dashboardCharts.weeklyActivity = null; }
+    if (dashboardCharts.moodTrend) { dashboardCharts.moodTrend.destroy(); dashboardCharts.moodTrend = null; }
+    if (dashboardCharts.habitCompletion) { dashboardCharts.habitCompletion.destroy(); dashboardCharts.habitCompletion = null; }
+    if (dashboardCharts.categoryBreakdown) { dashboardCharts.categoryBreakdown.destroy(); dashboardCharts.categoryBreakdown = null; }
+    
     renderDashboardOverview();
     renderWeeklyActivityChart();
     renderMoodTrendChart();
@@ -436,7 +442,8 @@ function calculateDashboardStats() {
     const weeklyTasksCompleted = weekData.values.reduce((a, b) => a + b, 0);
     const weeklyTasksTotal = Math.max(weekData.totalTasks, 0);
     const weeklyTaskPercent = weeklyTasksTotal > 0 ? Math.round((weeklyTasksCompleted / weeklyTasksTotal) * 100) : 0;
-    const weeklyMoodEntries = getMoodTrendData().filter(e => !!e.mood).length;
+    const trendData = getMoodTrendData();
+    const weeklyMoodEntries = (trendData && Array.isArray(trendData)) ? trendData.filter(e => !!e.mood).length : 0;
 
     return {
         overallScore,
@@ -514,10 +521,11 @@ function getMoodTrendData() {
         : null;
 
     let trend = 'Stable';
-    if (scores.length >= 4) {
-        const mid = Math.floor(scores.length / 2);
-        const first = scores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-        const second = scores.slice(mid).reduce((a, b) => a + b, 0) / Math.max(1, scores.length - mid);
+    const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+    if (validScores.length >= 4) {
+        const mid = Math.floor(validScores.length / 2);
+        const first = validScores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+        const second = validScores.slice(mid).reduce((a, b) => a + b, 0) / Math.max(1, validScores.length - mid);
         if (second > first + 0.3) trend = 'Improving';
         else if (second < first - 0.3) trend = 'Declining';
     }

@@ -1,5 +1,5 @@
 // Life Reset Service Worker - Offline-first caching strategy
-const CACHE_NAME = 'life-reset-v1.0.0';
+const CACHE_NAME = 'life-reset-v1.0.1';  // Increment version on app updates
 const STATIC_ASSETS = [
   '/',
   '/index.html',

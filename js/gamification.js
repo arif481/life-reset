@@ -8,8 +8,11 @@ function queueDailyXP(amount) {
 
     const flush = async () => {
         const delta = pendingDailyXP;
-        if (!delta) return;
-        pendingDailyXP = 0;
+        if (delta === 0) return;
+        
+        // Subtract what we're about to save, not reset to 0
+        pendingDailyXP -= delta;
+        
         try {
             const dateString = getDateString(new Date());
             await db.collection('users').doc(appState.currentUser.uid)
@@ -23,7 +26,7 @@ function queueDailyXP(amount) {
             appState.xpDailyHistory[dateString] = (appState.xpDailyHistory[dateString] || 0) + delta;
         } catch (error) {
             console.log('Error saving daily XP:', error);
-            // Put it back so it can retry next time
+            // Restore XP if save failed
             pendingDailyXP += delta;
         }
     };
@@ -172,12 +175,28 @@ function renderBadges() {
 function checkAndUnlockBadges() {
     badgesData.forEach(badge => {
         if (!appState.userStats.unlockedBadges.includes(badge.id)) {
-            // Evaluate condition
-            if (eval(badge.condition)) {
+            // Safe condition evaluation without eval()
+            if (evaluateBadgeCondition(badge.id)) {
                 unlockBadge(badge);
             }
         }
     });
+}
+
+// Safe badge condition evaluation without eval()
+function evaluateBadgeCondition(badgeId) {
+    const stats = appState.userStats;
+    switch(badgeId) {
+        case 'first_task': return stats.tasksCompleted >= 1;
+        case 'task_master': return stats.tasksCompleted >= 50;
+        case 'mood_tracker': return stats.moodLogged >= 10;
+        case 'journal_starter': return stats.journalEntries >= 5;
+        case 'week_warrior': return stats.streak >= 7;
+        case 'month_champion': return stats.streak >= 30;
+        case 'health_guru': return stats.healthScore >= 80;
+        case 'consistency_king': return stats.consistency >= 90;
+        default: return false;
+    }
 }
 
 function unlockBadge(badge) {
