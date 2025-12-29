@@ -68,6 +68,12 @@ async function saveMoodEntry() {
     const dateString = getDateString(appState.currentDate);
     const moodValue = appState.selectedMood;
     
+    // Store original state for rollback on error
+    const originalMoodLogged = appState.userStats.moodLogged;
+    const originalXP = appState.userStats.xp;
+    const originalLevel = appState.userStats.level;
+    const originalBadges = JSON.parse(JSON.stringify(appState.userStats.unlockedBadges || []));
+    
     try {
         appState.userStats.moodLogged++;
         addXP(15);
@@ -86,6 +92,7 @@ async function saveMoodEntry() {
                 { merge: true }
             );
         
+        // Only reset UI on SUCCESS
         showToast('Mood logged successfully! 🎉', 'success');
         document.getElementById('moodNote').value = '';
         document.getElementById('moodIntensity').value = '50';
@@ -98,7 +105,14 @@ async function saveMoodEntry() {
         updateGamificationUI();
         loadMoodStats();
     } catch (error) {
+        // ROLLBACK on failure - restore previous state
+        appState.userStats.moodLogged = originalMoodLogged;
+        appState.userStats.xp = originalXP;
+        appState.userStats.level = originalLevel;
+        appState.userStats.unlockedBadges = originalBadges;
+        updateGamificationUI();
         showToast('Error saving mood: ' + error.message, 'error');
+        console.error('Mood save error:', error);
     }
 }
 
@@ -166,6 +180,12 @@ async function saveJournalEntry() {
         return;
     }
     
+    // Store original state for rollback on error
+    const originalJournalCount = appState.userStats.journalEntries;
+    const originalXP = appState.userStats.xp;
+    const originalLevel = appState.userStats.level;
+    const originalBadges = JSON.parse(JSON.stringify(appState.userStats.unlockedBadges || []));
+    
     try {
         appState.userStats.journalEntries++;
         addXP(20);
@@ -185,6 +205,7 @@ async function saveJournalEntry() {
                 date: getDateString(new Date())
             });
         
+        // Only reset UI on SUCCESS
         showToast('Journal entry saved! 📝', 'success');
         document.getElementById('journalEntry').value = '';
         journalTags = [];
@@ -196,7 +217,14 @@ async function saveJournalEntry() {
         loadJournalEntries();
         updateGamificationUI();
     } catch (error) {
+        // ROLLBACK on failure - restore previous state
+        appState.userStats.journalEntries = originalJournalCount;
+        appState.userStats.xp = originalXP;
+        appState.userStats.level = originalLevel;
+        appState.userStats.unlockedBadges = originalBadges;
+        updateGamificationUI();
         showToast('Error saving journal: ' + error.message, 'error');
+        console.error('Journal save error:', error);
     }
 }
 
@@ -225,8 +253,14 @@ function analyzeSentiment(text) {
 }
 
 // Load mood statistics
+let isMoodStatsLoading = false;
+
 async function loadMoodStats() {
     if (!appState.currentUser || !db) return;
+    
+    // Prevent concurrent calls
+    if (isMoodStatsLoading) return;
+    isMoodStatsLoading = true;
     
     try {
         const today = getDateString(new Date());
@@ -280,6 +314,8 @@ async function loadMoodStats() {
         
     } catch (error) {
         console.log('Error loading mood stats:', error);
+    } finally {
+        isMoodStatsLoading = false;
     }
 }
 
@@ -377,6 +413,11 @@ function escapeHtml(text) {
 
 // Delete journal entry
 async function deleteJournalEntry(entryId) {
+    if (!appState.currentUser || !db) {
+        showToast('Please login first', 'error');
+        return;
+    }
+    
     if (confirm('Delete this entry?')) {
         try {
             await db.collection('users').doc(appState.currentUser.uid)

@@ -108,3 +108,11 @@ function formatDate(date) {
 function getDateString(date) {
     return date.toISOString().split('T')[0];
 }
+
+// Utility function: Sanitize HTML to prevent XSS attacks
+function sanitizeHTML(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}

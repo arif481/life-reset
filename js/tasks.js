@@ -72,7 +72,9 @@ function renderTaskCategories() {
         
         let taskList = '';
         tasks.forEach(task => {
-            const taskName = (task && task.name) ? task.name : 'Untitled task';
+            // Sanitize task name to prevent XSS
+            const rawName = (task && task.name) ? task.name : 'Untitled task';
+            const taskName = sanitizeHTML(rawName);
             const customActions = task && task.isCustom ? `
                 <button class="task-action-btn" onclick="editCustomTask('${task.id}')" title="Edit task">
                     <i class="fas fa-pen"></i>
@@ -143,9 +145,8 @@ function toggleTask(taskId) {
                 addXP(10);
             } else {
                 appState.userStats.tasksCompleted = Math.max(0, (appState.userStats.tasksCompleted || 0) - 1);
-                // Keep XP non-negative; we do not "level down".
-                appState.userStats.xp = Math.max(0, (appState.userStats.xp || 0) - 10);
-                if (typeof queueDailyXP === 'function') queueDailyXP(-10);
+                // Don't remove XP - it's earned, not a punishment
+                // This prevents negative XP in history
                 if (typeof saveUserStatsRealtime === 'function') saveUserStatsRealtime();
                 else if (typeof saveUserStats === 'function') saveUserStats();
             }
@@ -178,7 +179,32 @@ function updateProgress() {
     const completionRate = document.getElementById('completionRate');
     if (completionRate) completionRate.textContent = `${progressPercentage}%`;
     
-    appState.userStats.consistency = progressPercentage;
+    // FIXED: Calculate 30-day average consistency
+    let consistency30Day = 0;
+    if (appState.tasksHistory && Object.keys(appState.tasksHistory).length > 0) {
+        let totalDays = 0;
+        let completedDays = 0;
+        
+        for (let i = 0; i < 30; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = getDateString(date);
+            const dayData = appState.tasksHistory[dateStr];
+            
+            if (dayData && dayData.total > 0) {
+                totalDays++;
+                const dayPercent = (dayData.completed / dayData.total) * 100;
+                completedDays += dayPercent / 100;
+            }
+        }
+        
+        consistency30Day = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+    } else {
+        // Fallback to today's consistency if no history
+        consistency30Day = progressPercentage;
+    }
+    
+    appState.userStats.consistency = consistency30Day;
     updateGamificationUI();
 }
 
