@@ -21,6 +21,7 @@ let xpDailyRealtimeUnsubscribe = null;
 let moodPollingInterval = null;
 let journalPollingInterval = null;
 let xpDailyPollingInterval = null;
+let dateMonitorInterval = null;
 
 function cleanupRealtimeListeners() {
     try {
@@ -59,7 +60,6 @@ function cleanupRealtimeListeners() {
         });
     }
     window.firestoreUnsubscribers = [];
-}
 }
 
 // Debounce helper for real-time saves
@@ -380,9 +380,12 @@ window.addEventListener('DOMContentLoaded', () => {
     startDateMonitor();
 });
 
-// FIX #5: Monitor date changes and update app after midnight
-let dateMonitorInterval = null;
+// Monitor date changes and update app after midnight
 function startDateMonitor() {
+    // Clear existing interval if any
+    if (dateMonitorInterval) {
+        clearInterval(dateMonitorInterval);
+    }
     // Check if date has changed every minute
     dateMonitorInterval = setInterval(() => {
         const now = new Date();
