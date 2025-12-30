@@ -430,10 +430,17 @@ function renderAdvancedHabitChain() {
     generateHabitInsights();
 }
 
-function switchHabitView(view) {
+/**
+ * Switch between habit visualization views
+ * @param {string} view - View type: 'timeline' | 'calendar'
+ * @param {Event} [evt] - Optional click event
+ */
+function switchHabitView(view, evt) {
     currentHabitView = view;
     document.querySelectorAll('.chain-view-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    if (evt && evt.target) {
+        evt.target.classList.add('active');
+    }
     updateHabitChainView();
 }
 

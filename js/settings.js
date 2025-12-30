@@ -587,53 +587,70 @@ function switchSettingsTab(tab, element) {
     document.getElementById(tab + '-settings').classList.add('active');
 }
 
-// Load saved settings into UI
+/**
+ * Load saved settings into UI elements
+ * Uses safe element access with null checks
+ */
 function loadSavedSettings() {
+    // Helper for safe element assignment
+    const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value;
+    };
+    const setValue = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+    };
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+    
     // Notifications
-    document.getElementById('notificationsEnabled').checked = appSettings.notifications.enabled;
-    document.getElementById('taskReminders').checked = appSettings.notifications.taskReminders;
-    document.getElementById('goalReminders').checked = appSettings.notifications.goalReminders;
-    document.getElementById('moodReminders').checked = appSettings.notifications.moodReminders;
-    document.getElementById('achievementNotifications').checked = appSettings.notifications.achievementNotifications;
-    document.getElementById('soundEnabled').checked = appSettings.notifications.soundEnabled;
+    setChecked('notificationsEnabled', appSettings.notifications.enabled);
+    setChecked('taskReminders', appSettings.notifications.taskReminders);
+    setChecked('goalReminders', appSettings.notifications.goalReminders);
+    setChecked('moodReminders', appSettings.notifications.moodReminders);
+    setChecked('achievementNotifications', appSettings.notifications.achievementNotifications);
+    setChecked('soundEnabled', appSettings.notifications.soundEnabled);
     
     // Appearance
-    document.getElementById('darkModeSetting').checked = appSettings.appearance.darkMode;
-    document.getElementById('fontSizeSetting').value = appSettings.appearance.fontSize;
-    document.getElementById('animations').checked = appSettings.appearance.animations;
-    document.getElementById('compactMode').checked = appSettings.appearance.compactMode;
+    setChecked('darkModeSetting', appSettings.appearance.darkMode);
+    setValue('fontSizeSetting', appSettings.appearance.fontSize);
+    setChecked('animations', appSettings.appearance.animations);
+    setChecked('compactMode', appSettings.appearance.compactMode);
     
     // Privacy
-    document.getElementById('publicProfile').checked = appSettings.privacy.publicProfile;
-    document.getElementById('shareStats').checked = appSettings.privacy.shareStats;
-    document.getElementById('analytics').checked = appSettings.privacy.analytics;
+    setChecked('publicProfile', appSettings.privacy.publicProfile);
+    setChecked('shareStats', appSettings.privacy.shareStats);
+    setChecked('analytics', appSettings.privacy.analytics);
     
     // Reminders
-    document.getElementById('dailyCheckIn').value = appSettings.reminders.dailyCheckIn;
-    document.getElementById('eveningReflection').value = appSettings.reminders.eveningReflection;
-    document.getElementById('moodTracking').value = appSettings.reminders.moodTracking;
+    setValue('dailyCheckIn', appSettings.reminders.dailyCheckIn);
+    setValue('eveningReflection', appSettings.reminders.eveningReflection);
+    setValue('moodTracking', appSettings.reminders.moodTracking);
     
     // Backup
-    document.getElementById('autoBackup').checked = appSettings.backup.autoBackup;
-    document.getElementById('backupFrequency').value = appSettings.backup.backupFrequency;
-    document.getElementById('lastBackupTime').textContent = appSettings.backup.lastBackup;
+    setChecked('autoBackup', appSettings.backup.autoBackup);
+    setValue('backupFrequency', appSettings.backup.backupFrequency);
+    setText('lastBackupTime', appSettings.backup.lastBackup);
     
     // Gamification
-    document.getElementById('showXP').checked = appSettings.gamification.showXP;
-    document.getElementById('showLevel').checked = appSettings.gamification.showLevel;
-    document.getElementById('showBadges').checked = appSettings.gamification.showBadges;
-    document.getElementById('celebrateAchievements').checked = appSettings.gamification.celebrateAchievements;
+    setChecked('showXP', appSettings.gamification.showXP);
+    setChecked('showLevel', appSettings.gamification.showLevel);
+    setChecked('showBadges', appSettings.gamification.showBadges);
+    setChecked('celebrateAchievements', appSettings.gamification.celebrateAchievements);
     
     // Account info
     if (appState.currentUser) {
-        document.getElementById('userId').textContent = appState.currentUser.uid.substring(0, 10) + '...';
-        document.getElementById('displayName').value = appState.currentUser.displayName || '';
-        document.getElementById('userEmailSetting').value = appState.currentUser.email || '';
+        setText('userId', appState.currentUser.uid.substring(0, 10) + '...');
+        setValue('displayName', appState.currentUser.displayName || '');
+        setValue('userEmailSetting', appState.currentUser.email || '');
         
         // Set member since date
         if (appState.currentUser.metadata && appState.currentUser.metadata.creationTime) {
             const date = new Date(appState.currentUser.metadata.creationTime);
-            document.getElementById('memberSince').textContent = date.toLocaleDateString();
+            setText('memberSince', date.toLocaleDateString());
         }
     }
     

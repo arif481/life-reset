@@ -161,6 +161,7 @@ document.addEventListener('touchmove', (e) => {
     }
 });
 document.addEventListener('touchend', () => { touchStartX = null; });
+document.addEventListener('touchcancel', () => { touchStartX = null; });
 
 // Ensure sidebar resets when resizing to desktop
 window.addEventListener('resize', () => {

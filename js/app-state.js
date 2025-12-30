@@ -120,14 +120,22 @@ function showToast(message, type = 'info') {
     const toastMessage = document.getElementById('toastMessage');
     const toastIcon = document.getElementById('toastIcon');
     
+    // Guard against missing DOM elements
+    if (!toast || !toastMessage) {
+        console.warn('Toast elements not found:', message);
+        return;
+    }
+    
     toastMessage.textContent = message;
     toast.className = `toast ${type} show`;
     
     // Set icon based on type
-    if (type === 'success') toastIcon.className = 'fas fa-check-circle';
-    else if (type === 'error') toastIcon.className = 'fas fa-exclamation-circle';
-    else if (type === 'warning') toastIcon.className = 'fas fa-exclamation-triangle';
-    else toastIcon.className = 'fas fa-info-circle';
+    if (toastIcon) {
+        if (type === 'success') toastIcon.className = 'fas fa-check-circle';
+        else if (type === 'error') toastIcon.className = 'fas fa-exclamation-circle';
+        else if (type === 'warning') toastIcon.className = 'fas fa-exclamation-triangle';
+        else toastIcon.className = 'fas fa-info-circle';
+    }
     
     setTimeout(() => {
         toast.classList.remove('show');
