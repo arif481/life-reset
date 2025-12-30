@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-'use strict';
+
 
 /* ==========================================================================
    Email/Password Authentication
@@ -363,56 +363,60 @@ async function handleUserLoggedIn(user) {
     showToast('Loading your data...', 'info');
     
     try {
+        // Load data with timeout protection
+        const loadWithTimeout = (fn, timeout = 5000) => {
+            if (typeof fn !== 'function') return Promise.resolve();
+            return Promise.race([
+                fn(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+            ]).catch(e => console.warn('Load timeout/error:', e));
+        };
+        
         // Load data in the correct order (tasks list must exist before applying completion state)
-        await loadAllUserData();
-        await loadCustomTasks();
-        await loadTasksForDate();
+        await loadWithTimeout(() => loadAllUserData(), 8000);
+        await loadWithTimeout(() => loadCustomTasks(), 5000);
+        await loadWithTimeout(() => loadTasksForDate(), 5000);
 
-        // Remaining independent loads
-        await Promise.all([
-            (typeof loadJournalEntriesState === 'function' ? loadJournalEntriesState(50) : Promise.resolve()),
-            (typeof loadMoodHistoryState === 'function' ? loadMoodHistoryState(120) : Promise.resolve()),
-            (typeof loadTasksHistory === 'function' ? loadTasksHistory(30) : Promise.resolve()),
-            (typeof loadXPDailyHistory === 'function' ? loadXPDailyHistory(30) : Promise.resolve())
-        ]);
+        // Remaining independent loads (don't block UI)
+        Promise.all([
+            loadWithTimeout(() => typeof loadJournalEntriesState === 'function' && loadJournalEntriesState(50)),
+            loadWithTimeout(() => typeof loadMoodHistoryState === 'function' && loadMoodHistoryState(120)),
+            loadWithTimeout(() => typeof loadTasksHistory === 'function' && loadTasksHistory(30)),
+            loadWithTimeout(() => typeof loadXPDailyHistory === 'function' && loadXPDailyHistory(30))
+        ]).catch(e => console.warn('Background load error:', e));
         
-        // Update UI
-        document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('appContainer').classList.add('show');
-        
-        // Update user info in settings (guard missing elements)
-        if (user.displayName) {
-            const nameEl = document.getElementById('userName');
-            if (nameEl) nameEl.textContent = user.displayName;
-        }
-        if (user.email) {
-            const emailEl = document.getElementById('userEmail');
-            if (emailEl) emailEl.textContent = user.email;
-        }
-        
-        // Initialize app UI
-        initApp();
-        
-        // Setup real-time listeners
-        setupRealtimeListeners();
-
-        // Tasks-specific realtime + midnight refresh (defined in tasks.js)
-        if (typeof setupTasksRealtimeListener === 'function') {
-            setupTasksRealtimeListener();
-        }
-        if (typeof setupCustomTasksRealtimeListener === 'function') {
-            setupCustomTasksRealtimeListener();
-        }
-        if (typeof scheduleMidnightTrackerRefresh === 'function') {
-            scheduleMidnightTrackerRefresh();
-        }
-        
-        showToast('Welcome back! 🎉', 'success');
     } catch (error) {
         console.error('Error loading user data:', error);
-        showToast('Data loaded with some errors. Refreshing...', 'warning');
-        initApp();
     }
+    
+    // ALWAYS show the app UI, even if data loading fails
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('show');
+    
+    // Update user info in settings (guard missing elements)
+    if (user.displayName) {
+        const nameEl = document.getElementById('userName');
+        if (nameEl) nameEl.textContent = user.displayName;
+    }
+    if (user.email) {
+        const emailEl = document.getElementById('userEmail');
+        if (emailEl) emailEl.textContent = user.email;
+    }
+    
+    // Initialize app UI
+    initApp();
+    
+    // Setup real-time listeners (non-blocking)
+    try {
+        if (typeof setupRealtimeListeners === 'function') setupRealtimeListeners();
+        if (typeof setupTasksRealtimeListener === 'function') setupTasksRealtimeListener();
+        if (typeof setupCustomTasksRealtimeListener === 'function') setupCustomTasksRealtimeListener();
+        if (typeof scheduleMidnightTrackerRefresh === 'function') scheduleMidnightTrackerRefresh();
+    } catch (e) {
+        console.warn('Realtime listener setup error:', e);
+    }
+    
+    showToast('Welcome back! 🎉', 'success');
 }
 
 async function logout() {

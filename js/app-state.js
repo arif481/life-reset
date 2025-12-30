@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-'use strict';
+
 
 /* ==========================================================================
    Application Configuration
