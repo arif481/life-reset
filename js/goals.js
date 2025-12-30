@@ -255,7 +255,7 @@ function renderGoals() {
                         <li class="milestone-item ${m.completed ? 'completed' : ''}">
                             <input type="checkbox" class="milestone-checkbox" ${m.completed ? 'checked' : ''} 
                                    onchange="toggleMilestone('${goal.id}', ${i}, this.checked)">
-                            <span class="milestone-text">${m.text}</span>
+                            <span class="milestone-text">${sanitizeHTML(m.text)}</span>
                         </li>
                     `).join('')}
                 </ul>
@@ -330,7 +330,10 @@ function toggleMilestone(goalId, index, completed) {
 // Edit goal
 function editGoal(goalId) {
     const goal = appState.userGoals.find(g => g.id === goalId);
-    if (!goal) return;
+    if (!goal) {
+        showToast('Goal not found', 'error');
+        return;
+    }
     
     const newName = prompt('Edit goal name:', goal.name);
     if (newName && newName.trim()) {
@@ -341,14 +344,18 @@ function editGoal(goalId) {
     }
 }
 
-// Update goal progress from input field (used by inline progress inputs)
+/**
+ * Update goal progress from input field
+ * @param {string} goalId - Goal identifier
+ */
 function updateGoalProgressFromInput(goalId) {
     const input = document.getElementById(`progress_${goalId}`);
     if (!input) return;
     
     const goal = appState.userGoals.find(g => g.id === goalId);
     if (goal && !goal.completed) {
-        const newProgress = Math.min(parseInt(input.value) || goal.progress, goal.target);
+        const safeTarget = (goal.target && goal.target > 0) ? goal.target : 1;
+        const newProgress = Math.min(Math.max(0, parseInt(input.value) || 0), safeTarget);
         const oldProgress = goal.progress;
         goal.progress = newProgress;
         
@@ -371,9 +378,16 @@ function updateGoalProgressFromInput(goalId) {
     }
 }
 
-// Delete goal
+/**
+ * Delete a goal by ID
+ * @param {string} goalId - Goal identifier
+ */
 function deleteGoal(goalId) {
     const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) {
+        showToast('Goal not found', 'error');
+        return;
+    }
     if (confirm(`Delete "${goal.name}"? This cannot be undone.`)) {
         appState.userGoals = appState.userGoals.filter(g => g.id !== goalId);
         saveGoalsRealtime();
@@ -396,7 +410,7 @@ async function saveGoals() {
     
     try {
         window.isLocalUpdate = true;
-        await db.collection('users').doc(appState.currentUser.uid).update(
+        await db.collection('users').doc(appState.currentUser.uid).set(
             { goals: appState.userGoals },
             { merge: true }
         );

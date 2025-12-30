@@ -79,16 +79,21 @@ function getDateRange() {
     return { startDate, endDate: today };
 }
 
-// Change time range
-function changeTimeRange(range) {
+/**
+ * Change analytics time range
+ * @param {string} range - Time range: '7days' | '30days' | '90days' | 'all'
+ * @param {Event} [evt] - Optional click event
+ */
+function changeTimeRange(range, evt) {
     analyticsTimeRange = range;
     
     // Update active button
     document.querySelectorAll('.time-range-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    const evt = (typeof event !== 'undefined') ? event : null;
-    if (evt && evt.target) evt.target.classList.add('active');
+    if (evt && evt.target) {
+        evt.target.classList.add('active');
+    }
     
     // Refresh analytics
     initAnalytics();

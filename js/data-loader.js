@@ -40,6 +40,18 @@ function cleanupRealtimeListeners() {
     moodPollingInterval = null;
     journalPollingInterval = null;
     xpDailyPollingInterval = null;
+    
+    // Clear date monitor interval
+    if (dateMonitorInterval) {
+        clearInterval(dateMonitorInterval);
+        dateMonitorInterval = null;
+    }
+    
+    // Clear Firestore polling fallback
+    if (window.firestorePollingInterval) {
+        clearInterval(window.firestorePollingInterval);
+        window.firestorePollingInterval = null;
+    }
 
     if (window.firestoreUnsubscribers && Array.isArray(window.firestoreUnsubscribers)) {
         window.firestoreUnsubscribers.forEach(fn => {
@@ -47,6 +59,7 @@ function cleanupRealtimeListeners() {
         });
     }
     window.firestoreUnsubscribers = [];
+}
 }
 
 // Debounce helper for real-time saves

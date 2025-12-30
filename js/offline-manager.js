@@ -412,12 +412,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Periodic backup while app is running
-setInterval(() => {
-    if (window.appState?.currentUser) {
-        OfflineManager.backupUserData();
+// Periodic backup interval reference
+let backupInterval = null;
+
+/**
+ * Start periodic backup interval
+ */
+function startBackupInterval() {
+    if (backupInterval) clearInterval(backupInterval);
+    backupInterval = setInterval(() => {
+        if (window.appState?.currentUser) {
+            OfflineManager.backupUserData();
+        }
+    }, 60000);
+}
+
+/**
+ * Stop periodic backup interval (call on logout)
+ */
+function stopBackupInterval() {
+    if (backupInterval) {
+        clearInterval(backupInterval);
+        backupInterval = null;
     }
-}, 60000); // Every minute
+}
+
+// Start backup interval on load
+startBackupInterval();
 
 // Export for use in other modules
 window.OfflineManager = OfflineManager;

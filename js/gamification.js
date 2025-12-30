@@ -11,6 +11,7 @@
    ========================================================================== */
 
 let pendingDailyXP = 0;
+let isFlushingDailyXP = false;
 
 /* ==========================================================================
    XP Management
@@ -26,11 +27,12 @@ function queueDailyXP(amount) {
     pendingDailyXP += amount;
 
     const flush = async () => {
-        const delta = pendingDailyXP;
-        if (delta === 0) return;
+        // Prevent concurrent flushes
+        if (isFlushingDailyXP || pendingDailyXP === 0) return;
+        isFlushingDailyXP = true;
         
-        // Subtract what we're about to save, not reset to 0
-        pendingDailyXP -= delta;
+        const delta = pendingDailyXP;
+        pendingDailyXP = 0; // Reset before async operation
         
         try {
             const dateString = getDateString(new Date());
@@ -44,9 +46,11 @@ function queueDailyXP(amount) {
             // Update in-memory history for analytics
             appState.xpDailyHistory[dateString] = (appState.xpDailyHistory[dateString] || 0) + delta;
         } catch (error) {
-            console.log('Error saving daily XP:', error);
+            console.error('Error saving daily XP:', error);
             // Restore XP if save failed
             pendingDailyXP += delta;
+        } finally {
+            isFlushingDailyXP = false;
         }
     };
 
@@ -218,7 +222,15 @@ function evaluateBadgeCondition(badgeId) {
     }
 }
 
+/**
+ * Unlock a badge and award XP
+ * @param {Object} badge - Badge object to unlock
+ */
 function unlockBadge(badge) {
+    // Ensure unlockedBadges is an array
+    if (!Array.isArray(appState.userStats.unlockedBadges)) {
+        appState.userStats.unlockedBadges = [];
+    }
     appState.userStats.unlockedBadges.push(badge.id);
     celebrateAchievement(badge.name, badge.icon);
     addXP(50);
