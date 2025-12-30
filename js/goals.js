@@ -1,4 +1,14 @@
-// Advanced Goals and Habits Management Functions
+/**
+ * @fileoverview Goals & Milestones Module
+ * @description Goal setting, tracking, and progress management
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Configuration Constants
+   ========================================================================== */
 
 const categoryIcons = {
     'Health': '💪',
@@ -225,8 +235,10 @@ function renderGoals() {
     }
     
     goalsToShow.forEach(goal => {
-        const percentage = Math.min((goal.progress / goal.target) * 100, 100);
-        const isCompleted = goal.completed || goal.progress >= goal.target;
+        // Prevent division by zero - default target to 1 if 0 or undefined
+        const safeTarget = (goal.target && goal.target > 0) ? goal.target : 1;
+        const percentage = Math.min(((goal.progress || 0) / safeTarget) * 100, 100);
+        const isCompleted = goal.completed || (goal.progress || 0) >= safeTarget;
         const icon = categoryIcons[goal.category] || '🎯';
         const daysLeft = goal.deadline ? Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24)) : null;
         
@@ -243,7 +255,7 @@ function renderGoals() {
                         <li class="milestone-item ${m.completed ? 'completed' : ''}">
                             <input type="checkbox" class="milestone-checkbox" ${m.completed ? 'checked' : ''} 
                                    onchange="toggleMilestone('${goal.id}', ${i}, this.checked)">
-                            <span class="milestone-text">${m.text}</span>
+                            <span class="milestone-text">${sanitizeHTML(m.text)}</span>
                         </li>
                     `).join('')}
                 </ul>
@@ -292,7 +304,7 @@ function renderGoals() {
                         <div style="display: flex; gap: 10px; margin-top: 10px;">
                             <input type="number" id="progress_${goal.id}" value="${goal.progress}" min="0" max="${goal.target}" 
                                    class="goal-progress-input" placeholder="Enter progress">
-                            <button class="btn btn-primary" onclick="updateGoalProgress('${goal.id}')" style="flex-shrink: 0;">Update</button>
+                            <button class="btn btn-primary" onclick="updateGoalProgressFromInput('${goal.id}')" style="flex-shrink: 0;">Update</button>
                         </div>
                     ` : ''}
                 </div>
@@ -318,7 +330,10 @@ function toggleMilestone(goalId, index, completed) {
 // Edit goal
 function editGoal(goalId) {
     const goal = appState.userGoals.find(g => g.id === goalId);
-    if (!goal) return;
+    if (!goal) {
+        showToast('Goal not found', 'error');
+        return;
+    }
     
     const newName = prompt('Edit goal name:', goal.name);
     if (newName && newName.trim()) {
@@ -329,14 +344,18 @@ function editGoal(goalId) {
     }
 }
 
-// Update goal progress
-function updateGoalProgress(goalId) {
+/**
+ * Update goal progress from input field
+ * @param {string} goalId - Goal identifier
+ */
+function updateGoalProgressFromInput(goalId) {
     const input = document.getElementById(`progress_${goalId}`);
     if (!input) return;
     
     const goal = appState.userGoals.find(g => g.id === goalId);
     if (goal && !goal.completed) {
-        const newProgress = Math.min(parseInt(input.value) || goal.progress, goal.target);
+        const safeTarget = (goal.target && goal.target > 0) ? goal.target : 1;
+        const newProgress = Math.min(Math.max(0, parseInt(input.value) || 0), safeTarget);
         const oldProgress = goal.progress;
         goal.progress = newProgress;
         
@@ -359,9 +378,16 @@ function updateGoalProgress(goalId) {
     }
 }
 
-// Delete goal
+/**
+ * Delete a goal by ID
+ * @param {string} goalId - Goal identifier
+ */
 function deleteGoal(goalId) {
     const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) {
+        showToast('Goal not found', 'error');
+        return;
+    }
     if (confirm(`Delete "${goal.name}"? This cannot be undone.`)) {
         appState.userGoals = appState.userGoals.filter(g => g.id !== goalId);
         saveGoalsRealtime();
@@ -384,18 +410,21 @@ async function saveGoals() {
     
     try {
         window.isLocalUpdate = true;
-        await db.collection('users').doc(appState.currentUser.uid).update(
+        await db.collection('users').doc(appState.currentUser.uid).set(
             { goals: appState.userGoals },
             { merge: true }
         );
         setTimeout(() => { window.isLocalUpdate = false; }, 100);
     } catch (error) {
-        console.log('Error saving goals:', error);
+        console.error('Error saving goals:', error);
         window.isLocalUpdate = false;
     }
 }
 
-// Real-time save wrapper with debouncing
+/**
+ * Debounced wrapper for goal persistence
+ * @private
+ */
 function saveGoalsRealtime() {
     if (typeof debouncedSave === 'function') {
         debouncedSave('goals', saveGoals, 500);
@@ -452,34 +481,37 @@ function renderHabitChain() {
     updateHabitStats(streakData);
 }
 
-// Calculate habit streak
+// Calculate habit streak using tasksHistory (date-indexed completion data)
 function calculateHabitStreak() {
     const today = new Date();
     let streak = 0;
     let bestStreak = 0;
     let currentStreak = 0;
+    let isCurrentStreak = true; // Track if we're in today's streak
     
     for (let i = 0; i < 30; i++) {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
         const dateStr = getDateString(date);
-        const taskData = appState.userTasks[dateStr];
         
-        if (taskData) {
-            const completed = Object.values(taskData).filter(t => t.completed).length;
-            const total = Object.keys(taskData).length;
-            const percentage = total > 0 ? (completed / total) * 100 : 0;
+        // Use tasksHistory which is date-indexed, not userTasks which is category-indexed
+        const dayData = appState.tasksHistory ? appState.tasksHistory[dateStr] : null;
+        
+        if (dayData && dayData.total > 0) {
+            const percentage = dayData.rate || Math.round((dayData.completed / dayData.total) * 100);
             
             if (percentage === 100) {
                 currentStreak++;
-                if (i === 0) streak = currentStreak;
+                if (isCurrentStreak) streak = currentStreak; // Only update if still in current streak
             } else {
                 bestStreak = Math.max(bestStreak, currentStreak);
                 currentStreak = 0;
+                isCurrentStreak = false;
             }
         } else {
             bestStreak = Math.max(bestStreak, currentStreak);
             currentStreak = 0;
+            isCurrentStreak = false;
         }
     }
     
@@ -520,4 +552,62 @@ function updateHabitStats(streakData) {
         const el = document.getElementById(id);
         if (el) el.textContent = value;
     });
+}
+
+// FIX #7: Goal Progress Tracking Functions
+
+async function updateGoalProgress(goalId, amount) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) {
+        showToast('Goal not found', 'error');
+        return;
+    }
+    
+    const oldProgress = goal.progress || 0;
+    goal.progress = Math.min(oldProgress + amount, goal.target);
+    
+    // Check if goal is completed
+    if (goal.progress >= goal.target && !goal.completed) {
+        goal.completed = true;
+        goal.completedAt = new Date().toISOString();
+        completeGoal(goalId);
+    }
+    
+    saveGoalsRealtime();
+    renderGoals();
+}
+
+async function completeGoal(goalId) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) return;
+    
+    showToast(`🎉 Goal Completed: ${goal.name}!`, 'success');
+    celebrateAchievement(`Goal: ${goal.name}`, 'fa-trophy');
+    addXP(50);
+    
+    // Save completion
+    if (db && appState.currentUser) {
+        try {
+            await db.collection('users').doc(appState.currentUser.uid)
+                .collection('completedGoals').doc(goalId).set({
+                    goalId: goalId,
+                    name: goal.name,
+                    completedAt: new Date(),
+                    xpEarned: 50
+                });
+        } catch (error) {
+            console.error('Error saving completed goal:', error);
+        }
+    }
+}
+
+function showProgressModal(goalId) {
+    const goal = appState.userGoals.find(g => g.id === goalId);
+    if (!goal) return;
+    
+    const maxProgress = goal.target - (goal.progress || 0);
+    const amount = prompt(`How much progress on "${goal.name}"? (0-${maxProgress})`);
+    if (amount && !isNaN(amount) && amount > 0) {
+        updateGoalProgress(goalId, parseInt(amount));
+    }
 }

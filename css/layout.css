@@ -1,4 +1,13 @@
-/* App layout structure */
+/**
+ * @stylesheet layout.css
+ * @description Application layout structure and grid system
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   App Container
+   ========================================================================== */
+
 .app-container {
     display: none;
     min-height: 100vh;

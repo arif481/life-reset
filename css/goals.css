@@ -1,4 +1,12 @@
-/* Advanced Goals and Habits styles */
+/**
+ * @stylesheet goals.css
+ * @description Goal management - progress tracking, statistics
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Goals Grid Layout
+   ========================================================================== */
 
 .goals-grid {
     display: grid;

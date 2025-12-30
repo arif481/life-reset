@@ -1,4 +1,19 @@
-// Authentication Functions
+/**
+ * @fileoverview Authentication Module
+ * @description Handles user authentication including email/password and OAuth
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Email/Password Authentication
+   ========================================================================== */
+
+/**
+ * Authenticate user with email and password
+ * @async
+ */
 async function login() {
     if (!auth) {
         showToast('Firebase is not available. Please check your connection or try again later.', 'error');
@@ -403,6 +418,22 @@ async function handleUserLoggedIn(user) {
 async function logout() {
     if (confirm('Are you sure you want to logout?')) {
         try {
+            // Clean up all intervals and listeners before logout
+            if (typeof cleanupRealtimeListeners === 'function') {
+                cleanupRealtimeListeners();
+            }
+            
+            // Clear midnight refresh timer
+            if (window.midnightRefreshTimer) {
+                clearTimeout(window.midnightRefreshTimer);
+                window.midnightRefreshTimer = null;
+            }
+            
+            // Stop backup interval
+            if (typeof stopBackupInterval === 'function') {
+                stopBackupInterval();
+            }
+            
             if (auth) {
                 await auth.signOut();
             }
@@ -412,12 +443,21 @@ async function logout() {
             showToast('Logged out successfully', 'success');
             
             // Reset form
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
+            const loginEmail = document.getElementById('loginEmail');
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginEmail) loginEmail.value = '';
+            if (loginPassword) loginPassword.value = '';
         } catch (error) {
             showToast('Logout failed: ' + error.message, 'error');
         }
     }
+}
+
+/**
+ * Wrapper for logout - used by settings panel
+ */
+function handleLogout() {
+    logout();
 }
 
 function showAuthLoading(show) {

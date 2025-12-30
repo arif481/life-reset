@@ -1,5 +1,18 @@
-// UI Navigation and Layout Functions
+/**
+ * @fileoverview UI Navigation & Layout Module
+ * @description Handles view navigation, theme management, and UI interactions
+ * @version 1.0.0
+ */
 
+'use strict';
+
+/* ==========================================================================
+   Application Initialization
+   ========================================================================== */
+
+/**
+ * Initialize the application UI and state
+ */
 function initApp() {
     // Apply saved theme early
     if (typeof applyTheme === 'function') {
@@ -148,6 +161,7 @@ document.addEventListener('touchmove', (e) => {
     }
 });
 document.addEventListener('touchend', () => { touchStartX = null; });
+document.addEventListener('touchcancel', () => { touchStartX = null; });
 
 // Ensure sidebar resets when resizing to desktop
 window.addEventListener('resize', () => {

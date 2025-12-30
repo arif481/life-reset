@@ -1,4 +1,13 @@
-/* Tracker, Tasks, and Mood styles */
+/**
+ * @stylesheet tracker.css
+ * @description Daily tracker - tasks, mood logging, date navigation
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Date Navigation
+   ========================================================================== */
+
 .date-selector {
     display: flex;
     align-items: center;
