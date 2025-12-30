@@ -1,6 +1,15 @@
-// Advanced Settings System
+/**
+ * @fileoverview Settings Management Module
+ * @description User preferences, account settings, and data management
+ * @version 1.0.0
+ */
 
-// Settings state
+'use strict';
+
+/* ==========================================================================
+   Settings State
+   ========================================================================== */
+
 const appSettings = {
     notifications: {
         enabled: localStorage.getItem('notificationsEnabled') !== 'false',

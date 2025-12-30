@@ -1,8 +1,22 @@
-// Data Loading Functions
+/**
+ * @fileoverview Data Loading & Synchronization Module
+ * @description Handles Firebase data loading and real-time synchronization
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Real-time Listener References
+   ========================================================================== */
 
 let moodRealtimeUnsubscribe = null;
 let journalRealtimeUnsubscribe = null;
 let xpDailyRealtimeUnsubscribe = null;
+
+/* ==========================================================================
+   Polling Intervals
+   ========================================================================== */
 
 let moodPollingInterval = null;
 let journalPollingInterval = null;

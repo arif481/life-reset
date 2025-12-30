@@ -1,6 +1,15 @@
-// Mood and Journal Functions - Advanced Version
+/**
+ * @fileoverview Mood Tracking & Journal Module
+ * @description Handles mood logging, sentiment analysis, and journal entries
+ * @version 1.0.0
+ */
 
-// Mood tracking state
+'use strict';
+
+/* ==========================================================================
+   Module State
+   ========================================================================== */
+
 let selectedMoodTriggers = [];
 let selectedJournalMood = null;
 let journalTags = [];
@@ -123,10 +132,10 @@ function formatText(command) {
     
     if (command === 'color') {
         const color = document.getElementById('textColor').value;
-        // Note: Formatting in textarea is limited, we'll add visual indicator instead
+        // Textarea elements don't support inline styling - use visual indicator
         showToast('Color formatting saved in entry metadata', 'info');
     } else {
-        // For now, we'll show a toast. Full rich text would need contenteditable div
+        // Rich text formatting requires contenteditable implementation
         showToast('Text formatting will be applied on display', 'info');
     }
 }
@@ -313,7 +322,7 @@ async function loadMoodStats() {
         if (triggerEl) triggerEl.textContent = commonTrigger;
         
     } catch (error) {
-        console.log('Error loading mood stats:', error);
+        console.error('Error loading mood stats:', error);
     } finally {
         isMoodStatsLoading = false;
     }

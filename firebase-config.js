@@ -1,4 +1,15 @@
-// Firebase Configuration
+/**
+ * @fileoverview Firebase Configuration & Initialization
+ * @description Firebase SDK setup with authentication and Firestore
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Firebase Configuration
+   ========================================================================== */
+
 const firebaseConfig = {
   apiKey: "AIzaSyC1elvm-s3DJkH4o1O_4Vd9TWrvjl-JsuA",
   authDomain: "life-reset-e39f4.firebaseapp.com",

@@ -1,4 +1,12 @@
-/* Gamification: Badges, XP, Health Score, Streaks */
+/**
+ * @stylesheet gamification.css
+ * @description Gamification elements - badges, XP, levels, achievements
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Level Badge
+   ========================================================================== */
 
 .level-badge {
     display: inline-flex;

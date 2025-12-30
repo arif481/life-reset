@@ -1,4 +1,13 @@
-/* Button and form components */
+/**
+ * @stylesheet components.css
+ * @description Reusable UI components - buttons, forms, cards
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Button Components
+   ========================================================================== */
+
 .btn {
     padding: 14px 20px;
     border: none;

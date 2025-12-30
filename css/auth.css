@@ -1,4 +1,13 @@
-/* Authentication page styles */
+/**
+ * @stylesheet auth.css
+ * @description Authentication screens - login, register, password reset
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Authentication Container
+   ========================================================================== */
+
 .auth-screen {
     display: flex;
     align-items: center;

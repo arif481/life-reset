@@ -1,6 +1,15 @@
-// Advanced Analytics and Charts Functions
+/**
+ * @fileoverview Analytics & Visualization Module
+ * @description Advanced data visualization with Chart.js integration
+ * @version 1.0.0
+ */
 
-// Global chart instances
+'use strict';
+
+/* ==========================================================================
+   Chart Instances
+   ========================================================================== */
+
 let moodTrendChart = null;
 let completionRateChart = null;
 let categoryPerformanceChart = null;
@@ -8,8 +17,11 @@ let xpProgressChart = null;
 let habitStreakChart = null;
 let weeklyActivityChart = null;
 
-// Analytics time range state
-let analyticsTimeRange = '7days'; // 7days, 30days, 90days, all
+/* ==========================================================================
+   Module State
+   ========================================================================== */
+
+let analyticsTimeRange = '7days';
 
 // Initialize all analytics
 function initAnalytics() {
