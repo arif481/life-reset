@@ -1,5 +1,14 @@
-// Offline Storage Manager - Local storage fallback for Firestore
-// Handles offline data persistence and sync when back online
+/**
+ * @fileoverview Offline Storage Manager
+ * @description IndexedDB-based offline data persistence and sync
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Offline Manager
+   ========================================================================== */
 
 const OfflineManager = {
     DB_NAME: 'lifereset_offline',
@@ -403,12 +412,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Periodic backup while app is running
-setInterval(() => {
-    if (window.appState?.currentUser) {
-        OfflineManager.backupUserData();
+// Periodic backup interval reference
+let backupInterval = null;
+
+/**
+ * Start periodic backup interval
+ */
+function startBackupInterval() {
+    if (backupInterval) clearInterval(backupInterval);
+    backupInterval = setInterval(() => {
+        if (window.appState?.currentUser) {
+            OfflineManager.backupUserData();
+        }
+    }, 60000);
+}
+
+/**
+ * Stop periodic backup interval (call on logout)
+ */
+function stopBackupInterval() {
+    if (backupInterval) {
+        clearInterval(backupInterval);
+        backupInterval = null;
     }
-}, 60000); // Every minute
+}
+
+// Start backup interval on load
+startBackupInterval();
 
 // Export for use in other modules
 window.OfflineManager = OfflineManager;

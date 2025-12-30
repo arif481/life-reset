@@ -1,8 +1,22 @@
-// Data Loading Functions
+/**
+ * @fileoverview Data Loading & Synchronization Module
+ * @description Handles Firebase data loading and real-time synchronization
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Real-time Listener References
+   ========================================================================== */
 
 let moodRealtimeUnsubscribe = null;
 let journalRealtimeUnsubscribe = null;
 let xpDailyRealtimeUnsubscribe = null;
+
+/* ==========================================================================
+   Polling Intervals
+   ========================================================================== */
 
 let moodPollingInterval = null;
 let journalPollingInterval = null;
@@ -26,6 +40,18 @@ function cleanupRealtimeListeners() {
     moodPollingInterval = null;
     journalPollingInterval = null;
     xpDailyPollingInterval = null;
+    
+    // Clear date monitor interval
+    if (dateMonitorInterval) {
+        clearInterval(dateMonitorInterval);
+        dateMonitorInterval = null;
+    }
+    
+    // Clear Firestore polling fallback
+    if (window.firestorePollingInterval) {
+        clearInterval(window.firestorePollingInterval);
+        window.firestorePollingInterval = null;
+    }
 
     if (window.firestoreUnsubscribers && Array.isArray(window.firestoreUnsubscribers)) {
         window.firestoreUnsubscribers.forEach(fn => {
@@ -33,6 +59,7 @@ function cleanupRealtimeListeners() {
         });
     }
     window.firestoreUnsubscribers = [];
+}
 }
 
 // Debounce helper for real-time saves
@@ -348,4 +375,36 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Initialize UI regardless of Firebase status
     initApp();
+    
+    // Start monitoring date changes for new day detection
+    startDateMonitor();
 });
+
+// FIX #5: Monitor date changes and update app after midnight
+let dateMonitorInterval = null;
+function startDateMonitor() {
+    // Check if date has changed every minute
+    dateMonitorInterval = setInterval(() => {
+        const now = new Date();
+        const oldDate = getDateString(appState.currentDate);
+        const newDate = getDateString(now);
+        
+        if (oldDate !== newDate) {
+            console.log(`[Date] Updated from ${oldDate} to ${newDate}`);
+            appState.currentDate = now;
+            
+            // Reset task view for new day
+            if (typeof loadTasksForDate === 'function') {
+                loadTasksForDate();
+            }
+            if (typeof updateProgress === 'function') {
+                updateProgress();
+            }
+            if (typeof initDashboard === 'function') {
+                initDashboard();
+            }
+            
+            showToast('✨ New day! Fresh tasks loaded', 'success');
+        }
+    }, 60000); // Check every minute
+}

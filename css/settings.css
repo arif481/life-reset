@@ -1,6 +1,13 @@
-/* Advanced Settings Styles */
+/**
+ * @stylesheet settings.css
+ * @description Settings page - user preferences, account management
+ * @version 1.0.0
+ */
 
-/* Settings Header */
+/* ==========================================================================
+   Settings Header
+   ========================================================================== */
+
 .settings-header {
     margin-bottom: 30px;
 }

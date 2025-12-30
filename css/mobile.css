@@ -1,6 +1,13 @@
-/* Mobile Optimizations for Life Reset App */
+/**
+ * @stylesheet mobile.css
+ * @description Responsive design and mobile-specific optimizations
+ * @version 1.0.0
+ */
 
-/* Offline Indicator */
+/* ==========================================================================
+   Offline Status Indicator
+   ========================================================================== */
+
 .offline-indicator {
     position: fixed;
     top: 0;

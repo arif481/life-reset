@@ -1,6 +1,13 @@
-/* Advanced Analytics and Insights Styles */
+/**
+ * @stylesheet analytics.css
+ * @description Analytics dashboard and data visualization
+ * @version 1.0.0
+ */
 
-/* Analytics Header */
+/* ==========================================================================
+   Analytics Header
+   ========================================================================== */
+
 .analytics-header {
     display: flex;
     justify-content: space-between;
