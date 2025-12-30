@@ -1,6 +1,13 @@
-/* Advanced Habit Breaking & Tracking System */
+/**
+ * @stylesheet habits.css
+ * @description Habit tracking system - bad habit breaking, milestones
+ * @version 1.0.0
+ */
 
-/* Bad Habits Section */
+/* ==========================================================================
+   Bad Habits Section
+   ========================================================================== */
+
 .bad-habits-section {
     background: var(--bg-light);
     padding: 25px;

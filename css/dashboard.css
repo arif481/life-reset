@@ -1,4 +1,13 @@
-/* Dashboard and card styles */
+/**
+ * @stylesheet dashboard.css
+ * @description Dashboard layout, cards, and widget styles
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Dashboard Grid Layout
+   ========================================================================== */
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

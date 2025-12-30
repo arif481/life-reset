@@ -1,5 +1,14 @@
-// Life Reset Service Worker - Offline-first caching strategy
-const CACHE_NAME = 'life-reset-v1.0.1';  // Increment version on app updates
+/**
+ * @fileoverview Service Worker - Offline-First Caching
+ * @description PWA service worker with cache-first strategy for static assets
+ * @version 1.0.1
+ */
+
+/* ==========================================================================
+   Cache Configuration
+   ========================================================================== */
+
+const CACHE_NAME = 'life-reset-v1.0.1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

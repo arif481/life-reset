@@ -1,13 +1,32 @@
-// App Configuration and Global State
+/**
+ * @fileoverview Application State Management
+ * @description Centralized state management, configuration, and utility functions
+ * @version 1.0.0
+ * @license MIT
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Application Configuration
+   ========================================================================== */
+
 const APP_CONFIG = {
     appName: 'Life Reset: Recovery & Growth Platform',
     version: '1.0.0'
 };
 
-// Firebase auth and db are initialized in firebase-config.js (loaded first)
-// They are global variables: auth, db
+/* ==========================================================================
+   Firebase References
+   ========================================================================== */
 
-// Global app state
+// Firebase auth and db are initialized in firebase-config.js (loaded first)
+// Global variables: auth, db
+
+/* ==========================================================================
+   Application State
+   ========================================================================== */
+
 const appState = {
     currentUser: null,
     currentView: 'dashboard',
@@ -37,11 +56,17 @@ const appState = {
     }
 };
 
-// Chart instances
+/* ==========================================================================
+   Chart Instances
+   ========================================================================== */
+
 let moodChart = null;
 let completionChart = null;
 
-// Default tasks organized by categories
+/* ==========================================================================
+   Default Task Configuration
+   ========================================================================== */
+
 const defaultTasks = {
     morning: [
         { id: 'wake_early', name: 'Wake up early', completed: false },
@@ -66,7 +91,10 @@ const defaultTasks = {
     custom: []
 };
 
-// Badges System Data
+/* ==========================================================================
+   Achievement Badge Definitions
+   ========================================================================== */
+
 const badgesData = [
     { id: 'first_task', name: 'First Step', icon: '👣', description: 'Complete your first task', condition: 'appState.userStats.tasksCompleted >= 1' },
     { id: 'task_master', name: 'Task Master', icon: '✅', description: 'Complete 50 tasks', condition: 'appState.userStats.tasksCompleted >= 50' },
@@ -78,7 +106,15 @@ const badgesData = [
     { id: 'consistency_king', name: 'Consistency King', icon: '⭐', description: 'Maintain 90% consistency', condition: 'appState.userStats.consistency >= 90' }
 ];
 
-// Utility function: Show toast notifications
+/* ==========================================================================
+   Utility Functions
+   ========================================================================== */
+
+/**
+ * Display a toast notification to the user
+ * @param {string} message - The message to display
+ * @param {string} type - Notification type: 'info' | 'success' | 'warning' | 'error'
+ */
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
@@ -98,18 +134,30 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Utility function: Format date to readable string
+/**
+ * Format a date object to a human-readable string
+ * @param {Date} date - The date to format
+ * @returns {string} Formatted date string (e.g., "Monday, January 1, 2024")
+ */
 function formatDate(date) {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 }
 
-// Utility function: Get date string (YYYY-MM-DD)
+/**
+ * Convert a date to ISO date string format
+ * @param {Date} date - The date to convert
+ * @returns {string} Date string in YYYY-MM-DD format
+ */
 function getDateString(date) {
     return date.toISOString().split('T')[0];
 }
 
-// Utility function: Sanitize HTML to prevent XSS attacks
+/**
+ * Sanitize a string to prevent XSS attacks
+ * @param {string} str - The string to sanitize
+ * @returns {string} HTML-escaped string safe for DOM insertion
+ */
 function sanitizeHTML(str) {
     if (typeof str !== 'string') return '';
     const div = document.createElement('div');

@@ -1,7 +1,26 @@
-// Gamification System Functions
+/**
+ * @fileoverview Gamification System
+ * @description XP, leveling, achievements, and badge management
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Module State
+   ========================================================================== */
 
 let pendingDailyXP = 0;
 
+/* ==========================================================================
+   XP Management
+   ========================================================================== */
+
+/**
+ * Queue XP to be saved to the daily history
+ * Uses debouncing to batch rapid updates
+ * @param {number} amount - XP amount to queue
+ */
 function queueDailyXP(amount) {
     if (!db || !appState.currentUser || !firebase || !firebase.firestore) return;
     pendingDailyXP += amount;

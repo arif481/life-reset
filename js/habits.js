@@ -1,8 +1,21 @@
-// Advanced Habit Tracking and Bad Habit Breaking System
+/**
+ * @fileoverview Habit Tracking Module
+ * @description Bad habit breaking system with health improvement tracking
+ * @version 1.0.0
+ */
 
-let currentHabitView = 'timeline'; // 'timeline' or 'calendar'
+'use strict';
 
-// Bad habit data with health improvements
+/* ==========================================================================
+   Module State
+   ========================================================================== */
+
+let currentHabitView = 'timeline';
+
+/* ==========================================================================
+   Habit Definitions & Health Data
+   ========================================================================== */
+
 const badHabits = {
     'smoking': {
         icon: '🚬',
@@ -334,12 +347,15 @@ async function saveBadHabitsData() {
         );
         setTimeout(() => { window.isLocalUpdate = false; }, 100);
     } catch (error) {
-        console.log('Error saving bad habits:', error);
+        console.error('Error saving bad habits:', error);
         window.isLocalUpdate = false;
     }
 }
 
-// Real-time save wrapper with debouncing
+/**
+ * Debounced wrapper for habit persistence
+ * @private
+ */
 function saveBadHabitsRealtime() {
     if (typeof debouncedSave === 'function') {
         debouncedSave('badHabits', saveBadHabitsData, 500);

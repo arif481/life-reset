@@ -1,4 +1,19 @@
-// Authentication Functions
+/**
+ * @fileoverview Authentication Module
+ * @description Handles user authentication including email/password and OAuth
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Email/Password Authentication
+   ========================================================================== */
+
+/**
+ * Authenticate user with email and password
+ * @async
+ */
 async function login() {
     if (!auth) {
         showToast('Firebase is not available. Please check your connection or try again later.', 'error');

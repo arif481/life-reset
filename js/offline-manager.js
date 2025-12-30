@@ -1,5 +1,14 @@
-// Offline Storage Manager - Local storage fallback for Firestore
-// Handles offline data persistence and sync when back online
+/**
+ * @fileoverview Offline Storage Manager
+ * @description IndexedDB-based offline data persistence and sync
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Offline Manager
+   ========================================================================== */
 
 const OfflineManager = {
     DB_NAME: 'lifereset_offline',

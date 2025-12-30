@@ -1,4 +1,14 @@
-// Advanced Dashboard Functions
+/**
+ * @fileoverview Dashboard Module
+ * @description Main dashboard rendering, widgets, and overview statistics
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Chart Instances
+   ========================================================================== */
 
 let dashboardCharts = {
     weeklyActivity: null,

@@ -1,4 +1,14 @@
-// Advanced Goals and Habits Management Functions
+/**
+ * @fileoverview Goals & Milestones Module
+ * @description Goal setting, tracking, and progress management
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Configuration Constants
+   ========================================================================== */
 
 const categoryIcons = {
     'Health': '💪',
@@ -392,12 +402,15 @@ async function saveGoals() {
         );
         setTimeout(() => { window.isLocalUpdate = false; }, 100);
     } catch (error) {
-        console.log('Error saving goals:', error);
+        console.error('Error saving goals:', error);
         window.isLocalUpdate = false;
     }
 }
 
-// Real-time save wrapper with debouncing
+/**
+ * Debounced wrapper for goal persistence
+ * @private
+ */
 function saveGoalsRealtime() {
     if (typeof debouncedSave === 'function') {
         debouncedSave('goals', saveGoals, 500);
@@ -569,7 +582,7 @@ async function completeGoal(goalId) {
                     xpEarned: 50
                 });
         } catch (error) {
-            console.log('Error saving completed goal:', error);
+            console.error('Error saving completed goal:', error);
         }
     }
 }

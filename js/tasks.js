@@ -1,9 +1,28 @@
-// Task Management Functions
+/**
+ * @fileoverview Task Management Module
+ * @description Handles daily task tracking, completion, and persistence
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/* ==========================================================================
+   Module State
+   ========================================================================== */
 
 let tasksRealtimeUnsubscribe = null;
 let customTasksRealtimeUnsubscribe = null;
 let midnightRefreshTimer = null;
 
+/* ==========================================================================
+   Utility Functions
+   ========================================================================== */
+
+/**
+ * Create a deep copy of an object
+ * @param {Object} obj - Object to copy
+ * @returns {Object} Deep cloned object
+ */
 function deepCopy(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
@@ -33,7 +52,7 @@ function saveCustomTasksForCategory(category) {
                 .collection('customTasks').doc(category)
                 .set({ tasks, updatedAt: new Date() }, { merge: true });
         } catch (error) {
-            console.log('Error saving custom tasks:', error);
+            console.error('Error saving custom tasks:', error);
         }
     };
 
@@ -232,7 +251,7 @@ async function saveTaskCompletion(taskId, completed) {
                 await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
             }
         } catch (error) {
-            console.log('Error saving task online, queuing for offline:', error);
+            console.warn('Error saving task online, queuing for offline:', error);
             window.isLocalTaskUpdate = false;
             
             // Queue for later sync if online save fails
@@ -242,8 +261,7 @@ async function saveTaskCompletion(taskId, completed) {
             }
         }
     } else {
-        // Offline: queue the write and cache locally
-        console.log('[Offline] Queuing task save for later sync');
+        // Queue write for offline sync
         if (window.OfflineManager) {
             await window.OfflineManager.queueWrite('tasks', dateString, data, 'set');
             await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
@@ -293,16 +311,15 @@ async function loadTasksForDate() {
                 }
             }
         } catch (error) {
-            console.log('Error loading tasks from Firebase:', error);
+            console.error('Error loading tasks from Firebase:', error);
         }
     }
     
-    // If Firebase failed or offline, try cached data
+    // Fallback to cached data if Firebase unavailable
     if (!dataLoaded && window.OfflineManager) {
         try {
             const cachedData = await window.OfflineManager.getCachedData(`tasks_${dateString}`);
             if (cachedData) {
-                console.log('[Offline] Using cached task data for', dateString);
                 for (const category in appState.userTasks) {
                     appState.userTasks[category].forEach(task => {
                         if (cachedData[task.id] !== undefined) {
@@ -312,7 +329,7 @@ async function loadTasksForDate() {
                 }
             }
         } catch (cacheError) {
-            console.log('Error loading cached tasks:', cacheError);
+            console.error('Error loading cached tasks:', cacheError);
         }
     }
     
@@ -396,7 +413,7 @@ async function loadCustomTasks() {
                 });
             });
         } catch (error) {
-            console.log('Error loading custom tasks:', error);
+            console.error('Error loading custom tasks:', error);
         }
     }
 }

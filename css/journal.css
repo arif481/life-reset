@@ -1,6 +1,13 @@
-/* Advanced Journal & Mood Styles */
+/**
+ * @stylesheet journal.css
+ * @description Journal entries and mood visualization
+ * @version 1.0.0
+ */
 
-/* Mood Section */
+/* ==========================================================================
+   Mood Tracking Section
+   ========================================================================== */
+
 .mood-section {
     background: var(--bg-light);
     padding: 25px;

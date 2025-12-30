@@ -1,4 +1,13 @@
-/* Color and design system variables */
+/**
+ * @stylesheet variables.css
+ * @description Design system tokens - colors, spacing, typography, and effects
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Root CSS Custom Properties
+   ========================================================================== */
+
 :root {
     --primary: #4361ee;
     --primary-light: #4895ef;

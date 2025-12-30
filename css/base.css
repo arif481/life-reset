@@ -1,4 +1,13 @@
-/* Global styles and base layout */
+/**
+ * @stylesheet base.css
+ * @description Global reset and base element styles
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   CSS Reset & Base Styles
+   ========================================================================== */
+
 * {
     margin: 0;
     padding: 0;
