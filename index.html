@@ -22,8 +22,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 
-    <!-- Chart.js for analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js - Lazy loaded when needed -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -125,11 +126,17 @@
     </script>
 </head>
 <body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link" id="skip-to-main">Skip to main content</a>
+    
+    <!-- Live Region for Screen Reader Announcements -->
+    <div id="a11y-live-region" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    
     <!-- Auth Screen - hidden initially while checking persisted auth -->
-    <div class="auth-screen" id="authScreen" style="display: none;">
+    <div class="auth-screen" id="authScreen" style="display: none;" role="region" aria-labelledby="auth-title">
         <div class="auth-container">
             <div class="auth-header">
-                <h1>Life Reset</h1>
+                <h1 id="auth-title">Life Reset</h1>
                 <p>Your Personal Recovery & Growth Platform</p>
             </div>
 
@@ -223,126 +230,126 @@
     </div>
 
     <!-- Main App -->
-    <div class="app-container" id="appContainer">
+    <div class="app-container" id="appContainer" role="application" aria-label="Life Reset Application">
         <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()" role="presentation" aria-hidden="true"></div>
         
         <!-- Sidebar -->
-        <div class="sidebar">
+        <nav class="sidebar" role="navigation" aria-label="Main navigation">
             <div class="sidebar-header">
-                <h2><i class="fas fa-leaf"></i> Life Reset</h2>
+                <h2><i class="fas fa-leaf" aria-hidden="true"></i> Life Reset</h2>
             </div>
-            <div class="sidebar-nav">
-                <a href="#" class="nav-item active" onclick="navigateTo('dashboard')">
-                    <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+            <div class="sidebar-nav" role="menubar">
+                <a href="#" class="nav-item active" onclick="navigateTo('dashboard')" role="menuitem" aria-current="page">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i> <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('tracker')">
-                    <i class="fas fa-check-square"></i> <span>Daily Tracker</span>
+                <a href="#" class="nav-item" onclick="navigateTo('tracker')" role="menuitem">
+                    <i class="fas fa-check-square" aria-hidden="true"></i> <span>Daily Tracker</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('mood')">
-                    <i class="fas fa-smile"></i> <span>Mood & Journal</span>
+                <a href="#" class="nav-item" onclick="navigateTo('mood')" role="menuitem">
+                    <i class="fas fa-smile" aria-hidden="true"></i> <span>Mood & Journal</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('analytics')">
-                    <i class="fas fa-chart-bar"></i> <span>Analytics</span>
+                <a href="#" class="nav-item" onclick="navigateTo('analytics')" role="menuitem">
+                    <i class="fas fa-chart-bar" aria-hidden="true"></i> <span>Analytics</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('goals')">
-                    <i class="fas fa-bullseye"></i> <span>Goals</span>
+                <a href="#" class="nav-item" onclick="navigateTo('goals')" role="menuitem">
+                    <i class="fas fa-bullseye" aria-hidden="true"></i> <span>Goals</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('resources')">
-                    <i class="fas fa-phone"></i> <span>Resources</span>
+                <a href="#" class="nav-item" onclick="navigateTo('resources')" role="menuitem">
+                    <i class="fas fa-phone" aria-hidden="true"></i> <span>Resources</span>
                 </a>
-                <a href="#" class="nav-item" onclick="navigateTo('settings')">
-                    <i class="fas fa-cog"></i> <span>Settings</span>
+                <a href="#" class="nav-item" onclick="navigateTo('settings')" role="menuitem">
+                    <i class="fas fa-cog" aria-hidden="true"></i> <span>Settings</span>
                 </a>
             </div>
             <div class="sidebar-footer">
-                <button class="btn btn-secondary btn-block" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <button class="btn btn-secondary btn-block" onclick="logout()" aria-label="Sign out of your account">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                 </button>
             </div>
-        </div>
+        </nav>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <div class="content-header">
+        <main class="main-content" id="main-content" role="main">
+            <header class="content-header" role="banner">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()" title="Toggle menu">
-                        <i class="fas fa-bars"></i>
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
                     </button>
-                    <h1 id="pageTitle">Dashboard</h1>
+                    <h1 id="pageTitle" aria-live="polite">Dashboard</h1>
                 </div>
                 <div class="header-actions">
-                    <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
-                    <div class="user-menu">
-                        <button class="user-btn" onclick="toggleUserMenu()">
-                            <i class="fas fa-user-circle"></i> <span id="userName">User</span>
+                    <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode" aria-pressed="false">🌙</button>
+                    <div class="user-menu" role="menu">
+                        <button class="user-btn" onclick="toggleUserMenu()" aria-label="User menu" aria-haspopup="true" aria-expanded="false" aria-controls="userDropdown">
+                            <i class="fas fa-user-circle" aria-hidden="true"></i> <span id="userName">User</span>
                         </button>
-                        <div class="dropdown" id="userDropdown">
-                            <div class="dropdown-item" onclick="navigateTo('settings')">
-                                <i class="fas fa-cog"></i> Settings
+                        <div class="dropdown" id="userDropdown" role="menu" aria-label="User options">
+                            <div class="dropdown-item" onclick="navigateTo('settings')" role="menuitem" tabindex="0">
+                                <i class="fas fa-cog" aria-hidden="true"></i> Settings
                             </div>
-                            <button class="dropdown-item danger" onclick="logout()">
-                                <i class="fas fa-sign-out-alt"></i> Logout
+                            <button class="dropdown-item danger" onclick="logout()" role="menuitem">
+                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
             <!-- Dashboard View -->
-            <div id="dashboard-view"></div>
+            <section id="dashboard-view" role="region" aria-labelledby="pageTitle"></section>
 
             <!-- Tracker View -->
-            <div id="tracker-view" style="display: none;"></div>
+            <section id="tracker-view" style="display: none;" role="region" aria-label="Daily Task Tracker"></section>
 
             <!-- Mood & Journal View -->
-            <div id="mood-view" style="display: none;"></div>
+            <section id="mood-view" style="display: none;" role="region" aria-label="Mood Tracker"></section>
 
             <!-- Journal View -->
-            <div id="journal-view" style="display: none;"></div>
+            <section id="journal-view" style="display: none;" role="region" aria-label="Journal Entries"></section>
 
             <!-- Analytics View -->
-            <div id="analytics-view" style="display: none;"></div>
+            <section id="analytics-view" style="display: none;" role="region" aria-label="Analytics and Charts"></section>
 
             <!-- Resources View -->
-            <div id="resources-view" style="display: none;"></div>
+            <section id="resources-view" style="display: none;" role="region" aria-label="Helpful Resources"></section>
 
             <!-- Goals View -->
-            <div id="goals-view" style="display: none;"></div>
+            <section id="goals-view" style="display: none;" role="region" aria-label="Goals Management"></section>
 
             <!-- Settings View -->
-            <div id="settings-view" style="display: none;"></div>
-        </div>
+            <section id="settings-view" style="display: none;" role="region" aria-label="Application Settings"></section>
+        </main>
     </div>
 
     <!-- Toast Notifications -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle" id="toastIcon"></i>
+    <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <i class="fas fa-check-circle" id="toastIcon" aria-hidden="true"></i>
         <span id="toastMessage">Operation completed successfully!</span>
     </div>
 
     <!-- Achievement Unlock Popup -->
-    <div class="achievement-unlock-popup" id="achievementPopup">
-        <h2>🎉 Achievement Unlocked!</h2>
-        <div class="icon" id="popupIcon"></div>
+    <div class="achievement-unlock-popup" id="achievementPopup" role="alertdialog" aria-labelledby="achievementTitle" aria-describedby="popupDesc">
+        <h2 id="achievementTitle">🎉 Achievement Unlocked!</h2>
+        <div class="icon" id="popupIcon" role="img" aria-label="Achievement icon"></div>
         <p><strong id="popupTitle">Title</strong></p>
         <p id="popupDesc">Description</p>
     </div>
 
     <!-- Add Task Modal -->
-    <div class="modal" id="addTaskModal">
+    <div class="modal" id="addTaskModal" role="dialog" aria-labelledby="addTaskModalTitle" aria-modal="true">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Add Custom Task</h3>
-                <button class="modal-close" onclick="closeAddTaskModal()">×</button>
+                <h3 class="modal-title" id="addTaskModalTitle">Add Custom Task</h3>
+                <button class="modal-close" onclick="closeAddTaskModal()" aria-label="Close dialog">×</button>
             </div>
             <div class="form-group">
                 <label for="customTaskName">Task Name</label>
-                <input type="text" id="customTaskName" class="form-control" placeholder="Enter task name">
+                <input type="text" id="customTaskName" class="form-control" placeholder="Enter task name" aria-required="true">
             </div>
             <div class="form-group">
                 <label for="taskCategory">Category</label>
-                <select id="taskCategory" class="form-control">
+                <select id="taskCategory" class="form-control" aria-required="true">
                     <option value="morning">Morning Routine</option>
                     <option value="health">Health & Wellness</option>
                     <option value="productivity">Productivity</option>
@@ -351,7 +358,7 @@
                 </select>
             </div>
             <button class="btn btn-primary btn-block" onclick="addCustomTask()">
-                <i class="fas fa-plus"></i> Add Task
+                <i class="fas fa-plus" aria-hidden="true"></i> Add Task
             </button>
         </div>
     </div>
@@ -411,6 +418,12 @@
     <script src="app/features/gamification/gamification.data.js"></script>
     <script src="app/features/gamification/gamification.ui.js"></script>
     <script src="app/features/gamification/gamification.events.js"></script>
+    <!-- Shared Utilities -->
+    <script src="app/shared/utils/lazy-loader.js" type="module"></script>
+    <script src="app/shared/utils/accessibility.js" type="module"></script>
+    <!-- Shared Components -->
+    <script src="app/shared/components/loading-skeleton.js"></script>
+    <script src="app/shared/components/push-notifications.js"></script>
     
     <!-- Fallback Views Script -->
     <script>
