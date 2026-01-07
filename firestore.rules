@@ -2,52 +2,139 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is authenticated
+    // ========================================================================
+    // Helper Functions
+    // ========================================================================
+    
+    // Check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Helper function to check if user owns the resource
+    // Check if user owns the resource
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return request.auth != null && request.auth.uid == userId;
     }
     
-    // Users collection - users can only read/write their own data
+    // Check if the request size is within limits
+    function isValidSize() {
+      return request.resource.data.size() < 50; // Max 50 fields
+    }
+    
+    // Validate string field length
+    function isValidString(field, minLen, maxLen) {
+      return field is string && 
+             field.size() >= minLen && 
+             field.size() <= maxLen;
+    }
+    
+    // ========================================================================
+    // Users Collection
+    // ========================================================================
+    
     match /users/{userId} {
+      // Users can only read/write their own document
       allow create: if isAuthenticated() && isOwner(userId);
       allow read: if isAuthenticated() && isOwner(userId);
-      allow update: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId) && isValidSize();
       allow delete: if isAuthenticated() && isOwner(userId);
       
-      // User's tasks subcollection
+      // ======================================================================
+      // Tasks Subcollection
+      // ======================================================================
       match /tasks/{taskId} {
-        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['title']) &&
+          isValidString(request.resource.data.title, 1, 500);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
       }
       
-      // User's mood entries subcollection
+      // ======================================================================
+      // Habits Subcollection
+      // ======================================================================
+      match /habits/{habitId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['name']) &&
+          isValidString(request.resource.data.name, 1, 200);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // ======================================================================
+      // Moods Subcollection
+      // ======================================================================
+      match /moods/{moodId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['mood']) &&
+          request.resource.data.mood in ['very-sad', 'sad', 'okay', 'good', 'great'];
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // Legacy mood entries (for backwards compatibility)
       match /moodEntries/{entryId} {
         allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
       
-      // User's journal entries subcollection
+      // ======================================================================
+      // Journal Subcollection
+      // ======================================================================
       match /journal/{entryId} {
-        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['content']) &&
+          isValidString(request.resource.data.content, 1, 50000);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
       }
       
-      // User's custom tasks subcollection
+      // ======================================================================
+      // Goals Subcollection
+      // ======================================================================
+      match /goals/{goalId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['title']) &&
+          isValidString(request.resource.data.title, 1, 500);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // Legacy custom tasks (for backwards compatibility)
       match /customTasks/{taskId} {
         allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
       }
       
-      // User's goals subcollection
-      match /goals/{goalId} {
-        allow create, read, update, delete: if isAuthenticated() && isOwner(userId);
+      // ======================================================================
+      // Bad Habits Subcollection
+      // ======================================================================
+      match /badHabits/{habitId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId) &&
+          request.resource.data.keys().hasAll(['name']);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && isOwner(userId);
       }
     }
     
-    // Analytics collection for aggregated data (read-only)
+    // ========================================================================
+    // Global Settings (read-only for authenticated users)
+    // ========================================================================
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin only
+    }
+    
+    // ========================================================================
+    // Analytics (read-only)
+    // ========================================================================
     match /analytics/{doc=**} {
       allow read: if isAuthenticated();
+      allow write: if false; // Admin only via Cloud Functions
     }
   }
 }

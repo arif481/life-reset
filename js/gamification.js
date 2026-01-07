@@ -238,10 +238,17 @@ function unlockBadge(badge) {
     renderBadges();
 }
 
+/**
+ * Displays achievement unlock celebration with confetti
+ * @param {string} title - Achievement title
+ * @param {string} icon - Achievement icon (emoji or Font Awesome class)
+ */
 function celebrateAchievement(title, icon) {
-    // Show popup
     const popup = document.getElementById('achievementPopup');
     if (popup) {
+        // Show popup
+        popup.style.display = 'block';
+        
         document.getElementById('popupTitle').textContent = title;
         const iconEl = document.getElementById('popupIcon');
         
@@ -257,6 +264,10 @@ function celebrateAchievement(title, icon) {
         
         setTimeout(() => {
             popup.classList.remove('show');
+            // Hide after animation completes
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
         }, 3000);
     }
     

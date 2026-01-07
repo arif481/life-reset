@@ -1,95 +1,189 @@
-# Life Reset
+# Life Reset 🌟
 
-A personal wellness app to help you track daily progress, manage your mood, and journal your journey.
+> A modern personal wellness Progressive Web App (PWA) for building better habits, tracking mood, journaling, and gamifying self-improvement.
 
-## Setup Instructions
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Android-orange.svg)
 
-### 1. Configure Firebase
+## ✨ Features
 
-This app requires Firebase for authentication and data storage. Follow these steps:
+### 📋 Task Management
+- Daily task tracking with customizable categories
+- Morning, Health, Productivity, and Evening routines
+- Add custom tasks for personalized workflows
+- Real-time progress tracking and completion rates
 
-1. **Copy the template config file:**
+### 😊 Mood Tracking
+- 5-level mood scale with emoji indicators
+- Intensity slider for nuanced tracking
+- Trigger identification (work, relationships, health, etc.)
+- Mood statistics and trend analysis
+
+### 📔 Journal
+- Rich text journaling with daily entries
+- Sentiment analysis for emotional insights
+- Tag-based organization and search
+- Word count and writing statistics
+
+### 📊 Analytics Dashboard
+- Interactive charts powered by Chart.js
+- Mood trend visualization
+- Task completion patterns
+- XP progress tracking
+- Weekly/monthly insights
+
+### 🎮 Gamification System
+- Experience points (XP) for completing activities
+- Level progression system
+- Unlockable badges and achievements
+- Streak tracking with celebrations
+- Level-up animations and confetti
+
+### 🔧 Customization
+- Dark/Light mode toggle
+- Push notification reminders
+- Data export/import
+- Profile management
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Firebase project (for authentication and data storage)
+
+### Installation
+
+1. **Clone the repository**
    ```bash
-   cp firebase-config.template.js firebase-config.js
+   git clone https://github.com/yourusername/life-reset.git
+   cd life-reset
    ```
 
-2. **Get your Firebase credentials:**
+2. **Configure Firebase**
+   ```bash
+   # Create config from template
+   cp firebase-config.template.js firebase-config.js
+   ```
+   
+   Update `firebase-config.js` with your Firebase credentials:
+   ```javascript
+   const firebaseConfig = {
+     apiKey: "your-api-key",
+     authDomain: "your-project.firebaseapp.com",
+     projectId: "your-project-id",
+     storageBucket: "your-project.appspot.com",
+     messagingSenderId: "your-sender-id",
+     appId: "your-app-id"
+   };
+   ```
+
+3. **Enable Firebase Services**
    - Go to [Firebase Console](https://console.firebase.google.com/)
-   - Create a new project or select an existing one
-   - Go to Project Settings > General
-   - Scroll down to "Your apps" and click the web icon (</>)
-   - Copy your Firebase configuration
+   - Enable **Authentication** (Email/Password + Google Sign-In)
+   - Enable **Cloud Firestore**
+   - Deploy security rules from `firestore.rules`
 
-3. **Update `firebase-config.js`:**
-   - Open `firebase-config.js`
-   - Replace the placeholder values with your actual Firebase credentials
-   - **IMPORTANT:** Never commit this file to git - it's already in `.gitignore`
+4. **Run the App**
+   ```bash
+   # Using any static server
+   npx serve .
+   
+   # Or simply open index.html in your browser
+   ```
 
-4. **Enable Firebase services:**
-   - In Firebase Console, enable **Authentication** (Email/Password and Google)
-   - Enable **Cloud Firestore** database
-   - Update Firestore security rules using the provided `firestore.rules` file
+## 📱 Android Build
 
-### 2. Run the App
+This app supports Android deployment via Capacitor:
 
-Just open `index.html` in your web browser. No build process needed.
+```bash
+# Install dependencies
+npm install
 
-## Getting Started
+# Sync web assets to Android
+npm run sync
 
-**Create an Account**
-- Sign up with email and password
-- Use your Google account
-- Or just explore as a guest
+# Open in Android Studio
+npm run android
+```
 
-**Track Daily Tasks**
-- Check off tasks as you complete them
-- Your app automatically counts how many days in a row you've been consistent
-- Add your own custom tasks
+See [ANDROID-BUILD.md](ANDROID-BUILD.md) for detailed instructions.
 
-**Log Your Mood**
-- Rate how you're feeling each day (1-5 scale)
-- Write notes about what's affecting your mood
-- See patterns over time with charts
+## 🏗️ Project Structure
 
-**Write Journal Entries**
-- Write freely about your thoughts and day
-- Entries are organized by date
-- Delete old entries whenever you want
+```
+life-reset/
+├── app/                      # Feature modules (v2.0)
+│   ├── features/
+│   │   ├── tasks/           # Task management
+│   │   ├── mood/            # Mood tracking
+│   │   ├── journal/         # Journaling
+│   │   ├── analytics/       # Charts & insights
+│   │   ├── settings/        # User preferences
+│   │   └── gamification/    # XP & badges
+│   └── shared/
+│       ├── components/      # Reusable UI components
+│       └── utils/           # Helper functions
+├── css/                      # Stylesheets
+├── js/                       # Legacy scripts
+├── icons/                    # App icons
+├── android/                  # Capacitor Android project
+├── index.html               # Main entry point
+├── sw.js                    # Service Worker (PWA)
+├── manifest.webmanifest     # PWA manifest
+├── firestore.rules          # Firebase security rules
+└── capacitor.config.json    # Capacitor configuration
+```
 
-**See Your Progress**
-- Charts showing your mood trends
-- How many tasks you're completing
-- Your longest streak
+## 🔐 Security
 
-**Customize**
-- Toggle between dark and light mode
-- Add custom tasks
-- Update your profile
+- **Authentication**: Email/password and Google OAuth
+- **Authorization**: Row-level security via Firestore rules
+- **Data Validation**: Server-side validation in Firestore rules
+- **XSS Prevention**: Input sanitization throughout the app
+- **Offline Support**: IndexedDB caching with Firebase sync
 
-## How Your Data Stays Safe
+## 🛠️ Tech Stack
 
-Your information is stored securely. Only you can access it. When you create an account, your data is protected and no one else can see it.
+| Category | Technology |
+|----------|------------|
+| Frontend | Vanilla JavaScript (ES6+) |
+| Styling | CSS3 with CSS Variables |
+| Backend | Firebase (Firestore, Auth) |
+| Charts | Chart.js |
+| PWA | Service Worker, Web Manifest |
+| Mobile | Capacitor (Android) |
 
-## Using the App
+## 📖 Architecture
 
-1. Sign in with your preferred method
-2. Go to Daily Tracker to check off tasks and log your mood
-3. Visit Journal to write entries
-4. Check Analytics to see your progress
-5. Adjust Settings as needed
+The app follows a **feature-based modular architecture**:
 
-## If You Need Help
+- **Data Layer** (`*.data.js`): Firebase/Firestore operations
+- **Logic Layer** (`*.logic.js`): Pure business logic functions
+- **UI Layer** (`*.ui.js`): DOM manipulation and rendering
+- **Events Layer** (`*.events.js`): Event handlers and coordination
 
-If you're struggling, these resources are available:
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support Resources
+
+If you're going through a difficult time, help is available:
 - **India**: AASRA - 9820466726
-- **Global**: Crisis Text Line - Text HOME to 741741
+- **US**: Crisis Text Line - Text HOME to 741741
+- **International**: [Find a helpline](https://findahelpline.com/)
 
-## Questions?
+---
 
-The app is designed to be straightforward. Explore it and things should make sense. If something isn't clear, look for the icons and labels - they guide you through each section.
-
-## About This App
-
-Life Reset is built to help you on your personal journey. Whether you're working on building better habits, tracking your emotional health, or just staying consistent, this tool is here to support you.
-
-Track your progress. Celebrate the small wins. Keep moving forward.
+<p align="center">
+  <b>Track your progress. Celebrate small wins. Keep moving forward. 🚀</b>
+</p>

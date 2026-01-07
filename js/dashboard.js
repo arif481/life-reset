@@ -35,6 +35,9 @@ function initDashboard() {
     renderMilestones();
 }
 
+/**
+ * Renders the main dashboard overview with statistics and scores
+ */
 function renderDashboardOverview() {
     const overview = document.getElementById('dashboardOverview');
     if (!overview) return;
@@ -320,7 +323,10 @@ function renderQuickStats() {
                 <div class="stat-icon-lg">🔥</div>
                 <div class="stat-content">
                     <div class="stat-value">${stats.streak}</div>
-                    <div class="stat-name">Day Streak</div>
+                    <div class="stat-name">
+                        Overall Streak
+                        <span class="info-icon" title="Days with completed tasks" style="cursor: help; font-size: 0.8em; color: #888;">ℹ️</span>
+                    </div>
                 </div>
                 <div class="stat-progress">
                     <div class="streak-indicator" style="--streak: ${Math.min(stats.streak * 10, 100)}%">
@@ -402,44 +408,72 @@ function renderInsights() {
     `;
 }
 
+/**
+ * Renders milestone items with separate sections for upcoming and completed
+ */
 function renderMilestones() {
     const container = document.getElementById('milestones');
     if (!container) return;
 
     const milestones = getUpcomingMilestones();
+    const upcoming = milestones.filter(m => !m.reached);
+    const completed = milestones.filter(m => m.reached);
     
     container.innerHTML = `
         <div class="milestones-header">
             <h3>🎯 Upcoming Milestones</h3>
-            <button class="btn-icon" onclick="showMilestoneDetails()">→</button>
         </div>
-        <div class="milestones-timeline">
-            ${milestones.map((milestone, idx) => `
-                <div class="milestone-item ${milestone.reached ? 'reached' : 'pending'}">
-                    <div class="milestone-marker"></div>
-                    <div class="milestone-content">
-                        <div class="milestone-title">${milestone.title}</div>
-                        <div class="milestone-progress">
-                            <span>${milestone.current}/${milestone.target}</span>
-                            <div class="milestone-bar">
-                                <div class="milestone-fill" style="width: ${milestone.progress}%"></div>
-                            </div>
-                        </div>
-                        <div class="milestone-reward">
-                            Reward: <strong>${milestone.reward}</strong> XP
-                        </div>
+        ${upcoming.length > 0 ? `
+            <div class="milestones-timeline">
+                ${upcoming.map(m => renderMilestoneItem(m)).join('')}
+            </div>
+        ` : '<p class="no-milestones" style="text-align: center; padding: 20px; color: #888;">All milestones completed! 🎉</p>'}
+        
+        ${completed.length > 0 ? `
+            <div class="milestones-header" style="margin-top: 20px;">
+                <h3>✅ Completed Milestones</h3>
+            </div>
+            <div class="milestones-timeline completed">
+                ${completed.map(m => renderMilestoneItem(m)).join('')}
+            </div>
+        ` : ''}
+    `;
+}
+
+/**
+ * Renders a single milestone item
+ * @param {Object} milestone - Milestone data
+ * @returns {string} HTML string for milestone item
+ */
+function renderMilestoneItem(milestone) {
+    return `
+        <div class="milestone-item ${milestone.reached ? 'reached' : 'pending'}">
+            <div class="milestone-marker"></div>
+            <div class="milestone-content">
+                <div class="milestone-title">${milestone.title}</div>
+                <div class="milestone-progress">
+                    <span>${milestone.current}/${milestone.target}</span>
+                    <div class="milestone-bar">
+                        <div class="milestone-fill" style="width: ${milestone.progress}%"></div>
                     </div>
                 </div>
-            `).join('')}
+                <div class="milestone-reward">
+                    Reward: <strong>${milestone.reward}</strong> XP
+                </div>
+            </div>
         </div>
     `;
 }
 
 // Helper Functions
 
+/**
+ * Calculates dashboard statistics including overall health score
+ * @returns {Object} Dashboard stats including scores and color
+ */
 function calculateDashboardStats() {
     const taskScore = Math.min((appState.userStats.consistency || 0), 100);
-    const moodScore = (appState.moodHistory && appState.moodHistory.length) ? 100 : 0;
+    const moodScore = calculateMoodScore();
     const habitScore = calculateHabitScore();
 
     const overallScore = Math.round((taskScore + moodScore + habitScore) / 3);
@@ -470,6 +504,44 @@ function calculateDashboardStats() {
     };
 }
 
+/**
+ * Calculates mood tracking score based on 7-day consistency
+ * @returns {number} Score from 0-100 based on mood entries in last 7 days
+ */
+function calculateMoodScore() {
+    if (!appState.moodHistory || appState.moodHistory.length === 0) {
+        return 0;
+    }
+    
+    // Calculate score based on last 7 days
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const recentMoods = appState.moodHistory.filter(entry => {
+        const entryDate = entry.timestamp?.toDate ? entry.timestamp.toDate() : new Date(entry.timestamp);
+        return entryDate >= sevenDaysAgo;
+    });
+    
+    // Score = (entries in last 7 days / 7) * 100
+    // This rewards consistency in mood tracking
+    const score = Math.min((recentMoods.length / 7) * 100, 100);
+    return Math.round(score);
+}
+
+/**
+ * Calculates habit completion score
+ * @returns {number} Score based on quit habits
+ */
+function calculateHabitScore() {
+    if (!appState.badHabits || Object.keys(appState.badHabits).length === 0) return 0;
+    const completed = Object.values(appState.badHabits).filter(h => h.quitDate).length;
+    return Math.min((completed / Object.keys(appState.badHabits).length) * 100, 100);
+}
+
+/**
+ * Gets weekly activity data for chart visualization
+ * @returns {Object} Object with labels, values, and totalTasks
+ */
 function getWeeklyActivityData() {
     const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const values = [0, 0, 0, 0, 0, 0, 0];
@@ -493,6 +565,10 @@ function getWeeklyActivityData() {
     return { labels, values, totalTasks };
 }
 
+/**
+ * Gets mood trend data for the past 7 days
+ * @returns {Array} Array of mood data objects
+ */
 function getMoodTrendData() {
     const moods = [];
     const moodHistory = appState.moodHistory || [];
@@ -606,9 +682,89 @@ function calculateHabitScore() {
     return Math.min((completed / Object.keys(appState.badHabits).length) * 100, 100);
 }
 
+/**
+ * Gets active challenges based on user progress
+ * @returns {Array} Array of active challenges
+ */
 function getActiveChallenges() {
-    // Challenge system is not implemented; avoid showing fake/demo data.
-    return [];
+    const challenges = [
+        {
+            id: 'daily_tasks',
+            title: 'Complete 5 Tasks Today',
+            type: 'daily',
+            progress: appState.dailyProgress?.tasksCompleted || 0,
+            target: 5,
+            reward: 50,
+            expiresAt: getEndOfDay()
+        },
+        {
+            id: 'week_streak',
+            title: '7-Day Streak',
+            type: 'streak',
+            progress: appState.userStats?.streak || 0,
+            target: 7,
+            reward: 200,
+            expiresAt: null
+        },
+        {
+            id: 'mood_tracking',
+            title: 'Track Mood 3 Times This Week',
+            type: 'weekly',
+            progress: getMoodEntriesThisWeek(),
+            target: 3,
+            reward: 100,
+            expiresAt: getEndOfWeek()
+        }
+    ];
+    
+    // Filter to only show incomplete challenges
+    return challenges.filter(c => c.progress < c.target);
+}
+
+/**
+ * Gets the end of the current day
+ * @returns {Date} End of day timestamp
+ */
+function getEndOfDay() {
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    return end;
+}
+
+/**
+ * Gets the end of the current week (Sunday)
+ * @returns {Date} End of week timestamp
+ */
+function getEndOfWeek() {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysUntilSunday = 7 - dayOfWeek;
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + daysUntilSunday);
+    endOfWeek.setHours(23, 59, 59, 999);
+    return endOfWeek;
+}
+
+/**
+ * Gets number of mood entries this week
+ * @returns {number} Count of mood entries
+ */
+function getMoodEntriesThisWeek() {
+    if (!appState.moodHistory || appState.moodHistory.length === 0) return 0;
+    
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - daysFromMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const thisWeekMoods = appState.moodHistory.filter(entry => {
+        const entryDate = entry.timestamp?.toDate ? entry.timestamp.toDate() : new Date(entry.timestamp);
+        return entryDate >= startOfWeek;
+    });
+    
+    return thisWeekMoods.length;
 }
 
 function getRecentActivities() {
@@ -679,6 +835,10 @@ function generateInsights() {
     return insights;
 }
 
+/**
+ * Gets list of milestones with progress tracking
+ * @returns {Array} Array of milestone objects with progress and reached status
+ */
 function getUpcomingMilestones() {
     const tasks = appState.userStats.tasksCompleted || 0;
     const level = appState.userStats.level || 1;

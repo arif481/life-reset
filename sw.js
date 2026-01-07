@@ -1,14 +1,21 @@
 /**
- * @fileoverview Service Worker - Offline-First Caching
- * @description PWA service worker with cache-first strategy for static assets
- * @version 1.0.1
+ * @fileoverview Service Worker - Enhanced Offline-First Caching
+ * @description PWA service worker with improved caching strategies
+ * @version 2.0.0
  */
 
 /* ==========================================================================
    Cache Configuration
    ========================================================================== */
 
-const CACHE_NAME = 'life-reset-v1.0.1';
+const CACHE_VERSION = '2.0.0';
+const STATIC_CACHE = `life-reset-static-v${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `life-reset-dynamic-v${CACHE_VERSION}`;
+const IMAGE_CACHE = `life-reset-images-v${CACHE_VERSION}`;
+
+// Max items in dynamic cache
+const MAX_DYNAMIC_ITEMS = 50;
+
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -25,10 +32,14 @@ const STATIC_ASSETS = [
   '/css/journal.css',
   '/css/analytics.css',
   '/css/gamification.css',
+  '/css/gamification-v2.css',
   '/css/goals.css',
   '/css/settings.css',
-  // JS
+  '/css/habits.css',
+  '/css/mobile.css',
+  // Legacy JS
   '/js/app-state.js',
+  '/js/offline-manager.js',
   '/js/auth.js',
   '/js/ui.js',
   '/js/gamification.js',
@@ -39,7 +50,36 @@ const STATIC_ASSETS = [
   '/js/habits.js',
   '/js/settings.js',
   '/js/data-loader.js',
-  '/js/dashboard.js'
+  '/js/dashboard.js',
+  // New Modular JS
+  '/app/shared/utils/date.utils.js',
+  '/app/shared/utils/sanitize.utils.js',
+  '/app/shared/utils/debounce.utils.js',
+  '/app/shared/components/toast.js',
+  '/app/shared/components/modal.js',
+  '/app/shared/components/onboarding.js',
+  '/app/features/tasks/tasks.data.js',
+  '/app/features/tasks/tasks.logic.js',
+  '/app/features/tasks/tasks.ui.js',
+  '/app/features/tasks/tasks.events.js',
+  '/app/features/mood/mood.data.js',
+  '/app/features/mood/mood.logic.js',
+  '/app/features/mood/mood.ui.js',
+  '/app/features/mood/mood.events.js',
+  '/app/features/journal/journal.data.js',
+  '/app/features/journal/journal.logic.js',
+  '/app/features/journal/journal.ui.js',
+  '/app/features/journal/journal.events.js',
+  '/app/features/analytics/analytics.data.js',
+  '/app/features/analytics/analytics.charts.js',
+  '/app/features/analytics/analytics.ui.js',
+  '/app/features/analytics/analytics.events.js',
+  '/app/features/settings/settings.data.js',
+  '/app/features/settings/settings.ui.js',
+  '/app/features/settings/settings.events.js',
+  '/app/features/gamification/gamification.data.js',
+  '/app/features/gamification/gamification.ui.js',
+  '/app/features/gamification/gamification.events.js'
 ];
 
 // External CDN resources to cache
@@ -48,24 +88,41 @@ const CDN_ASSETS = [
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
+// Helper: Limit cache size
+async function trimCache(cacheName, maxItems) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length > maxItems) {
+    await cache.delete(keys[0]);
+    return trimCache(cacheName, maxItems);
+  }
+}
+
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
+  console.log('[SW] Installing service worker v2.0.0...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
         console.log('[SW] Caching static assets');
-        // Cache local assets
-        const localPromise = cache.addAll(STATIC_ASSETS).catch(err => {
-          console.warn('[SW] Some static assets failed to cache:', err);
-        });
-        // Cache CDN assets (may fail if offline during install)
-        const cdnPromise = Promise.all(
-          CDN_ASSETS.map(url => 
-            cache.add(url).catch(err => console.warn('[SW] CDN asset failed:', url))
+        // Cache local assets (don't fail install if some fail)
+        return Promise.all(
+          STATIC_ASSETS.map(url => 
+            cache.add(url).catch(err => {
+              console.warn('[SW] Failed to cache:', url);
+            })
           )
         );
-        return Promise.all([localPromise, cdnPromise]);
+      })
+      .then(() => {
+        // Cache CDN assets separately
+        return caches.open(DYNAMIC_CACHE).then(cache => {
+          return Promise.all(
+            CDN_ASSETS.map(url => 
+              cache.add(url).catch(err => console.warn('[SW] CDN failed:', url))
+            )
+          );
+        });
       })
       .then(() => {
         console.log('[SW] Installation complete');
@@ -76,13 +133,15 @@ self.addEventListener('install', (event) => {
 
 // Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
+  console.log('[SW] Activating service worker v2.0.0...');
+  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE];
+  
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => name !== CACHE_NAME)
+            .filter((name) => !currentCaches.includes(name))
             .map((name) => {
               console.log('[SW] Deleting old cache:', name);
               return caches.delete(name);
@@ -96,7 +155,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - smart caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -104,74 +163,102 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Skip Firebase/Firestore API calls (let them handle their own caching)
+  // Skip Firebase/Firestore API calls
   if (url.hostname.includes('firestore.googleapis.com') ||
       url.hostname.includes('firebase') ||
-      url.hostname.includes('googleapis.com')) {
+      url.hostname.includes('googleapis.com') ||
+      url.hostname.includes('identitytoolkit')) {
     return;
   }
 
-  // For navigation requests (HTML pages), use network-first
+  // Strategy: Network-first for HTML navigation
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache the new version
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache
-          return caches.match(request).then((cached) => {
-            return cached || caches.match('/index.html');
-          });
-        })
-    );
+    event.respondWith(networkFirst(request));
     return;
   }
 
-  // For static assets, use cache-first strategy
-  event.respondWith(
-    caches.match(request)
-      .then((cached) => {
-        if (cached) {
-          // Return cached version, but also update cache in background
-          fetch(request).then((response) => {
-            if (response && response.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, response);
-              });
-            }
-          }).catch(() => {});
-          return cached;
-        }
+  // Strategy: Cache-first for static assets
+  if (isStaticAsset(url.pathname)) {
+    event.respondWith(cacheFirst(request, STATIC_CACHE));
+    return;
+  }
 
-        // Not in cache, fetch from network
-        return fetch(request)
-          .then((response) => {
-            // Cache successful responses
-            if (response && response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, responseClone);
-              });
-            }
-            return response;
-          })
-          .catch((error) => {
-            console.warn('[SW] Fetch failed:', request.url, error);
-            // Return offline fallback for certain file types
-            if (request.destination === 'image') {
-              return new Response('', { status: 404 });
-            }
-            throw error;
-          });
-      })
-  );
+  // Strategy: Cache-first for images with separate cache
+  if (request.destination === 'image') {
+    event.respondWith(cacheFirst(request, IMAGE_CACHE));
+    return;
+  }
+
+  // Strategy: Stale-while-revalidate for everything else
+  event.respondWith(staleWhileRevalidate(request));
 });
+
+// Check if path is a static asset
+function isStaticAsset(pathname) {
+  return pathname.endsWith('.js') || 
+         pathname.endsWith('.css') || 
+         pathname.endsWith('.woff2') ||
+         pathname.endsWith('.webmanifest');
+}
+
+// Network-first strategy
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await caches.match(request);
+    return cached || caches.match('/index.html');
+  }
+}
+
+// Cache-first strategy
+async function cacheFirst(request, cacheName) {
+  const cached = await caches.match(request);
+  if (cached) {
+    // Update cache in background
+    fetch(request).then(response => {
+      if (response && response.status === 200) {
+        caches.open(cacheName).then(cache => {
+          cache.put(request, response);
+        });
+      }
+    }).catch(() => {});
+    return cached;
+  }
+  
+  try {
+    const response = await fetch(request);
+    if (response && response.status === 200) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    console.warn('[SW] Fetch failed:', request.url);
+    return new Response('', { status: 404 });
+  }
+}
+
+// Stale-while-revalidate strategy
+async function staleWhileRevalidate(request) {
+  const cached = await caches.match(request);
+  
+  const fetchPromise = fetch(request).then(async response => {
+    if (response && response.status === 200) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, response.clone());
+      await trimCache(DYNAMIC_CACHE, MAX_DYNAMIC_ITEMS);
+    }
+    return response;
+  }).catch(() => cached);
+  
+  return cached || fetchPromise;
+}
 
 // Handle messages from the app
 self.addEventListener('message', (event) => {
@@ -179,21 +266,79 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
   if (event.data && event.data.type === 'CLEAR_CACHE') {
-    caches.delete(CACHE_NAME).then(() => {
-      console.log('[SW] Cache cleared');
+    Promise.all([
+      caches.delete(STATIC_CACHE),
+      caches.delete(DYNAMIC_CACHE),
+      caches.delete(IMAGE_CACHE)
+    ]).then(() => {
+      console.log('[SW] All caches cleared');
+      event.source.postMessage({ type: 'CACHE_CLEARED' });
     });
+  }
+  if (event.data && event.data.type === 'GET_VERSION') {
+    event.source.postMessage({ type: 'VERSION', version: CACHE_VERSION });
   }
 });
 
-// Background sync for offline data (if supported)
+// Background sync for offline data
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-data') {
     console.log('[SW] Background sync triggered');
-    // Firestore handles its own sync, but we can notify the app
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({ type: 'SYNC_COMPLETE' });
-      });
-    });
+    event.waitUntil(
+      self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SYNC_TRIGGERED' });
+        });
+      })
+    );
   }
 });
+
+// Push notification handler
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  
+  const data = event.data.json();
+  const options = {
+    body: data.body || 'Time to check your tasks!',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/badge-72.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      url: data.url || '/'
+    },
+    actions: [
+      { action: 'open', title: 'Open App' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Life Reset', options)
+  );
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  if (event.action === 'dismiss') return;
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((clientList) => {
+      // Focus existing window if open
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise open new window
+      if (clients.openWindow) {
+        return clients.openWindow(event.notification.data.url || '/');
+      }
+    })
+  );
+});
+
+console.log('[SW] Service Worker v2.0.0 loaded');

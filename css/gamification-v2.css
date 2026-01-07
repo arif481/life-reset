@@ -1,0 +1,378 @@
+/**
+ * @fileoverview Gamification Styles
+ * @description Styles for XP bars, badges, level displays, animations
+ * @version 2.0.0
+ */
+
+/* ============================================================================
+   XP Bar
+   ============================================================================ */
+
+.xp-bar-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.xp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.level-badge {
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.xp-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.xp-bar {
+    height: 12px;
+    background: var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #8b5cf6);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+/* XP Popup Animation */
+.xp-popup {
+    position: fixed;
+    color: var(--success);
+    font-weight: 700;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 10000;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ============================================================================
+   Level Up Celebration
+   ============================================================================ */
+
+.level-up-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.level-up-content {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    animation: bounceIn 0.5s ease;
+}
+
+.level-up-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: bounce 1s infinite;
+}
+
+.level-up-content h2 {
+    font-size: 32px;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.new-level {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+}
+
+/* Confetti */
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall 3s linear forwards;
+    z-index: 10001;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ============================================================================
+   Badges
+   ============================================================================ */
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.badge-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.badge-card.unlocked {
+    border-color: var(--primary);
+}
+
+.badge-card.locked {
+    opacity: 0.6;
+}
+
+.badge-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.badge-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.badge-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.badge-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.badge-progress {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.badge-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* Badge Notification */
+.badge-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    z-index: 9000;
+    animation: slideInRight 0.5s ease;
+}
+
+.badge-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge-notification-icon {
+    font-size: 32px;
+}
+
+.badge-notification-text strong {
+    display: block;
+    color: var(--success);
+    margin-bottom: 4px;
+}
+
+.badge-notification.fade-out {
+    animation: slideOutRight 0.5s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* ============================================================================
+   Gamification Stats
+   ============================================================================ */
+
+.gamification-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 16px;
+}
+
+.gamification-stat-item {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gamification-stat-item .stat-icon {
+    font-size: 24px;
+}
+
+.gamification-stat-item .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.gamification-stat-item .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Streak Display
+   ============================================================================ */
+
+.streak-display {
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.streak-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.streak-fire {
+    font-size: 32px;
+    animation: pulse 1s infinite;
+}
+
+.streak-number {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.streak-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.streak-best {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* ============================================================================
+   Responsive
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .level-up-content {
+        padding: 24px;
+        margin: 16px;
+    }
+    
+    .new-level {
+        font-size: 36px;
+    }
+}
