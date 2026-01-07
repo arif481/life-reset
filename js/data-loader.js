@@ -411,3 +411,9 @@ function startDateMonitor() {
         }
     }, 60000); // Check every minute
 }
+
+// Export globally
+if (typeof window !== 'undefined') {
+    window.loadAllUserData = loadAllUserData;
+    window.syncPendingParams = syncPendingParams;
+}

@@ -55,8 +55,10 @@ function initApp() {
     // Load user data if available
     if (appState.currentUser && typeof firebase !== 'undefined') {
         // Use Data Loader if available, otherwise rely on individual modules
-        if (typeof loadAllUserData === 'function') {
-            loadAllUserData(); 
+        if (typeof window.loadAllUserData === 'function') {
+            window.loadAllUserData(); 
+        } else if (typeof loadAllUserData === 'function') {
+            loadAllUserData();
         }
     }
 
