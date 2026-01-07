@@ -349,7 +349,7 @@ const NetworkMonitor = {
 
     async _checkConnection() {
         try {
-            const response = await fetch('/manifest.webmanifest', { 
+            const response = await fetch('./manifest.webmanifest', { 
                 method: 'HEAD',
                 cache: 'no-store'
             });
