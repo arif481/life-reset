@@ -352,7 +352,7 @@ async function getJournalStats(period = 'month') {
 // Exports
 // ============================================================================
 
-export const AnalyticsData = {
+const AnalyticsData = {
     getDateRange,
     getDateLabels,
     getTaskCompletionData,
@@ -364,6 +364,4 @@ export const AnalyticsData = {
     getJournalStats
 };
 
-if (typeof window !== 'undefined') {
-    window.AnalyticsData = AnalyticsData;
-}
+window.AnalyticsData = AnalyticsData;

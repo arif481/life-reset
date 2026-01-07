@@ -365,7 +365,7 @@ function updateChartTheme() {
 // Exports
 // ============================================================================
 
-export const AnalyticsCharts = {
+const AnalyticsCharts = {
     charts,
     getChartColors,
     getCommonOptions,
@@ -378,6 +378,4 @@ export const AnalyticsCharts = {
     updateChartTheme
 };
 
-if (typeof window !== 'undefined') {
-    window.AnalyticsCharts = AnalyticsCharts;
-}
+window.AnalyticsCharts = AnalyticsCharts;

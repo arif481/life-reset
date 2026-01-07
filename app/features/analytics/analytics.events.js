@@ -239,7 +239,7 @@ function initAnalytics() {
 // Exports
 // ============================================================================
 
-export const AnalyticsEvents = {
+const AnalyticsEvents = {
     loadAnalytics,
     handlePeriodChange,
     refreshAnalytics,
@@ -251,12 +251,10 @@ export const AnalyticsEvents = {
     getAnalyticsData: () => analyticsData
 };
 
-if (typeof window !== 'undefined') {
-    window.AnalyticsEvents = AnalyticsEvents;
-    // Legacy support
-    window.loadAnalytics = loadAnalytics;
-    window.refreshAnalytics = refreshAnalytics;
-    window.exportAnalyticsCSV = exportAnalyticsCSV;
-    window.loadMoodChart = loadMoodChart;
-    window.loadTaskChart = loadTaskChart;
-}
+window.AnalyticsEvents = AnalyticsEvents;
+// Legacy support
+window.loadAnalytics = loadAnalytics;
+window.refreshAnalytics = refreshAnalytics;
+window.exportAnalyticsCSV = exportAnalyticsCSV;
+window.loadMoodChart = loadMoodChart;
+window.loadTaskChart = loadTaskChart;

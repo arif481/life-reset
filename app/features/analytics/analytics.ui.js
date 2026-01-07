@@ -314,7 +314,7 @@ function hideChartLoading(canvasId) {
 // Exports
 // ============================================================================
 
-export const AnalyticsUI = {
+const AnalyticsUI = {
     renderStatsCards,
     updateStatCard,
     renderPeriodSelector,
@@ -326,6 +326,4 @@ export const AnalyticsUI = {
     hideChartLoading
 };
 
-if (typeof window !== 'undefined') {
-    window.AnalyticsUI = AnalyticsUI;
-}
+window.AnalyticsUI = AnalyticsUI;
