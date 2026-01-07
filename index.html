@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="css/journal.css">
     <link rel="stylesheet" href="css/analytics.css">
     <link rel="stylesheet" href="css/gamification.css">
+    <link rel="stylesheet" href="css/gamification-v2.css">
     <link rel="stylesheet" href="css/goals.css">
     <link rel="stylesheet" href="css/habits.css">
     <link rel="stylesheet" href="css/settings.css">
@@ -321,11 +322,11 @@
     </div>
 
     <!-- Achievement Unlock Popup -->
-    <div class="achievement-unlock-popup" id="achievementPopup">
+    <div class="achievement-unlock-popup" id="achievementPopup" style="display: none;">
         <h2>🎉 Achievement Unlocked!</h2>
         <div class="icon" id="popupIcon"></div>
-        <p><strong id="popupTitle">Title</strong></p>
-        <p id="popupDesc">Description</p>
+        <p><strong id="popupTitle"></strong></p>
+        <p id="popupDesc"></p>
     </div>
 
     <!-- Add Task Modal -->
@@ -358,7 +359,7 @@
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
     
-    <!-- JavaScript Modules -->
+    <!-- JavaScript Modules (Legacy - being migrated) -->
     <script src="js/app-state.js"></script>
     <script src="js/offline-manager.js"></script>
     <script src="js/auth.js"></script>
@@ -372,6 +373,43 @@
     <script src="js/settings.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="js/dashboard.js"></script>
+    
+    <!-- New Modular Architecture (v2.0) - DISABLED to prevent duplicate declarations -->
+    <!-- 
+    Temporarily commented out to resolve duplicate variable declarations.
+    The legacy js/ modules and app/features/ modules declare the same variables,
+    causing syntax errors. Will be re-enabled after proper migration.
+    -->
+    <!--
+    <script src="app/shared/utils/date.utils.js"></script>
+    <script src="app/shared/utils/sanitize.utils.js"></script>
+    <script src="app/shared/utils/debounce.utils.js"></script>
+    <script src="app/shared/components/toast.js"></script>
+    <script src="app/shared/components/modal.js"></script>
+    <script src="app/shared/components/onboarding.js"></script>
+    <script src="app/features/tasks/tasks.data.js"></script>
+    <script src="app/features/tasks/tasks.logic.js"></script>
+    <script src="app/features/tasks/tasks.ui.js"></script>
+    <script src="app/features/tasks/tasks.events.js"></script>
+    <script src="app/features/mood/mood.data.js"></script>
+    <script src="app/features/mood/mood.logic.js"></script>
+    <script src="app/features/mood/mood.ui.js"></script>
+    <script src="app/features/mood/mood.events.js"></script>
+    <script src="app/features/journal/journal.data.js"></script>
+    <script src="app/features/journal/journal.logic.js"></script>
+    <script src="app/features/journal/journal.ui.js"></script>
+    <script src="app/features/journal/journal.events.js"></script>
+    <script src="app/features/analytics/analytics.data.js"></script>
+    <script src="app/features/analytics/analytics.charts.js"></script>
+    <script src="app/features/analytics/analytics.ui.js"></script>
+    <script src="app/features/analytics/analytics.events.js"></script>
+    <script src="app/features/settings/settings.data.js"></script>
+    <script src="app/features/settings/settings.ui.js"></script>
+    <script src="app/features/settings/settings.events.js"></script>
+    <script src="app/features/gamification/gamification.data.js"></script>
+    <script src="app/features/gamification/gamification.ui.js"></script>
+    <script src="app/features/gamification/gamification.events.js"></script>
+    -->
     
     <!-- Fallback Views Script -->
     <script>

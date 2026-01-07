@@ -72,7 +72,22 @@ function debouncedSave(key, saveFunction, delay = 500) {
     }, delay);
 }
 
-// Load all user data once on login
+/**
+ * Shows user-friendly error message
+ * @param {string} message - Error message to display
+ * @param {Error} error - Original error object for logging
+ */
+function showFirebaseError(message, error) {
+    console.error(message, error);
+    if (typeof showToast === 'function') {
+        showToast(message, 'error');
+    }
+}
+
+/**
+ * Loads all user data from Firestore
+ * @returns {Promise<void>}
+ */
 async function loadAllUserData() {
     if (!appState.currentUser || !db) return;
     
@@ -117,7 +132,7 @@ async function loadAllUserData() {
             }
         }
     } catch (error) {
-        console.error('Error loading user data:', error);
+        showFirebaseError('Unable to load your data. Please check your connection.', error);
     }
 }
 
