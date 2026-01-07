@@ -357,7 +357,7 @@ async function initAnalyticsLazy() {
 // Exports
 // ============================================================================
 
-export const LazyLoader = {
+const LazyLoader = {
     // Core
     loadScript,
     loadCSS,

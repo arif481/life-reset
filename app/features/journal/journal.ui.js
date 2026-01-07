@@ -307,7 +307,7 @@ function showFullEntryModal(entry) {
 // Exports
 // ============================================================================
 
-export const JournalUI = {
+const JournalUI = {
     renderEntry,
     renderEntries,
     renderTagsDisplay,

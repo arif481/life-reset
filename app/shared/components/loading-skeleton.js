@@ -556,7 +556,7 @@ if (typeof document !== 'undefined' && !document.getElementById('skeleton-styles
 // Exports
 // ============================================================================
 
-export const LoadingSkeleton = {
+const LoadingSkeleton = {
     templates: SkeletonTemplates,
     generate: generateSkeleton,
     show: showSkeleton,

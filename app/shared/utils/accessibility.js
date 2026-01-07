@@ -697,7 +697,7 @@ if (document.readyState === 'loading') {
 // Exports
 // ============================================================================
 
-export const AccessibilityManager = {
+const AccessibilityManager = {
     // Announcements
     announce,
     announceAssertive,

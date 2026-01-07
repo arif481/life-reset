@@ -132,7 +132,7 @@ async function isMoodLoggedToday() {
 // Exports
 // ============================================================================
 
-export const MoodData = {
+const MoodData = {
     saveMoodEntry,
     getMoodForDate,
     getMoodRange,

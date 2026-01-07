@@ -11,7 +11,7 @@
  * @param {Date} date - The date to format
  * @returns {string} Formatted date string (e.g., "Monday, January 1, 2024")
  */
-export function formatDate(date) {
+function formatDate(date) {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 }
@@ -21,7 +21,7 @@ export function formatDate(date) {
  * @param {Date} date - The date to convert
  * @returns {string} Date string in YYYY-MM-DD format
  */
-export function getDateString(date) {
+function getDateString(date) {
     return date.toISOString().split('T')[0];
 }
 
@@ -29,7 +29,7 @@ export function getDateString(date) {
  * Get today's date string
  * @returns {string} Today's date in YYYY-MM-DD format
  */
-export function getTodayString() {
+function getTodayString() {
     return getDateString(new Date());
 }
 
@@ -38,7 +38,7 @@ export function getTodayString() {
  * @param {number} daysAgo - Number of days in the past
  * @returns {Date} The date N days ago
  */
-export function getDateDaysAgo(daysAgo) {
+function getDateDaysAgo(daysAgo) {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
     return date;
@@ -49,7 +49,7 @@ export function getDateDaysAgo(daysAgo) {
  * @param {string} dateString - Date string in YYYY-MM-DD format
  * @returns {boolean} True if the date is today
  */
-export function isToday(dateString) {
+function isToday(dateString) {
     return dateString === getTodayString();
 }
 
@@ -58,7 +58,7 @@ export function isToday(dateString) {
  * @param {number} days - Number of days to include
  * @returns {string[]} Array of date strings
  */
-export function getLastNDays(days) {
+function getLastNDays(days) {
     const dates = [];
     for (let i = 0; i < days; i++) {
         dates.push(getDateString(getDateDaysAgo(i)));
@@ -71,7 +71,7 @@ export function getLastNDays(days) {
  * @param {Date} date - The date
  * @returns {string} Short day name
  */
-export function getShortDayName(date) {
+function getShortDayName(date) {
     return date.toLocaleDateString('en-US', { weekday: 'short' });
 }
 
@@ -80,7 +80,7 @@ export function getShortDayName(date) {
  * @param {Date} date - The date
  * @returns {string} Short date format
  */
-export function getShortDate(date) {
+function getShortDate(date) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 

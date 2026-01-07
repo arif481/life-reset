@@ -551,7 +551,7 @@ function saveCustomTasksForCategory(category) {
 // Exports
 // ============================================================================
 
-export const TasksEvents = {
+const TasksEvents = {
     initTasks,
     cleanupTasks,
     handleTaskToggle,

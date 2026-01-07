@@ -374,7 +374,7 @@ function getSettings() {
 // Exports
 // ============================================================================
 
-export const SettingsEvents = {
+const SettingsEvents = {
     initSettings,
     handleDarkModeChange,
     handleNotificationsChange,

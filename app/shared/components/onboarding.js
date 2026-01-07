@@ -354,7 +354,7 @@ if (typeof document !== 'undefined') {
 // Exports
 // ============================================================================
 
-export const Onboarding = {
+const Onboarding = {
     startOnboarding,
     hasCompletedOnboarding,
     completeOnboarding,

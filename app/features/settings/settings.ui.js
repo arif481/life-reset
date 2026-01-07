@@ -304,7 +304,7 @@ function escapeHtml(text) {
 // Exports
 // ============================================================================
 
-export const SettingsUI = {
+const SettingsUI = {
     applyDarkMode,
     toggleDarkMode,
     renderSettingsForm,

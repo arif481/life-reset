@@ -11,7 +11,7 @@
  * @param {string} str - The string to sanitize
  * @returns {string} HTML-escaped string safe for DOM insertion
  */
-export function sanitizeHTML(str) {
+function sanitizeHTML(str) {
     if (typeof str !== 'string') return '';
     const div = document.createElement('div');
     div.textContent = str;
@@ -24,7 +24,7 @@ export function sanitizeHTML(str) {
  * @param {string[]} fields - Fields to sanitize
  * @returns {Object} Object with sanitized fields
  */
-export function sanitizeObject(obj, fields) {
+function sanitizeObject(obj, fields) {
     const result = { ...obj };
     fields.forEach(field => {
         if (typeof result[field] === 'string') {
@@ -40,7 +40,7 @@ export function sanitizeObject(obj, fields) {
  * @param {number} maxLength - Maximum allowed length (default 200)
  * @returns {{ valid: boolean, sanitized: string, error?: string }}
  */
-export function validateTaskName(name, maxLength = 200) {
+function validateTaskName(name, maxLength = 200) {
     if (!name || typeof name !== 'string') {
         return { valid: false, sanitized: '', error: 'Task name is required' };
     }
@@ -66,7 +66,7 @@ export function validateTaskName(name, maxLength = 200) {
  * @param {string} mood - Mood value to validate
  * @returns {boolean} True if valid mood
  */
-export function isValidMood(mood) {
+function isValidMood(mood) {
     const validMoods = ['very-sad', 'sad', 'okay', 'good', 'great'];
     return validMoods.includes(mood);
 }
@@ -76,7 +76,7 @@ export function isValidMood(mood) {
  * @param {number} intensity - Intensity value
  * @returns {number} Clamped intensity value
  */
-export function validateIntensity(intensity) {
+function validateIntensity(intensity) {
     const num = parseInt(intensity, 10);
     if (isNaN(num)) return 50;
     return Math.max(0, Math.min(100, num));

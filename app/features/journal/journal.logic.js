@@ -232,7 +232,7 @@ function searchEntries(entries, query) {
 // Exports
 // ============================================================================
 
-export const JournalLogic = {
+const JournalLogic = {
     // Sentiment
     analyzeSentiment,
     getSentimentScore,

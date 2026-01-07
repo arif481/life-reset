@@ -343,7 +343,7 @@ window.updateGamificationUI = updateGamificationUI;
 // Exports
 // ============================================================================
 
-export const GamificationEvents = {
+const GamificationEvents = {
     XP_REWARDS,
     initGamification,
     updateGamificationUI,

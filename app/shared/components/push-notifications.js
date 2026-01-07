@@ -484,7 +484,7 @@ if (typeof document !== 'undefined') {
 // Exports
 // ============================================================================
 
-export const PushNotifications = {
+const PushNotifications = {
     // Permission
     isSupported: isNotificationSupported,
     getPermission: getNotificationPermission,

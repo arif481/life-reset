@@ -382,7 +382,7 @@ function extractHistoryEntry(data) {
 // Exports
 // ============================================================================
 
-export const TasksLogic = {
+const TasksLogic = {
     // Config
     DEFAULT_TASKS,
     CATEGORY_CONFIG,

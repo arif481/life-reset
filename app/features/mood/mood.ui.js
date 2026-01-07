@@ -252,7 +252,7 @@ function resetMoodForm() {
 // Exports
 // ============================================================================
 
-export const MoodUI = {
+const MoodUI = {
     renderMoodSelector,
     setSelectedMood,
     clearMoodSelection,

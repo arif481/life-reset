@@ -10,7 +10,7 @@
  * Show a modal by ID
  * @param {string} modalId - ID of the modal element
  */
-export function showModal(modalId) {
+function showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.add('show');
@@ -28,7 +28,7 @@ export function showModal(modalId) {
  * Hide a modal by ID
  * @param {string} modalId - ID of the modal element
  */
-export function hideModal(modalId) {
+function hideModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('show');
@@ -46,7 +46,7 @@ export function hideModal(modalId) {
  * @param {boolean} options.danger - Show as danger dialog (default false)
  * @returns {Promise<boolean>} Resolves true if confirmed, false if cancelled
  */
-export function confirm(options) {
+function confirm(options) {
     return new Promise((resolve) => {
         const {
             title = 'Confirm',
@@ -126,7 +126,7 @@ export function confirm(options) {
  * @param {string} options.cancelText - Cancel button text (default 'Cancel')
  * @returns {Promise<string|null>} Resolves with input value or null if cancelled
  */
-export function prompt(options) {
+function prompt(options) {
     return new Promise((resolve) => {
         const {
             title = 'Input',
@@ -192,7 +192,7 @@ export function prompt(options) {
 }
 
 // Export Modal object
-export const Modal = {
+const Modal = {
     show: showModal,
     hide: hideModal,
     confirm,

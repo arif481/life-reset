@@ -160,7 +160,7 @@ async function searchJournalEntries(options = {}) {
 // Exports
 // ============================================================================
 
-export const JournalData = {
+const JournalData = {
     saveJournalEntry,
     getJournalEntry,
     getJournalEntries,

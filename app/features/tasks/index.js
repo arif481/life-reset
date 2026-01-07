@@ -13,7 +13,7 @@ export { TasksUI } from './tasks.ui.js';
 export { TasksEvents } from './tasks.events.js';
 
 // Combined Tasks namespace for convenience
-export const Tasks = {
+const Tasks = {
     get Data() { return window.TasksData; },
     get Logic() { return window.TasksLogic; },
     get UI() { return window.TasksUI; },

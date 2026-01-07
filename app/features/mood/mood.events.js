@@ -275,7 +275,7 @@ function initMood() {
 // Exports
 // ============================================================================
 
-export const MoodEvents = {
+const MoodEvents = {
     initMood,
     selectMood,
     toggleTrigger,

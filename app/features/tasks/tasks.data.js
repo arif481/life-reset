@@ -291,7 +291,7 @@ function cleanupListeners() {
 // Exports (for ES modules) & Global Registration
 // ============================================================================
 
-export const TasksData = {
+const TasksData = {
     saveTaskCompletion,
     loadTasksForDate,
     loadTasksHistory,

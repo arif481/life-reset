@@ -333,7 +333,7 @@ function calculateBadgeProgress(badge, stats) {
 // Exports
 // ============================================================================
 
-export const GamificationData = {
+const GamificationData = {
     XP_PER_LEVEL,
     MAX_LEVEL,
     BADGE_DEFINITIONS,

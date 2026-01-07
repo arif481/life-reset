@@ -16,7 +16,7 @@ let isShowingToast = false;
  * @param {string} type - Notification type: 'info' | 'success' | 'warning' | 'error'
  * @param {number} duration - Duration in milliseconds (default 3000)
  */
-export function showToast(message, type = 'info', duration = 3000) {
+function showToast(message, type = 'info', duration = 3000) {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
     const toastIcon = document.getElementById('toastIcon');
@@ -54,7 +54,7 @@ export function showToast(message, type = 'info', duration = 3000) {
  * Show a success toast
  * @param {string} message - Success message
  */
-export function showSuccess(message) {
+function showSuccess(message) {
     showToast(message, 'success');
 }
 
@@ -62,7 +62,7 @@ export function showSuccess(message) {
  * Show an error toast
  * @param {string} message - Error message
  */
-export function showError(message) {
+function showError(message) {
     showToast(message, 'error');
 }
 
@@ -70,7 +70,7 @@ export function showError(message) {
  * Show a warning toast
  * @param {string} message - Warning message
  */
-export function showWarning(message) {
+function showWarning(message) {
     showToast(message, 'warning');
 }
 
@@ -78,14 +78,14 @@ export function showWarning(message) {
  * Show an info toast
  * @param {string} message - Info message
  */
-export function showInfo(message) {
+function showInfo(message) {
     showToast(message, 'info');
 }
 
 /**
  * Hide the currently shown toast
  */
-export function hideToast() {
+function hideToast() {
     const toast = document.getElementById('toast');
     if (toast) {
         toast.classList.remove('show');
@@ -93,7 +93,7 @@ export function hideToast() {
 }
 
 // Export Toast object
-export const Toast = {
+const Toast = {
     show: showToast,
     success: showSuccess,
     error: showError,

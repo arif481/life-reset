@@ -266,7 +266,7 @@ function renderStreakDisplay(containerId, currentStreak, longestStreak) {
 // Exports
 // ============================================================================
 
-export const GamificationUI = {
+const GamificationUI = {
     renderXPBar,
     animateXPGain,
     showLevelUpCelebration,

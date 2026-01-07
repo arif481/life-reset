@@ -402,7 +402,7 @@ if (typeof document !== 'undefined') {
 // Exports
 // ============================================================================
 
-export const JournalEvents = {
+const JournalEvents = {
     selectJournalMood,
     addTag,
     removeJournalTag,

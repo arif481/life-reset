@@ -16,7 +16,7 @@ const debounceTimers = {};
  * @param {Function} fn - Function to debounce
  * @param {number} delay - Delay in milliseconds (default 500)
  */
-export function debouncedSave(key, fn, delay = 500) {
+function debouncedSave(key, fn, delay = 500) {
     if (debounceTimers[key]) {
         clearTimeout(debounceTimers[key]);
     }
@@ -30,7 +30,7 @@ export function debouncedSave(key, fn, delay = 500) {
  * Cancel a pending debounced operation
  * @param {string} key - Key of the operation to cancel
  */
-export function cancelDebounce(key) {
+function cancelDebounce(key) {
     if (debounceTimers[key]) {
         clearTimeout(debounceTimers[key]);
         delete debounceTimers[key];
@@ -42,7 +42,7 @@ export function cancelDebounce(key) {
  * @param {string} key - Key to check
  * @returns {boolean} True if a debounce is pending
  */
-export function isDebouncing(key) {
+function isDebouncing(key) {
     return !!debounceTimers[key];
 }
 
@@ -52,7 +52,7 @@ export function isDebouncing(key) {
  * @param {number} delay - Delay in milliseconds
  * @returns {Function} Debounced function
  */
-export function debounce(fn, delay = 300) {
+function debounce(fn, delay = 300) {
     let timer = null;
     return function (...args) {
         if (timer) clearTimeout(timer);
@@ -69,7 +69,7 @@ export function debounce(fn, delay = 300) {
  * @param {number} limit - Minimum time between calls in milliseconds
  * @returns {Function} Throttled function
  */
-export function throttle(fn, limit = 100) {
+function throttle(fn, limit = 100) {
     let lastCall = 0;
     return function (...args) {
         const now = Date.now();
@@ -84,7 +84,7 @@ export function throttle(fn, limit = 100) {
  * Clear all pending debounces
  * Useful when logging out or resetting state
  */
-export function clearAllDebounces() {
+function clearAllDebounces() {
     Object.keys(debounceTimers).forEach(key => {
         clearTimeout(debounceTimers[key]);
         delete debounceTimers[key];

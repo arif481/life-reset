@@ -304,7 +304,7 @@ function sanitizeForHTML(str) {
 // Exports
 // ============================================================================
 
-export const TasksUI = {
+const TasksUI = {
     renderTaskCategories,
     updateTaskItem,
     updateProgressUI,

@@ -312,7 +312,7 @@ async function deleteAllData() {
 // Exports
 // ============================================================================
 
-export const SettingsData = {
+const SettingsData = {
     DEFAULT_SETTINGS,
     getSettings,
     saveSettings,

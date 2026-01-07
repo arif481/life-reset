@@ -254,7 +254,7 @@ function toChartDataPoint(entry) {
 // Exports
 // ============================================================================
 
-export const MoodLogic = {
+const MoodLogic = {
     // Constants
     MOOD_VALUES,
     MOOD_EMOJIS,
