@@ -10,7 +10,9 @@
 // State
 // ============================================================================
 
-let currentGoalFilter = 'all';
+const GoalsState = {
+    filter: 'all'
+};
 
 // ============================================================================
 // Main Render Functions
@@ -24,7 +26,7 @@ function renderGoalsView() {
     if (!container) return;
     
     const stats = window.GoalsData?.getStats() || { total: 0, completed: 0, active: 0, successRate: 0 };
-    const goals = window.GoalsData?.getFiltered(currentGoalFilter) || [];
+    const goals = window.GoalsData?.getFiltered(GoalsState.filter) || [];
     const config = window.GoalsData?.config || {};
     
     container.innerHTML = `
@@ -52,11 +54,11 @@ function renderGoalsView() {
             <!-- Filter Tabs -->
             <div class="goals-filter-bar">
                 <div class="filter-tabs">
-                    <button class="filter-tab ${currentGoalFilter === 'all' ? 'active' : ''}" 
+                    <button class="filter-tab ${GoalsState.filter === 'all' ? 'active' : ''}" 
                             onclick="GoalsUI.setFilter('all')">All</button>
-                    <button class="filter-tab ${currentGoalFilter === 'active' ? 'active' : ''}" 
+                    <button class="filter-tab ${GoalsState.filter === 'active' ? 'active' : ''}" 
                             onclick="GoalsUI.setFilter('active')">Active</button>
-                    <button class="filter-tab ${currentGoalFilter === 'completed' ? 'active' : ''}" 
+                    <button class="filter-tab ${GoalsState.filter === 'completed' ? 'active' : ''}" 
                             onclick="GoalsUI.setFilter('completed')">Done</button>
                 </div>
                 <button class="add-goal-btn" onclick="GoalsUI.showCreateModal()">
@@ -181,7 +183,7 @@ function renderEmptyGoals() {
         'completed': { icon: '🏆', text: 'No completed goals yet. Keep working on your goals!' }
     };
     
-    const msg = messages[currentGoalFilter] || messages.all;
+    const msg = messages[GoalsState.filter] || messages.all;
     
     return `
         <div class="goals-empty-state">
@@ -347,7 +349,7 @@ function closeGoalModal(event) {
  * @param {string} filter - Filter value
  */
 function setGoalFilter(filter) {
-    currentGoalFilter = filter;
+    GoalsState.filter = filter;
     renderGoalsView();
 }
 

@@ -29,36 +29,54 @@ function initApp() {
     // Update date display
     updateDateDisplay();
 
-    // Initialize charts if available
+    // Initialize charts if available - No-op here, done in Analytics module
     if (typeof Chart !== 'undefined') {
-        if (!moodTrendChart && !completionRateChart) {
-            // Charts will be initialized when analytics view is opened
-            console.log('Chart.js loaded and ready');
-        }
+        console.log('Chart.js loaded and ready');
     }
 
-    // Set up task categories and achievements
+    // Set up task categories and achievements (Modern V2)
     try {
-        renderTaskCategories();
-        renderBadges();
+        if (window.TasksUI && window.TasksUI.renderTaskCategories) {
+            window.TasksUI.renderTaskCategories(appState.userTasks || {});
+        } else if (typeof renderTaskCategories === 'function') {
+            renderTaskCategories(); // Fallback
+        }
+
+        if (window.GamificationUI && window.GamificationUI.renderBadgesGrid) {
+            // Badges are rendered inside specific views usually, or sidebar
+            // Removing global renderBadges call as it's view-specific now
+        } else if (typeof renderBadges === 'function') {
+            renderBadges();
+        }
     } catch (error) {
         console.warn('Error rendering initial UI:', error);
     }
 
     // Load user data if available
-    if (appState.currentUser && db) {
-        loadAllUserData();
+    if (appState.currentUser && typeof firebase !== 'undefined') {
+        // Use Data Loader if available, otherwise rely on individual modules
+        if (typeof loadAllUserData === 'function') {
+            loadAllUserData(); 
+        }
     }
 
-    // Initialize dashboard
+    // Initialize dashboard (Modern V2)
     try {
-        initDashboard();
+        if (window.DashboardEvents && window.DashboardEvents.init) {
+            window.DashboardEvents.init();
+        } else if (typeof initDashboard === 'function') {
+            initDashboard();
+        }
     } catch (error) {
         console.warn('Dashboard initialization warning:', error);
     }
 
-    // Update gamification UI
-    updateGamificationUI();
+    // Update gamification UI header
+    if (window.GamificationUI && window.GamificationUI.updateHeaderLevelDisplay) {
+        window.GamificationUI.updateHeaderLevelDisplay(appState.userLevel, appState.userXP, appState.nextLevelXP);
+    } else if (typeof updateGamificationUI === 'function') {
+        updateGamificationUI();
+    }
 }
 
 function navigateTo(view) {
@@ -90,23 +108,29 @@ function navigateTo(view) {
     
     // Load specific data for the view
     if (view === 'dashboard') {
-        initDashboard();
+        if (window.DashboardEvents && window.DashboardEvents.init) window.DashboardEvents.init();
+        else if (typeof initDashboard === 'function') initDashboard();
     }
     if (view === 'analytics') {
-        // Initialize advanced analytics
         setTimeout(() => {
-            initAnalytics();
+            if (window.AnalyticsEvents && window.AnalyticsEvents.init) window.AnalyticsEvents.init();
+            else if (typeof initAnalytics === 'function') initAnalytics();
         }, 100);
     }
     if (view === 'mood') {
-        loadMoodStats();
+        if (window.MoodEvents && window.MoodEvents.initMoodDisplay) window.MoodEvents.initMoodDisplay();
+        else if (typeof loadMoodStats === 'function') loadMoodStats();
     }
     if (view === 'journal') {
-        loadJournalEntries();
+        if (window.JournalEvents && window.JournalEvents.loadJournalEntries) window.JournalEvents.loadJournalEntries();
+        else if (typeof loadJournalEntries === 'function') loadJournalEntries();
     }
     if (view === 'goals') {
-        renderGoals();
-        renderHabitChain();
+        if (window.GoalsEvents && window.GoalsEvents.init) window.GoalsEvents.init();
+        else {
+            if (typeof renderGoals === 'function') renderGoals();
+            if (typeof renderHabitChain === 'function') renderHabitChain();
+        }
     }
     if (view === 'settings') {
         // Initialize advanced settings

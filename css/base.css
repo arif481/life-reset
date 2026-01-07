@@ -15,8 +15,14 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-light);
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    background-attachment: fixed;
+    background-size: cover;
     min-height: 100vh;
     color: var(--text-dark);
     line-height: 1.6;
@@ -25,9 +31,30 @@ body {
 }
 
 body.dark-mode {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 100%, hsla(225,39%,20%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(339,49%,20%,1) 0, transparent 50%);
     color: var(--text-light);
 }
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius);
+}
+
+.dark-mode .glass-panel {
+    background: var(--bg-card-dark);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Button Refinements for Touch */
 
 /* Improve touch targets on mobile for interactive elements */
 @media (max-width: 768px) {
