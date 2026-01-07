@@ -1,0 +1,816 @@
+/**
+ * @stylesheet habits-v2.css
+ * @description Modern habits interface styles
+ * @version 2.0.0
+ */
+
+/* ============================================================================
+   Bad Habits Section
+   ============================================================================ */
+
+.tracked-habits-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.tracked-habits-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.dark-mode .tracked-habits-header h3 {
+    color: var(--text-light);
+}
+
+.btn-add-habit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-habit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.tracked-habits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ============================================================================
+   Habit Card
+   ============================================================================ */
+
+.habit-card {
+    background: var(--bg-light);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s;
+}
+
+body.dark-mode .habit-card {
+    background: var(--bg-card-dark);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.habit-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.habit-card.quit-mode {
+    border-left: 4px solid #10b981;
+}
+
+.habit-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.habit-icon-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.habit-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.habit-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 4px 0;
+}
+
+body.dark-mode .habit-name {
+    color: var(--text-light);
+}
+
+.habit-status {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.habit-status.quit {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+body.dark-mode .habit-status.quit {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.habit-status.active {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+body.dark-mode .habit-status.active {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.habit-menu-btn {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #9ca3af;
+    transition: all 0.2s;
+}
+
+.habit-menu-btn:hover {
+    background: var(--bg-card);
+    color: var(--text-dark);
+}
+
+/* ============================================================================
+   Quit Stats
+   ============================================================================ */
+
+.habit-progress-section {
+    margin-bottom: 16px;
+}
+
+.quit-stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.quit-stat {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    flex: 1;
+}
+
+body.dark-mode .quit-stat {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+}
+
+.quit-stat.money {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+body.dark-mode .quit-stat.money {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
+}
+
+.quit-stat .stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #065f46;
+    line-height: 1.2;
+}
+
+body.dark-mode .quit-stat .stat-value {
+    color: #34d399;
+}
+
+.quit-stat.money .stat-value {
+    color: #92400e;
+}
+
+body.dark-mode .quit-stat.money .stat-value {
+    color: #fbbf24;
+}
+
+.quit-stat .stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   Health Progress
+   ============================================================================ */
+
+.health-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.health-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.health-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 140px;
+    font-size: 13px;
+    color: var(--text-dark);
+}
+
+body.dark-mode .health-label {
+    color: var(--text-light);
+}
+
+.health-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+body.dark-mode .health-bar-wrap {
+    background: #374151;
+}
+
+.health-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.health-percent {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 36px;
+    text-align: right;
+}
+
+/* ============================================================================
+   Benefits
+   ============================================================================ */
+
+.benefits-unlocked {
+    background: #f0fdf4;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+body.dark-mode .benefits-unlocked {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.benefits-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.dark-mode .benefits-header {
+    color: #34d399;
+}
+
+.benefits-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.benefits-list li {
+    font-size: 13px;
+    color: #374151;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.dark-mode .benefits-list li {
+    color: #d1d5db;
+}
+
+.benefits-list li i {
+    color: #10b981;
+    font-size: 11px;
+}
+
+.next-benefit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+}
+
+body.dark-mode .next-benefit {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+}
+
+/* ============================================================================
+   Tracking CTA
+   ============================================================================ */
+
+.habit-tracking-cta {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+body.dark-mode .habit-tracking-cta {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.06) 100%);
+}
+
+.habit-tracking-cta p {
+    margin: 0 0 12px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.habit-tracking-cta .btn-success {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.habit-tracking-cta .btn-success:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+/* ============================================================================
+   Card Actions
+   ============================================================================ */
+
+.habit-card-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .habit-card-actions {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.habit-action {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.habit-action.quit {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.habit-action.quit:hover {
+    background: #a7f3d0;
+}
+
+.habit-action.relapse {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.habit-action.relapse:hover {
+    background: #fde68a;
+}
+
+.habit-action.remove {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.habit-action.remove:hover {
+    background: #fecaca;
+}
+
+/* ============================================================================
+   Empty State
+   ============================================================================ */
+
+.habits-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.habits-empty-state .empty-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.habits-empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.habits-empty-state p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+}
+
+/* ============================================================================
+   Habit Chain Section
+   ============================================================================ */
+
+.chain-section {
+    background: var(--bg-light);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .chain-section {
+    background: var(--bg-card-dark);
+}
+
+.chain-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.chain-title h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chain-title h2 i {
+    color: #f59e0b;
+}
+
+.chain-title p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 4px 0 0 0;
+}
+
+.chain-view-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 3px;
+}
+
+body.dark-mode .chain-view-toggle {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chain-view-toggle .view-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chain-view-toggle .view-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.chain-view-toggle .view-btn:hover:not(.active) {
+    color: var(--text-dark);
+}
+
+/* Chain Stats */
+.chain-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.chain-stat {
+    text-align: center;
+    padding: 12px 8px;
+    background: var(--bg-card);
+    border-radius: 10px;
+}
+
+body.dark-mode .chain-stat {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chain-stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.chain-stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Timeline */
+.chain-timeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 16px 0;
+    justify-content: center;
+}
+
+.timeline-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.timeline-dot.empty {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+
+body.dark-mode .timeline-dot.empty {
+    background: #374151;
+    color: #6b7280;
+}
+
+.timeline-dot.missed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+body.dark-mode .timeline-dot.missed {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.timeline-dot.partial {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+body.dark-mode .timeline-dot.partial {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.timeline-dot.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+body.dark-mode .timeline-dot.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.timeline-dot.today {
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Calendar */
+.chain-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 16px 0;
+}
+
+.cal-header {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    padding: 6px 0;
+}
+
+.cal-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cal-cell.empty {
+    background: transparent;
+}
+
+.cal-cell.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+body.dark-mode .cal-cell.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.cal-cell.partial {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.cal-cell.missed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.cal-cell.today {
+    box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+/* Insights */
+.chain-insights {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .chain-insights {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.insights-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.dark-mode .insights-header {
+    color: var(--text-light);
+}
+
+.insights-header i {
+    color: #f59e0b;
+}
+
+.insights-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-dark);
+}
+
+body.dark-mode .insight-item {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+}
+
+.insight-icon {
+    font-size: 16px;
+}
+
+/* ============================================================================
+   Popup Menu
+   ============================================================================ */
+
+.habit-popup-menu {
+    position: fixed;
+    background: var(--bg-light);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 160px;
+    overflow: hidden;
+}
+
+body.dark-mode .habit-popup-menu {
+    background: var(--bg-card-dark);
+}
+
+.habit-popup-menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+body.dark-mode .habit-popup-menu button {
+    color: var(--text-light);
+}
+
+.habit-popup-menu button:hover {
+    background: var(--bg-card);
+}
+
+.habit-popup-menu button.danger {
+    color: #ef4444;
+}
+
+/* ============================================================================
+   Responsive
+   ============================================================================ */
+
+@media (max-width: 600px) {
+    .chain-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .timeline-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+    
+    .health-label {
+        min-width: 100px;
+        font-size: 12px;
+    }
+}

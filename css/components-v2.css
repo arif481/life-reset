@@ -1,0 +1,663 @@
+/**
+ * @stylesheet components-v2.css
+ * @description Standardized reusable UI components
+ * @version 2.0.0
+ */
+
+/* ============================================================================
+   Unified Empty States
+   ============================================================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.empty-state-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    opacity: 0.9;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+}
+
+body.dark-mode .empty-state-title {
+    color: var(--text-light);
+}
+
+.empty-state-desc {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+}
+
+.empty-state-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.empty-state-action:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Variants */
+.empty-state.compact {
+    padding: 32px 16px;
+}
+
+.empty-state.compact .empty-state-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.empty-state.compact .empty-state-title {
+    font-size: 16px;
+}
+
+/* ============================================================================
+   Unified Stat Cards
+   ============================================================================ */
+
+.stat-card {
+    background: var(--bg-light);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s;
+}
+
+body.dark-mode .stat-card {
+    background: var(--bg-card-dark);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.stat-card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+body.dark-mode .stat-card-value {
+    color: var(--text-light);
+}
+
+.stat-card-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stat Card Variants */
+.stat-card.primary .stat-card-value {
+    color: var(--primary);
+}
+
+.stat-card.success .stat-card-value {
+    color: #10b981;
+}
+
+.stat-card.warning .stat-card-value {
+    color: #f59e0b;
+}
+
+.stat-card.accent .stat-card-value {
+    color: var(--accent, #7c3aed);
+}
+
+/* Stat Cards Grid */
+.stat-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* ============================================================================
+   Unified Section Headers
+   ============================================================================ */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+body.dark-mode .section-title {
+    color: var(--text-light);
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.section-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0 0;
+}
+
+.section-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.section-action:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   Unified Progress Bars
+   ============================================================================ */
+
+.progress-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+body.dark-mode .progress-bar {
+    background: #374151;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.progress-fill.success {
+    background: #10b981;
+}
+
+.progress-fill.warning {
+    background: #f59e0b;
+}
+
+.progress-fill.danger {
+    background: #ef4444;
+}
+
+.progress-fill.gradient {
+    background: linear-gradient(90deg, var(--primary), var(--accent, #7c3aed));
+}
+
+/* Progress with label */
+.progress-labeled {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-label {
+    font-size: 13px;
+    color: var(--text-dark);
+}
+
+body.dark-mode .progress-label {
+    color: var(--text-light);
+}
+
+.progress-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* ============================================================================
+   Unified Badges
+   ============================================================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+body.dark-mode .badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+body.dark-mode .badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+body.dark-mode .badge-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.badge-neutral {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+body.dark-mode .badge-neutral {
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+}
+
+/* ============================================================================
+   Unified List Items
+   ============================================================================ */
+
+.list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-light);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+
+body.dark-mode .list-item {
+    background: var(--bg-card-dark);
+}
+
+.list-item:hover {
+    transform: translateX(2px);
+}
+
+.list-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.list-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin: 0 0 2px 0;
+}
+
+body.dark-mode .list-item-title {
+    color: var(--text-light);
+}
+
+.list-item-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.list-item-action {
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   Unified Filter Tabs
+   ============================================================================ */
+
+.filter-tabs {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+body.dark-mode .filter-tabs {
+    background: var(--bg-card-dark);
+}
+
+.filter-tab {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-tab:hover {
+    color: var(--text-dark);
+}
+
+body.dark-mode .filter-tab:hover {
+    color: var(--text-light);
+}
+
+.filter-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* ============================================================================
+   Unified Action Buttons
+   ============================================================================ */
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.action-btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-dark);
+}
+
+body.dark-mode .action-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+}
+
+.action-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+body.dark-mode .action-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.action-btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.action-btn-success:hover {
+    background: #059669;
+}
+
+.action-btn-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-btn-danger:hover {
+    background: #fecaca;
+}
+
+/* Icon-only button */
+.action-btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+}
+
+/* ============================================================================
+   Unified Form Controls
+   ============================================================================ */
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+body.dark-mode .form-label {
+    color: var(--text-light);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    background: var(--bg-light);
+    color: var(--text-dark);
+    transition: all 0.2s;
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .form-textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.form-error {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 4px;
+}
+
+/* ============================================================================
+   Unified Cards
+   ============================================================================ */
+
+.card {
+    background: var(--bg-light);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+body.dark-mode .card {
+    background: var(--bg-card-dark);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .card-footer {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================================
+   Unified Tooltips
+   ============================================================================ */
+
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    padding: 6px 12px;
+    background: #1f2937;
+    color: white;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    z-index: 1000;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+/* ============================================================================
+   Responsive Adjustments
+   ============================================================================ */
+
+@media (max-width: 600px) {
+    .stat-cards-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .filter-tabs {
+        width: 100%;
+    }
+}

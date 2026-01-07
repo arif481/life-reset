@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Colors (same in dark mode) -->
+    <color name="colorPrimary">#4361ee</color>
+    <color name="colorPrimaryDark">#3651d4</color>
+    <color name="colorPrimaryLight">#6b86f2</color>
+    <color name="colorAccent">#7c3aed</color>
+    
+    <!-- Surface Colors - Dark Mode -->
+    <color name="colorSurface">#1e293b</color>
+    <color name="colorSurfaceVariant">#334155</color>
+    <color name="colorBackground">#0f172a</color>
+    
+    <!-- On Colors - Dark Mode -->
+    <color name="colorOnPrimary">#ffffff</color>
+    <color name="colorOnSurface">#f1f5f9</color>
+    <color name="colorOnBackground">#cbd5e1</color>
+    
+    <!-- Status Colors (same in dark mode) -->
+    <color name="colorSuccess">#10b981</color>
+    <color name="colorWarning">#f59e0b</color>
+    <color name="colorError">#ef4444</color>
+    
+    <!-- Splash Screen -->
+    <color name="splash_background">#4361ee</color>
+    
+    <!-- Navigation Bar - Dark Mode -->
+    <color name="navigationBarColor">#1e293b</color>
+    <color name="statusBarColor">#0f172a</color>
+</resources>

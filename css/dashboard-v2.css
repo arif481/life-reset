@@ -1,0 +1,709 @@
+/**
+ * @stylesheet dashboard-v2.css
+ * @description Modern "Today's Overview" dashboard styles
+ * @version 2.0.0
+ */
+
+/* ============================================================================
+   Dashboard Header
+   ============================================================================ */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding: 0 4px;
+}
+
+.greeting-section {
+    flex: 1;
+}
+
+.greeting-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+}
+
+body.dark-mode .greeting-text {
+    color: var(--text-light);
+}
+
+.date-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+body.dark-mode .date-text {
+    color: #9ca3af;
+}
+
+.level-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.level-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.level-icon {
+    font-size: 14px;
+}
+
+/* ============================================================================
+   Hero Progress Card
+   ============================================================================ */
+
+.today-hero-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 8px 32px rgba(67, 97, 238, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.today-hero-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+.hero-progress-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.progress-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: white;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+}
+
+.hero-progress-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+}
+
+.hero-percentage {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.hero-label {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.hero-stat-item {
+    text-align: center;
+    color: white;
+}
+
+.hero-stat-item .stat-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero-stat-item .stat-label {
+    font-size: 11px;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hero-stat-item.streak-active .stat-value {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50% { text-shadow: 0 0 12px rgba(255, 255, 255, 0.5); }
+}
+
+.hero-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================================
+   Quick Actions
+   ============================================================================ */
+
+.quick-actions-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--bg-light);
+    border: 1px solid transparent;
+    border-radius: 16px;
+    padding: 16px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .quick-action-btn {
+    background: var(--bg-card-dark);
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.quick-action-btn:active {
+    transform: translateY(0);
+}
+
+.action-icon {
+    font-size: 24px;
+}
+
+.action-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+body.dark-mode .action-label {
+    color: var(--text-light);
+}
+
+/* ============================================================================
+   Insight Banner
+   ============================================================================ */
+
+.insight-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+}
+
+.insight-banner.insight-celebration {
+    background: #d1fae5;
+    border-left-color: #10b981;
+}
+
+.insight-banner.insight-encouragement {
+    background: #dbeafe;
+    border-left-color: #3b82f6;
+}
+
+.insight-banner.insight-reminder {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+}
+
+.insight-banner.insight-suggestion {
+    background: #f3e8ff;
+    border-left-color: #8b5cf6;
+}
+
+.insight-banner.insight-achievement {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left-color: #d97706;
+}
+
+body.dark-mode .insight-banner {
+    background: var(--bg-card-dark);
+    border-left-width: 4px;
+}
+
+.insight-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.insight-message {
+    flex: 1;
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.4;
+}
+
+body.dark-mode .insight-message {
+    color: var(--text-light);
+}
+
+.insight-action-btn {
+    background: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.insight-action-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* ============================================================================
+   Section Cards
+   ============================================================================ */
+
+.section-card {
+    background: var(--bg-light);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .section-card {
+    background: var(--bg-card-dark);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body.dark-mode .section-header h3 {
+    color: var(--text-light);
+}
+
+.section-icon {
+    font-size: 18px;
+}
+
+.section-meta {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+body.dark-mode .section-meta {
+    color: #9ca3af;
+}
+
+.section-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.section-link:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   Week Overview Dots
+   ============================================================================ */
+
+.week-dots-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.week-day-dot {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot-label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.week-day-dot.today .dot-label {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.dot-indicator {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+body.dark-mode .dot-indicator {
+    background: #374151;
+}
+
+.dot-indicator.filled {
+    background: var(--primary);
+}
+
+.dot-indicator.has-mood {
+    border-color: var(--accent);
+}
+
+.week-day-dot.today .dot-indicator {
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
+/* ============================================================================
+   Pending Tasks List
+   ============================================================================ */
+
+.pending-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pending-task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+body.dark-mode .pending-task-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pending-task-item:hover {
+    background: rgba(67, 97, 238, 0.08);
+}
+
+.pending-task-item.completing {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.task-category-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.task-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+body.dark-mode .task-name {
+    color: var(--text-light);
+}
+
+.task-quick-check {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #9ca3af;
+}
+
+.task-quick-check:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(67, 97, 238, 0.1);
+}
+
+.task-quick-check:active {
+    transform: scale(0.9);
+}
+
+/* ============================================================================
+   XP Progress Card
+   ============================================================================ */
+
+.xp-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: none;
+}
+
+body.dark-mode .xp-card {
+    background: linear-gradient(135deg, #422006 0%, #713f12 100%);
+}
+
+.xp-progress-bar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.xp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+    border-radius: 5px;
+    transition: width 0.6s ease;
+}
+
+.xp-hint {
+    margin: 0;
+    font-size: 12px;
+    color: #92400e;
+    text-align: right;
+}
+
+body.dark-mode .xp-hint {
+    color: #fcd34d;
+}
+
+/* ============================================================================
+   Recent Activity List
+   ============================================================================ */
+
+.recent-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item-mini {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.activity-item-mini .activity-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border-radius: 10px;
+}
+
+body.dark-mode .activity-item-mini .activity-icon {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.activity-item-mini .activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-item-mini .activity-title {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+body.dark-mode .activity-item-mini .activity-title {
+    color: var(--text-light);
+}
+
+.activity-item-mini .activity-desc {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.dark-mode .activity-item-mini .activity-desc {
+    color: #9ca3af;
+}
+
+.activity-item-mini .activity-time {
+    font-size: 11px;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   Empty States
+   ============================================================================ */
+
+.empty-state-mini {
+    text-align: center;
+    padding: 24px 16px;
+}
+
+.empty-state-mini .empty-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.empty-state-mini p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+body.dark-mode .empty-state-mini p {
+    color: #9ca3af;
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+.fade-in-up {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   Mobile Responsive
+   ============================================================================ */
+
+@media (max-width: 480px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .level-badge {
+        align-self: flex-start;
+    }
+    
+    .today-hero-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+    
+    .hero-stats {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .hero-stat-divider {
+        height: 1px;
+        width: 24px;
+    }
+    
+    .quick-actions-row {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .quick-action-btn {
+        padding: 12px 6px;
+    }
+    
+    .action-icon {
+        font-size: 20px;
+    }
+    
+    .action-label {
+        font-size: 10px;
+    }
+}
