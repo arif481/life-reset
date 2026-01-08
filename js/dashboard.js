@@ -114,21 +114,24 @@ function renderDashboardOverview() {
                     <button class="btn-icon" onclick="showChallengeDetails()">🎯</button>
                 </div>
                 <div class="challenges-list">
-                    ${stats.activeChallenges.length ? stats.activeChallenges.map(challenge => `
+                    ${stats.activeChallenges.length ? stats.activeChallenges.map(challenge => {
+                        const progressPercent = Math.round((challenge.progress / challenge.target) * 100);
+                        const daysLeft = challenge.expiresAt ? Math.max(0, Math.ceil((challenge.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : '∞';
+                        return `
                         <div class="challenge-item">
                             <div class="challenge-header">
-                                <span class="challenge-name">${challenge.name}</span>
-                                <span class="challenge-progress">${challenge.progress}%</span>
+                                <span class="challenge-name">${challenge.title}</span>
+                                <span class="challenge-progress">${progressPercent}%</span>
                             </div>
                             <div class="progress-bar-small">
-                                <div class="progress-fill-small" style="width: ${challenge.progress}%"></div>
+                                <div class="progress-fill-small" style="width: ${progressPercent}%"></div>
                             </div>
                             <div class="challenge-details">
-                                <span>${challenge.current}/${challenge.target}</span>
-                                <span class="challenge-days">${challenge.daysLeft} days left</span>
+                                <span>${challenge.progress}/${challenge.target}</span>
+                                <span class="challenge-days">${daysLeft === '∞' ? 'No deadline' : daysLeft + ' days left'}</span>
                             </div>
                         </div>
-                    `).join('') : '<div class="empty-state">No challenges yet.</div>'}
+                    `}).join('') : '<div class="empty-state">No challenges yet.</div>'}
                 </div>
             </div>
         </div>
@@ -913,14 +916,19 @@ function showChallengeDetails() {
                 <button class="close-btn" onclick="this.closest('.modal').style.display='none'">×</button>
             </div>
             <div class="modal-body">
-                ${challenges.map(ch => `
+                ${challenges.length ? challenges.map(ch => {
+                    const progressPercent = Math.round((ch.progress / ch.target) * 100);
+                    const daysLeft = ch.expiresAt ? Math.max(0, Math.ceil((ch.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : null;
+                    const timeText = daysLeft !== null ? `${daysLeft} days` : 'No deadline';
+                    return `
                     <div class="challenge-detail-card">
-                        <h4>${ch.name}</h4>
-                        <p>Progress: ${ch.current}/${ch.target}</p>
-                        <div class="progress-bar"><div class="progress-fill" style="width: ${ch.progress}%"></div></div>
-                        <p>Time remaining: ${ch.daysLeft} days</p>
+                        <h4>${ch.title}</h4>
+                        <p>Progress: ${ch.progress}/${ch.target}</p>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${progressPercent}%"></div></div>
+                        <p>Time remaining: ${timeText}</p>
+                        <p class="challenge-reward">🎁 Reward: ${ch.reward} XP</p>
                     </div>
-                `).join('')}
+                `}).join('') : '<div class="empty-state">All challenges completed! 🎉</div>'}
             </div>
         </div>
     `;

@@ -224,7 +224,62 @@ function updateProgress() {
     }
     
     appState.userStats.consistency = consistency30Day;
+    
+    // Calculate and update streak
+    calculateAndUpdateStreak();
+    
     updateGamificationUI();
+}
+
+/**
+ * Calculates the current streak based on consecutive days with >= 50% task completion
+ * and updates appState.userStats.streak
+ */
+function calculateAndUpdateStreak() {
+    let streak = 0;
+    const today = new Date();
+    
+    // Start from yesterday and count backwards
+    // (today doesn't count unless it's completed)
+    for (let i = 0; i <= 365; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() - i);
+        const dateStr = getDateString(checkDate);
+        
+        const dayData = appState.tasksHistory ? appState.tasksHistory[dateStr] : null;
+        
+        if (i === 0) {
+            // Today: only count if there's progress
+            if (dayData && dayData.total > 0 && (dayData.completed / dayData.total) >= 0.5) {
+                streak++;
+            }
+            // Don't break on day 0 - allow the streak to start from yesterday
+            continue;
+        }
+        
+        // For previous days: require >= 50% completion to continue streak
+        if (dayData && dayData.total > 0) {
+            const completionRate = dayData.completed / dayData.total;
+            if (completionRate >= 0.5) {
+                streak++;
+            } else {
+                // Streak broken
+                break;
+            }
+        } else {
+            // No data for this day - streak broken
+            break;
+        }
+    }
+    
+    appState.userStats.streak = streak;
+    
+    // Save updated streak to Firestore
+    if (typeof saveUserStatsRealtime === 'function') {
+        saveUserStatsRealtime();
+    } else if (typeof saveUserStats === 'function') {
+        saveUserStats();
+    }
 }
 
 async function saveTaskCompletion(taskId, completed) {
