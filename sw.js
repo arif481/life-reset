@@ -101,7 +101,7 @@ async function trimCache(cacheName, maxItems) {
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v2.0.0...');
+  console.log('[SW] Installing service worker v2.1.0...');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
