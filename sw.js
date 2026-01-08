@@ -37,6 +37,7 @@ const STATIC_ASSETS = [
   './css/settings.css',
   './css/habits.css',
   './css/mobile.css',
+  './css/futuristic.css',
   // Legacy JS
   './js/app-state.js',
   './js/offline-manager.js',
