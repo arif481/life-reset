@@ -19,12 +19,10 @@ function initApp() {
         applyTheme(localStorage.getItem('theme') || 'default');
     }
 
-    // Set up dark mode
-    if (appState.isDarkMode) {
-        document.body.classList.add('dark-mode');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) darkModeToggle.textContent = '☀️';
-    }
+    // Force dark mode always on
+    appState.isDarkMode = true;
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'true');
 
     // Update date display
     updateDateDisplay();
@@ -174,20 +172,9 @@ window.addEventListener('resize', () => {
 });
 
 function toggleDarkMode() {
-    appState.isDarkMode = !appState.isDarkMode;
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', appState.isDarkMode);
-    
-    if (document.getElementById('darkModeToggle')) {
-        document.getElementById('darkModeToggle').textContent = appState.isDarkMode ? '☀️' : '🌙';
-    }
-    
-    // Save to Firebase
-    if (appState.currentUser && db) {
-        db.collection('users').doc(appState.currentUser.uid).update(
-            { darkMode: appState.isDarkMode }
-        ).catch(err => console.log('Dark mode save error:', err));
-    }
+    // Dark mode is permanently enabled - this function is kept for compatibility
+    appState.isDarkMode = true;
+    document.body.classList.add('dark-mode');
 }
 
 function toggleMobileMenu() {

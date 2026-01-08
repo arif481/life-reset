@@ -20,7 +20,7 @@ const appSettings = {
         soundEnabled: localStorage.getItem('soundEnabled') !== 'false'
     },
     appearance: {
-        darkMode: localStorage.getItem('darkMode') === 'true',
+        darkMode: true, // Always dark mode
         theme: localStorage.getItem('theme') || 'default',
         fontSize: localStorage.getItem('fontSize') || 'medium',
         animations: localStorage.getItem('animations') !== 'false',
@@ -326,16 +326,6 @@ function loadSettingsUI() {
                             <div class="setting-title">Theme & Colors</div>
                         </div>
                         <div class="setting-body">
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <span class="toggle-label">Dark Mode</span>
-                                    <span class="toggle-desc">Easy on the eyes</span>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="darkModeSetting" onchange="toggleDarkModeSetting()">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
                             <div class="form-group">
                                 <label>Color Theme</label>
                                 <div class="theme-selector">
@@ -614,8 +604,7 @@ function loadSavedSettings() {
     setChecked('achievementNotifications', appSettings.notifications.achievementNotifications);
     setChecked('soundEnabled', appSettings.notifications.soundEnabled);
     
-    // Appearance
-    setChecked('darkModeSetting', appSettings.appearance.darkMode);
+    // Appearance (dark mode always on, no toggle needed)
     setValue('fontSizeSetting', appSettings.appearance.fontSize);
     setChecked('animations', appSettings.appearance.animations);
     setChecked('compactMode', appSettings.appearance.compactMode);
@@ -693,26 +682,11 @@ function toggleSetting(category, setting) {
     showToast(`Setting updated: ${setting}`, 'success');
 }
 
-// Toggle dark mode
+// Toggle dark mode - disabled, dark mode is always on
 function toggleDarkModeSetting() {
-    const isDark = document.getElementById('darkModeSetting').checked;
-    appSettings.appearance.darkMode = isDark;
-    appState.isDarkMode = isDark;
-    localStorage.setItem('darkMode', isDark);
-    
-    if (isDark) {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
-    }
-    
-    // Update dark mode toggle in header if it exists
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.textContent = isDark ? '☀️' : '🌙';
-    }
-    
-    showToast('Dark mode ' + (isDark ? 'enabled' : 'disabled'), 'success');
+    // Dark mode is permanently enabled
+    appState.isDarkMode = true;
+    document.body.classList.add('dark-mode');
 }
 
 // Change font size
