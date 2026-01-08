@@ -1,14 +1,14 @@
 /**
  * @fileoverview Service Worker - Enhanced Offline-First Caching
  * @description PWA service worker with improved caching strategies
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 /* ==========================================================================
    Cache Configuration
    ========================================================================== */
 
-const CACHE_VERSION = '2.0.0';
+const CACHE_VERSION = '2.1.0';
 const STATIC_CACHE = `life-reset-static-v${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `life-reset-dynamic-v${CACHE_VERSION}`;
 const IMAGE_CACHE = `life-reset-images-v${CACHE_VERSION}`;
@@ -134,7 +134,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker v2.0.0...');
+  console.log('[SW] Activating service worker v2.1.0...');
   const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE];
   
   event.waitUntil(
@@ -163,6 +163,9 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests
   if (request.method !== 'GET') return;
+
+  // Skip non-http(s) requests (chrome-extension://, etc.)
+  if (!url.protocol.startsWith('http')) return;
 
   // Skip Firebase/Firestore API calls
   if (url.hostname.includes('firestore.googleapis.com') ||
@@ -204,6 +207,12 @@ function isStaticAsset(pathname) {
 
 // Network-first strategy
 async function networkFirst(request) {
+  // Safety check: only cache http(s) requests
+  const url = new URL(request.url);
+  if (!url.protocol.startsWith('http')) {
+    return fetch(request);
+  }
+
   try {
     const response = await fetch(request);
     if (response && response.status === 200) {
@@ -219,6 +228,12 @@ async function networkFirst(request) {
 
 // Cache-first strategy
 async function cacheFirst(request, cacheName) {
+  // Safety check: only cache http(s) requests
+  const url = new URL(request.url);
+  if (!url.protocol.startsWith('http')) {
+    return fetch(request);
+  }
+
   const cached = await caches.match(request);
   if (cached) {
     // Update cache in background
@@ -247,6 +262,12 @@ async function cacheFirst(request, cacheName) {
 
 // Stale-while-revalidate strategy
 async function staleWhileRevalidate(request) {
+  // Safety check: only cache http(s) requests
+  const url = new URL(request.url);
+  if (!url.protocol.startsWith('http')) {
+    return fetch(request);
+  }
+
   const cached = await caches.match(request);
   
   const fetchPromise = fetch(request).then(async response => {
@@ -342,4 +363,4 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-console.log('[SW] Service Worker v2.0.0 loaded');
+console.log('[SW] Service Worker v2.1.0 loaded');
