@@ -127,7 +127,7 @@ async function signup() {
                     name: name,
                     email: email,
                     createdAt: new Date(),
-                    darkMode: false,
+                    darkMode: true, // Dark mode always enabled
                     stats: appState.userStats
                 });
                 break;
@@ -271,7 +271,7 @@ async function handleGoogleSignInResult(result) {
                 name: result.user.displayName,
                 email: result.user.email,
                 createdAt: new Date(),
-                darkMode: false,
+                darkMode: true, // Dark mode always enabled
                 stats: appState.userStats
             });
         }
@@ -333,7 +333,7 @@ async function guestSignIn() {
                     name: 'Guest',
                     isGuest: true,
                     createdAt: new Date(),
-                    darkMode: false,
+                    darkMode: true, // Dark mode always enabled
                     stats: appState.userStats
                 });
                 break;

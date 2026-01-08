@@ -32,7 +32,7 @@ const appState = {
     currentView: 'dashboard',
     currentDate: new Date(),
     selectedMood: null,
-    isDarkMode: localStorage.getItem('darkMode') === 'true',
+    isDarkMode: true, // Dark mode is always enabled
     userTasks: {},
     // Computed/loaded history maps for analytics
     tasksHistory: {}, // { 'YYYY-MM-DD': { completed: number, total: number, rate: number } }
