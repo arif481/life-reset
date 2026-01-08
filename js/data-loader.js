@@ -112,15 +112,9 @@ async function loadAllUserData() {
                 appState.badHabits = data.badHabits;
             }
             
-            // Load dark mode preference
-            if (data.darkMode !== undefined) {
-                appState.isDarkMode = data.darkMode;
-                if (appState.isDarkMode) {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
-            }
+            // Dark mode is always enabled - ignore saved preference
+            appState.isDarkMode = true;
+            document.body.classList.add('dark-mode');
             
             // Update UI
             updateGamificationUI();
