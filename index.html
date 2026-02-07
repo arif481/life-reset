@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="theme-color" content="#4361ee">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,12 +13,12 @@
     <meta name="description" content="Personal Recovery & Growth Platform - Track habits, mood, and goals">
     <meta name="format-detection" content="telephone=no">
     <title>Life Reset: Recovery & Growth Platform</title>
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="data:,">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
-    
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
@@ -24,13 +26,14 @@
 
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- CSS Modules -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -57,7 +60,7 @@
     <link rel="stylesheet" href="css/rewards-store.css">
     <link rel="stylesheet" href="css/data-export.css">
     <link rel="stylesheet" href="css/customization.css">
-    
+
     <!-- Service Worker Registration -->
     <script>
         // Register Service Worker for offline support
@@ -66,7 +69,7 @@
                 navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('[SW] Registered:', registration.scope);
-                        
+
                         // Check for updates periodically
                         setInterval(() => {
                             registration.update();
@@ -77,9 +80,9 @@
                     });
             });
         }
-        
+
         // Initialize native Google Auth plugin on Android
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.GoogleAuth) {
                 window.Capacitor.Plugins.GoogleAuth.initialize({
                     clientId: '214444955038-rs3dilo6ugsq4lekt7u1ocs9re1s4u86.apps.googleusercontent.com',
@@ -88,17 +91,17 @@
                 });
                 console.log('[GoogleAuth] Native plugin initialized with config');
             }
-            
+
             // Handle Android back button
             if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-                window.Capacitor.Plugins.App.addListener('backButton', function(data) {
+                window.Capacitor.Plugins.App.addListener('backButton', function (data) {
                     // If user dropdown is open, close it
                     const dropdown = document.getElementById('userDropdown');
                     if (dropdown && dropdown.classList.contains('show')) {
                         dropdown.classList.remove('show');
                         return;
                     }
-                    
+
                     // If sidebar is open on mobile, close it
                     const sidebar = document.querySelector('.sidebar');
                     const overlay = document.getElementById('sidebarOverlay');
@@ -107,7 +110,7 @@
                         if (overlay) overlay.classList.remove('show');
                         return;
                     }
-                    
+
                     // If modal is open, close it
                     const modals = document.querySelectorAll('.modal');
                     for (let modal of modals) {
@@ -116,14 +119,14 @@
                             return;
                         }
                     }
-                    
+
                     // If not on dashboard, go to dashboard
                     const currentView = document.querySelector('[id$="-view"]:not([style*="display: none"])');
                     if (currentView && currentView.id !== 'dashboard-view') {
                         navigateTo('dashboard');
                         return;
                     }
-                    
+
                     // If on dashboard, show exit confirmation or minimize
                     if (data.canGoBack) {
                         window.history.back();
@@ -137,7 +140,11 @@
         });
     </script>
 </head>
+
 <body>
+    <!-- Accessibility: Skip to main content link for keyboard users -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
     <!-- Auth Screen - hidden initially while checking persisted auth -->
     <div class="auth-screen" id="authScreen" style="display: none;">
         <div class="auth-container">
@@ -153,12 +160,16 @@
                 <form onsubmit="login(); return false;">
                     <div class="form-group">
                         <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com"
+                            autocomplete="email" required>
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="Password" autocomplete="current-password" required>
-                        <a href="#" onclick="showForgotPassword(); return false;" style="display: block; text-align: right; margin-top: 8px; font-size: 13px; color: var(--primary); text-decoration: none;">Forgot Password?</a>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Password"
+                            autocomplete="current-password" required>
+                        <a href="#" onclick="showForgotPassword(); return false;"
+                            style="display: block; text-align: right; margin-top: 8px; font-size: 13px; color: var(--primary); text-decoration: none;">Forgot
+                            Password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-sign-in-alt"></i> Login
@@ -167,7 +178,8 @@
 
                 <div class="auth-divider"><span>OR</span></div>
 
-                <button id="googleSignInBtn" class="btn btn-block" style="background: #4285f4; color: white;" onclick="googleSignIn()">
+                <button id="googleSignInBtn" class="btn btn-block" style="background: #4285f4; color: white;"
+                    onclick="googleSignIn()">
                     <i class="fab fa-google"></i> Sign in with Google
                 </button>
                 <button class="btn btn-secondary btn-block" onclick="guestSignIn()">
@@ -175,7 +187,8 @@
                 </button>
 
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    Don't have an account? <a href="#" onclick="showSignup(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign up</a>
+                    Don't have an account? <a href="#" onclick="showSignup(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Sign up</a>
                 </p>
             </div>
 
@@ -184,19 +197,23 @@
                 <form onsubmit="signup(); return false;">
                     <div class="form-group">
                         <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" class="form-control" placeholder="Your name" autocomplete="name" required>
+                        <input type="text" id="signupName" class="form-control" placeholder="Your name"
+                            autocomplete="name" required>
                     </div>
                     <div class="form-group">
                         <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                        <input type="email" id="signupEmail" class="form-control" placeholder="your@email.com"
+                            autocomplete="email" required>
                     </div>
                     <div class="form-group">
                         <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" class="form-control" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                        <input type="password" id="signupPassword" class="form-control"
+                            placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
                     </div>
                     <div class="form-group">
                         <label for="signupPasswordConfirm">Confirm Password</label>
-                        <input type="password" id="signupPasswordConfirm" class="form-control" placeholder="Confirm password" autocomplete="new-password" minlength="6" required>
+                        <input type="password" id="signupPasswordConfirm" class="form-control"
+                            placeholder="Confirm password" autocomplete="new-password" minlength="6" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-user-plus"></i> Create Account
@@ -204,7 +221,8 @@
                 </form>
 
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    Already have an account? <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
+                    Already have an account? <a href="#" onclick="showLogin(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Login</a>
                 </p>
             </div>
 
@@ -217,14 +235,17 @@
                 <form onsubmit="resetPassword(); return false;">
                     <div class="form-group">
                         <label for="resetEmail">Email</label>
-                        <input type="email" id="resetEmail" class="form-control" placeholder="your@email.com" autocomplete="email" required>
+                        <input type="email" id="resetEmail" class="form-control" placeholder="your@email.com"
+                            autocomplete="email" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-paper-plane"></i> Send Reset Link
                     </button>
                 </form>
                 <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-                    <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;"><i class="fas fa-arrow-left"></i> Back to Login</a>
+                    <a href="#" onclick="showLogin(); return false;"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;"><i
+                            class="fas fa-arrow-left"></i> Back to Login</a>
                 </p>
             </div>
 
@@ -239,7 +260,7 @@
     <div class="app-container" id="appContainer">
         <!-- Mobile Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
-        
+
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
@@ -276,10 +297,11 @@
         </div>
 
         <!-- Main Content -->
-        <div class="main-content">
+        <main class="main-content" id="main-content" role="main" aria-labelledby="pageTitle">
             <div class="content-header">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()" title="Toggle menu">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileSidebar()"
+                        title="Toggle menu">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1 id="pageTitle">Dashboard</h1>
@@ -324,11 +346,11 @@
 
             <!-- Settings View -->
             <div id="settings-view" style="display: none;"></div>
-        </div>
+        </main>
     </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast" id="toast">
+    <!-- Toast Notifications (ARIA live region for screen readers) -->
+    <div class="toast" id="toast" role="alert" aria-live="polite" aria-atomic="true">
         <i class="fas fa-check-circle" id="toastIcon"></i>
         <span id="toastMessage">Operation completed successfully!</span>
     </div>
@@ -370,7 +392,7 @@
 
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
-    
+
     <!-- JavaScript Modules (Legacy - being migrated) -->
     <script src="js/app-state.js"></script>
     <script src="js/offline-manager.js"></script>
@@ -396,7 +418,7 @@
     <script src="js/rewards-store.js"></script>
     <script src="js/data-export.js"></script>
     <script src="js/customization.js"></script>
-    
+
     <!-- New Modular Architecture (v2.0) - DISABLED to prevent duplicate declarations -->
     <!-- 
     Temporarily commented out to resolve duplicate variable declarations.
@@ -433,7 +455,7 @@
     <script src="app/features/gamification/gamification.ui.js"></script>
     <script src="app/features/gamification/gamification.events.js"></script>
     -->
-    
+
     <!-- Fallback Views Script -->
     <script>
         // Initialize fallback views
@@ -837,7 +859,7 @@
             `;
 
             document.getElementById('settings-view').innerHTML = ``;
-            
+
             // Initialize settings
             if (typeof initSettings === 'function') {
                 initSettings();
@@ -845,4 +867,5 @@
         }
     </script>
 </body>
+
 </html>

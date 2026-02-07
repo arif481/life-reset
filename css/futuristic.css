@@ -15,27 +15,27 @@
     --neon-pink: #ff00ff;
     --neon-green: #00ff88;
     --neon-orange: #ff6b00;
-    
+
     /* Glassmorphism */
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.18);
     --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    
+
     /* Dark Theme Enhancement */
     --bg-primary: #0a0a1a;
     --bg-secondary: #12122a;
     --bg-tertiary: #1a1a3e;
     --bg-card-glass: rgba(26, 26, 62, 0.7);
-    
+
     /* Glows */
     --glow-primary: 0 0 20px rgba(0, 245, 255, 0.5);
     --glow-accent: 0 0 20px rgba(191, 0, 255, 0.5);
     --glow-success: 0 0 20px rgba(0, 255, 136, 0.5);
-    
+
     /* Enhanced Animations */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f72585 100%);
     --gradient-neon: linear-gradient(135deg, #00f5ff 0%, #bf00ff 100%);
@@ -61,7 +61,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
         radial-gradient(ellipse at 20% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 20%, rgba(191, 0, 255, 0.1) 0%, transparent 50%),
         radial-gradient(ellipse at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 40%);
@@ -71,8 +71,15 @@ body::before {
 }
 
 @keyframes ambientPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Floating Particles */
@@ -83,7 +90,7 @@ body::after {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
+    background-image:
         radial-gradient(2px 2px at 20px 30px, rgba(0, 245, 255, 0.3), transparent),
         radial-gradient(2px 2px at 40px 70px, rgba(191, 0, 255, 0.3), transparent),
         radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.3), transparent),
@@ -98,15 +105,23 @@ body::after {
 }
 
 @keyframes particleFloat {
-    0% { transform: translateY(0) translateX(0); }
-    100% { transform: translateY(-200px) translateX(50px); }
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    100% {
+        transform: translateY(-200px) translateX(50px);
+    }
 }
 
 /* ==========================================================================
    GLASSMORPHISM CARDS
    ========================================================================== */
 
-.card, .overview-card, .stat-card, .section {
+.card,
+.overview-card,
+.stat-card,
+.section {
     background: var(--bg-card-glass) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -118,7 +133,9 @@ body::after {
     overflow: hidden;
 }
 
-.card::before, .overview-card::before, .section::before {
+.card::before,
+.overview-card::before,
+.section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -129,14 +146,18 @@ body::after {
     transition: left 0.7s ease;
 }
 
-.card:hover::before, .overview-card:hover::before, .section:hover::before {
+.card:hover::before,
+.overview-card:hover::before,
+.section:hover::before {
     left: 100%;
 }
 
-.card:hover, .overview-card:hover, .section:hover {
+.card:hover,
+.overview-card:hover,
+.section:hover {
     transform: translateY(-8px) scale(1.02);
     border-color: var(--neon-blue) !important;
-    box-shadow: 
+    box-shadow:
         var(--glass-shadow),
         0 0 30px rgba(0, 245, 255, 0.2),
         inset 0 0 60px rgba(0, 245, 255, 0.05) !important;
@@ -183,8 +204,15 @@ body::after {
 }
 
 @keyframes numberGlow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.3); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.3);
+    }
 }
 
 .stat-label {
@@ -283,12 +311,14 @@ nav {
     transition: width 0.3s ease;
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover,
+.nav-item.active {
     color: var(--neon-blue) !important;
     background: rgba(0, 245, 255, 0.1);
 }
 
-.nav-item:hover::after, .nav-item.active::after {
+.nav-item:hover::after,
+.nav-item.active::after {
     width: 40px;
     box-shadow: 0 0 10px var(--neon-blue);
 }
@@ -298,15 +328,25 @@ nav {
 }
 
 @keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
 }
 
 /* ==========================================================================
    PROGRESS BARS & XP
    ========================================================================== */
 
-.xp-bar, .mini-bar, .milestone-bar, .progress-bar {
+.xp-bar,
+.mini-bar,
+.milestone-bar,
+.progress-bar {
     background: rgba(255, 255, 255, 0.1) !important;
     border-radius: 10px !important;
     overflow: hidden;
@@ -314,7 +354,10 @@ nav {
     height: 10px !important;
 }
 
-.xp-fill, .mini-fill, .milestone-fill, .progress-fill {
+.xp-fill,
+.mini-fill,
+.milestone-fill,
+.progress-fill {
     background: var(--gradient-neon) !important;
     border-radius: 10px !important;
     position: relative;
@@ -322,7 +365,8 @@ nav {
     box-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
 }
 
-.xp-fill::after, .progress-fill::after {
+.xp-fill::after,
+.progress-fill::after {
     content: '';
     position: absolute;
     top: 0;
@@ -334,8 +378,13 @@ nav {
 }
 
 @keyframes progressShine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ==========================================================================
@@ -344,7 +393,7 @@ nav {
 
 .level-badge {
     background: var(--gradient-neon) !important;
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(0, 245, 255, 0.5),
         inset 0 0 20px rgba(255, 255, 255, 0.1) !important;
     animation: levelPulse 3s ease-in-out infinite;
@@ -352,10 +401,13 @@ nav {
 }
 
 @keyframes levelPulse {
-    0%, 100% { 
+
+    0%,
+    100% {
         box-shadow: 0 0 30px rgba(0, 245, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
     }
-    50% { 
+
+    50% {
         box-shadow: 0 0 50px rgba(0, 245, 255, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.2);
     }
 }
@@ -410,7 +462,9 @@ nav {
 }
 
 @keyframes streakRotate {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .streak-flame {
@@ -420,15 +474,23 @@ nav {
 }
 
 @keyframes flameGlow {
-    0% { filter: drop-shadow(0 0 20px #ff6b00) brightness(1); }
-    100% { filter: drop-shadow(0 0 40px #ff00ff) brightness(1.3); }
+    0% {
+        filter: drop-shadow(0 0 20px #ff6b00) brightness(1);
+    }
+
+    100% {
+        filter: drop-shadow(0 0 40px #ff00ff) brightness(1.3);
+    }
 }
 
 /* ==========================================================================
    FORMS & INPUTS
    ========================================================================== */
 
-input, textarea, select, .form-control {
+input,
+textarea,
+select,
+.form-control {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 12px !important;
@@ -438,13 +500,17 @@ input, textarea, select, .form-control {
     transition: var(--transition-smooth) !important;
 }
 
-input:focus, textarea:focus, select:focus, .form-control:focus {
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
     border-color: var(--neon-blue) !important;
     box-shadow: 0 0 20px rgba(0, 245, 255, 0.3) !important;
     outline: none !important;
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
     color: rgba(255, 255, 255, 0.4) !important;
 }
 
@@ -458,7 +524,7 @@ input::placeholder, textarea::placeholder {
     -webkit-backdrop-filter: blur(30px) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 24px !important;
-    box-shadow: 
+    box-shadow:
         0 25px 80px rgba(0, 0, 0, 0.5),
         0 0 60px rgba(0, 245, 255, 0.1) !important;
     animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -469,13 +535,15 @@ input::placeholder, textarea::placeholder {
         opacity: 0;
         transform: scale(0.9) translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
 }
 
-.modal-overlay, .modal {
+.modal-overlay,
+.modal {
     background: rgba(0, 0, 0, 0.7) !important;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
@@ -515,6 +583,7 @@ input::placeholder, textarea::placeholder {
         opacity: 0;
         transform: translateX(100px) scale(0.8);
     }
+
     to {
         opacity: 1;
         transform: translateX(0) scale(1);
@@ -526,12 +595,10 @@ input::placeholder, textarea::placeholder {
    ========================================================================== */
 
 .score-circle {
-    background: conic-gradient(
-        var(--neon-blue) 0deg calc(var(--score) * 3.6deg),
-        rgba(255, 255, 255, 0.1) calc(var(--score) * 3.6deg)
-    ) !important;
+    background: conic-gradient(var(--neon-blue) 0deg calc(var(--score) * 3.6deg),
+            rgba(255, 255, 255, 0.1) calc(var(--score) * 3.6deg)) !important;
     border: 3px solid var(--glass-border);
-    box-shadow: 
+    box-shadow:
         0 0 40px rgba(0, 245, 255, 0.3),
         inset 0 0 40px rgba(0, 0, 0, 0.3) !important;
     position: relative;
@@ -641,8 +708,15 @@ input::placeholder, textarea::placeholder {
 }
 
 @keyframes selectedPulse {
-    0%, 100% { box-shadow: 0 0 40px rgba(0, 245, 255, 0.5); }
-    50% { box-shadow: 0 0 60px rgba(0, 245, 255, 0.8); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 40px rgba(0, 245, 255, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 60px rgba(0, 245, 255, 0.8);
+    }
 }
 
 /* ==========================================================================
@@ -655,7 +729,7 @@ input::placeholder, textarea::placeholder {
     -webkit-backdrop-filter: blur(30px) !important;
     border: 2px solid var(--neon-green) !important;
     border-radius: 24px !important;
-    box-shadow: 
+    box-shadow:
         0 0 100px rgba(0, 255, 136, 0.4),
         inset 0 0 60px rgba(0, 255, 136, 0.05) !important;
     animation: achievementPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -666,9 +740,11 @@ input::placeholder, textarea::placeholder {
         opacity: 0;
         transform: scale(0.3) translateY(50px);
     }
+
     50% {
         transform: scale(1.1) translateY(-10px);
     }
+
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -682,8 +758,15 @@ input::placeholder, textarea::placeholder {
 }
 
 @keyframes achievementBounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.1); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.1);
+    }
 }
 
 /* ==========================================================================
@@ -700,7 +783,7 @@ input::placeholder, textarea::placeholder {
     -webkit-backdrop-filter: blur(30px) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 24px !important;
-    box-shadow: 
+    box-shadow:
         0 25px 80px rgba(0, 0, 0, 0.5),
         0 0 100px rgba(0, 245, 255, 0.1),
         inset 0 0 60px rgba(0, 245, 255, 0.02) !important;
@@ -716,19 +799,19 @@ input::placeholder, textarea::placeholder {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: conic-gradient(
-        from 0deg,
-        transparent,
-        rgba(0, 245, 255, 0.03),
-        transparent,
-        rgba(191, 0, 255, 0.03),
-        transparent
-    );
+    background: conic-gradient(from 0deg,
+            transparent,
+            rgba(0, 245, 255, 0.03),
+            transparent,
+            rgba(191, 0, 255, 0.03),
+            transparent);
     animation: authRotate 15s linear infinite;
 }
 
 @keyframes authRotate {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes authFadeIn {
@@ -736,6 +819,7 @@ input::placeholder, textarea::placeholder {
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -779,14 +863,16 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Google Sign In Button */
-.btn-google, .google-signin-btn {
+.btn-google,
+.google-signin-btn {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     color: white !important;
     transition: var(--transition-smooth) !important;
 }
 
-.btn-google:hover, .google-signin-btn:hover {
+.btn-google:hover,
+.google-signin-btn:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     border-color: var(--neon-blue) !important;
     box-shadow: 0 0 30px rgba(0, 245, 255, 0.2) !important;
@@ -820,7 +906,12 @@ input::placeholder, textarea::placeholder {
    TYPOGRAPHY ENHANCEMENTS
    ========================================================================== */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -850,7 +941,8 @@ h1, h2, h3, h4, h5, h6 {
    HEADER
    ========================================================================== */
 
-header, .app-header {
+header,
+.app-header {
     background: rgba(10, 10, 26, 0.9) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -858,7 +950,8 @@ header, .app-header {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
 }
 
-.logo, .app-title {
+.logo,
+.app-title {
     background: var(--gradient-neon);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -947,7 +1040,8 @@ header, .app-header {
    GRID LAYOUTS
    ========================================================================== */
 
-.dashboard-grid, .overview-grid {
+.dashboard-grid,
+.overview-grid {
     gap: 24px !important;
 }
 
@@ -968,20 +1062,34 @@ header, .app-header {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.section, .card, .overview-card {
+.section,
+.card,
+.overview-card {
     animation: fadeInUp 0.6s ease-out;
 }
 
-.dashboard-grid > *:nth-child(1) { animation-delay: 0.1s; }
-.dashboard-grid > *:nth-child(2) { animation-delay: 0.2s; }
-.dashboard-grid > *:nth-child(3) { animation-delay: 0.3s; }
-.dashboard-grid > *:nth-child(4) { animation-delay: 0.4s; }
+.dashboard-grid>*:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.dashboard-grid>*:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dashboard-grid>*:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.dashboard-grid>*:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 /* ==========================================================================
    RESPONSIVE ENHANCEMENTS
@@ -991,17 +1099,19 @@ header, .app-header {
     .stat-number {
         font-size: 36px !important;
     }
-    
-    .card, .overview-card, .section {
+
+    .card,
+    .overview-card,
+    .section {
         border-radius: 16px !important;
         padding: 20px !important;
     }
-    
+
     .modal-content {
         margin: 10px;
         border-radius: 20px !important;
     }
-    
+
     nav {
         padding-bottom: env(safe-area-inset-bottom, 10px);
     }
@@ -1013,28 +1123,157 @@ header, .app-header {
 
 /* Holographic effect for special elements */
 .holographic {
-    background: linear-gradient(
-        45deg,
-        rgba(255, 0, 255, 0.1) 0%,
-        rgba(0, 255, 255, 0.1) 25%,
-        rgba(255, 255, 0, 0.1) 50%,
-        rgba(0, 255, 255, 0.1) 75%,
-        rgba(255, 0, 255, 0.1) 100%
-    );
+    background: linear-gradient(45deg,
+            rgba(255, 0, 255, 0.1) 0%,
+            rgba(0, 255, 255, 0.1) 25%,
+            rgba(255, 255, 0, 0.1) 50%,
+            rgba(0, 255, 255, 0.1) 75%,
+            rgba(255, 0, 255, 0.1) 100%);
     background-size: 400% 400%;
     animation: holographicShift 8s ease infinite;
 }
 
 @keyframes holographicShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Glow text effect */
 .glow-text {
-    text-shadow: 
+    text-shadow:
         0 0 10px currentColor,
         0 0 20px currentColor,
         0 0 30px currentColor;
+}
+
+/* ==========================================================================
+   REDUCED MOTION SUPPORT
+   Disables decorative animations for users who prefer reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    /* Disable background animations */
+    body::before,
+    body::after {
+        animation: none !important;
+        opacity: 0.3 !important;
+    }
+
+    /* Disable card hover animations */
+    .card:hover,
+    .overview-card:hover,
+    .section:hover,
+    .stat-card:hover {
+        transform: none !important;
+    }
+
+    .card::before,
+    .overview-card::before,
+    .section::before {
+        display: none !important;
+    }
+
+    /* Disable button animations */
+    .btn::before {
+        display: none !important;
+    }
+
+    .btn:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover {
+        transform: none !important;
+    }
+
+    /* Disable glow animations */
+    .stat-number,
+    .level-badge,
+    .streak-flame {
+        animation: none !important;
+    }
+
+    .stat-card::after {
+        display: none !important;
+    }
+
+    /* Disable progress bar animations */
+    .xp-fill::after,
+    .progress-fill::after {
+        animation: none !important;
+        display: none !important;
+    }
+
+    /* Disable streak rotation */
+    .streak-container::before {
+        animation: none !important;
+    }
+
+    /* Disable nav animations */
+    .nav-item.active i {
+        animation: none !important;
+    }
+
+    /* Disable modal animations */
+    .modal-content {
+        animation: none !important;
+    }
+
+    /* Disable achievement animations */
+    .achievement-popup,
+    .achievement-icon {
+        animation: none !important;
+    }
+
+    /* Disable toast animations */
+    .toast {
+        animation: none !important;
+    }
+
+    /* Disable auth container rotation */
+    .auth-container::before {
+        animation: none !important;
+    }
+
+    /* Disable holographic effect */
+    .holographic {
+        animation: none !important;
+    }
+
+    /* Disable mood button pulse */
+    .mood-btn.selected {
+        animation: none !important;
+    }
+
+    /* Keep simple transitions for feedback but make them instant */
+    * {
+        transition-duration: 0.1s !important;
+    }
+}
+
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Use GPU acceleration for animated elements */
+body::before,
+body::after,
+.card,
+.btn,
+.modal-content {
+    will-change: auto;
+}
+
+/* Only enable will-change during hover/interaction for better performance */
+.card:hover,
+.btn:hover {
+    will-change: transform, box-shadow;
 }
