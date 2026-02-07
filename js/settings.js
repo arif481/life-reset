@@ -54,6 +54,11 @@ const appSettings = {
 function initSettings() {
     loadSettingsUI();
     applySavedSettings();
+    
+    // Initialize smart reminders UI (v2.1)
+    if (typeof renderReminderSettings === 'function') {
+        setTimeout(() => renderReminderSettings(), 100);
+    }
 }
 
 // Load settings UI
@@ -311,6 +316,20 @@ function loadSettingsUI() {
                                 <label>Mood Tracking</label>
                                 <input type="time" id="moodTracking" class="form-control" onchange="updateReminderTime('moodTracking')">
                                 <small class="form-text">Log how you're feeling</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Smart Reminders (v2.1) -->
+                    <div class="setting-card">
+                        <div class="setting-header">
+                            <i class="fas fa-brain"></i>
+                            <div class="setting-title">Smart Reminders</div>
+                        </div>
+                        <div class="setting-body">
+                            <div id="reminderSettingsContainer">
+                                <!-- Rendered by reminders.js -->
+                                <p class="loading-text">Loading smart reminder settings...</p>
                             </div>
                         </div>
                     </div>

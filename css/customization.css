@@ -1,0 +1,337 @@
+/**
+ * Customization & Themes Styles
+ */
+
+/* Customization Container */
+.customization-section {
+    padding: 1rem;
+}
+
+.customization-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.customization-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--bg-tertiary);
+    padding-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Themes Grid */
+.themes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.theme-card {
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.theme-card:hover {
+    transform: translateY(-2px);
+}
+
+.theme-card.active .theme-preview {
+    box-shadow: 0 0 0 3px var(--accent-primary);
+}
+
+.theme-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.theme-icon {
+    font-size: 2rem;
+}
+
+.theme-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Categories List */
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 0.75rem;
+    border: 1px solid var(--bg-tertiary);
+}
+
+.category-icon {
+    font-size: 1.5rem;
+}
+
+.category-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.category-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Preference Groups */
+.preference-group {
+    background: var(--bg-secondary);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.preference-group h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.preference-group .toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.preference-group .toggle-label:last-child {
+    border-bottom: none;
+}
+
+.select-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.select-label:last-child {
+    border-bottom: none;
+}
+
+.select-label select {
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--bg-primary);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* Profile Form */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-form .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.profile-form input[type="text"],
+.profile-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-tertiary);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.profile-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.profile-form input:focus,
+.profile-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* Badge Selector */
+.badge-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge-option {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--bg-tertiary);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.badge-option:hover {
+    border-color: var(--accent-primary);
+}
+
+.badge-option.selected {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent-primary);
+}
+
+/* Icon Picker */
+.icon-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.icon-option {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-option:hover {
+    border-color: var(--text-secondary);
+}
+
+.icon-option.selected {
+    border-color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+/* Color Pickers */
+.color-pickers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.color-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.color-group label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.color-group input[type="color"] {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    background: none;
+}
+
+.color-group input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-group input[type="color"]::-webkit-color-swatch {
+    border: 2px solid var(--bg-tertiary);
+    border-radius: 0.5rem;
+}
+
+/* Modal Styles */
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* Compact Mode */
+body.compact-mode .card,
+body.compact-mode .task-item,
+body.compact-mode .habit-item {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+body.compact-mode h1 {
+    font-size: 1.5rem;
+}
+
+body.compact-mode h2 {
+    font-size: 1.25rem;
+}
+
+/* No Animations Mode */
+body.no-animations *,
+body.no-animations *::before,
+body.no-animations *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .themes-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .color-pickers {
+        grid-template-columns: 1fr;
+    }
+
+    .preference-group .toggle-label,
+    .select-label {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .select-label select {
+        width: 100%;
+    }
+}

@@ -33,6 +33,21 @@ function initDashboard() {
     renderRecentActivity();
     renderInsights();
     renderMilestones();
+    
+    // Initialize new features (v2.1)
+    if (typeof initChallenges === 'function') {
+        initChallenges().then(() => {
+            if (typeof renderChallengesUI === 'function') renderChallengesUI();
+        }).catch(e => console.error('[Dashboard] Challenges init error:', e));
+    }
+    
+    if (typeof renderAdvancedAnalytics === 'function') {
+        renderAdvancedAnalytics();
+    }
+    
+    if (typeof initReminders === 'function') {
+        initReminders().catch(e => console.error('[Dashboard] Reminders init error:', e));
+    }
 }
 
 /**

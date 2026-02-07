@@ -1,0 +1,297 @@
+/**
+ * Smart Reminders Styles
+ */
+
+/* ==========================================================================
+   Reminder Settings
+   ========================================================================== */
+
+.reminder-settings {
+    padding: 1rem 0;
+}
+
+.setting-group {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.setting-group.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.setting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.setting-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.setting-description {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.setting-description .btn-link {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.85rem;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Setting Rows
+   ========================================================================== */
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.setting-icon {
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.setting-label {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.setting-time,
+.setting-desc {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+}
+
+/* ==========================================================================
+   Toggle Switch
+   ========================================================================== */
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-tertiary);
+    border-radius: 26px;
+    transition: 0.3s;
+}
+
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-secondary);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: var(--accent-primary);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(22px);
+    background-color: white;
+}
+
+/* ==========================================================================
+   Setting Actions
+   ========================================================================== */
+
+.setting-actions {
+    padding-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   Notification Styles (in-app)
+   ========================================================================== */
+
+.in-app-notification {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    z-index: 10000;
+    display: flex;
+    gap: 1rem;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.in-app-notification .notification-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.in-app-notification .notification-content {
+    flex: 1;
+}
+
+.in-app-notification .notification-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.in-app-notification .notification-body {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.in-app-notification .close-notification {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+}
+
+/* ==========================================================================
+   Streak Alert Banner
+   ========================================================================== */
+
+.streak-alert {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(251, 146, 60, 0.2));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.streak-alert .alert-icon {
+    font-size: 1.5rem;
+}
+
+.streak-alert .alert-content {
+    flex: 1;
+}
+
+.streak-alert .alert-title {
+    color: #f87171;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.streak-alert .alert-message {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.streak-alert .alert-action {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.streak-alert .alert-action:hover {
+    background: #dc2626;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 480px) {
+    .in-app-notification {
+        left: 0.5rem;
+        right: 0.5rem;
+    }
+}
