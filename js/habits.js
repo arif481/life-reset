@@ -160,8 +160,8 @@ function renderBadHabits() {
 
                     <div class="health-improvement">
                         ${Object.entries(habit.healthCategories).map(([key, category]) => {
-                            const improvement = category.improvement(daysQuit);
-                            return `
+                const improvement = category.improvement(daysQuit);
+                return `
                                 <div class="health-category">
                                     <div class="health-category-title">
                                         <span>${category.icon}</span>
@@ -174,7 +174,7 @@ function renderBadHabits() {
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+            }).join('')}
                     </div>
 
                     <div class="health-benefits">
@@ -227,42 +227,47 @@ function renderBadHabits() {
 
 // Show add bad habit modal
 function showAddBadHabitModal() {
+    // Remove existing if any
+    const existing = document.getElementById('addBadHabitModal');
+    if (existing) existing.remove();
+
     const modal = document.createElement('div');
     modal.id = 'addBadHabitModal';
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); display: flex; align-items: center;
-        justify-content: center; z-index: 1000;
-    `;
+    modal.className = 'modal active';
 
-    const habitOptions = Object.entries(badHabits).map(([id, data]) => 
+    const habitOptions = Object.entries(badHabits).map(([id, data]) =>
         `<option value="${id}">${data.icon} ${data.name}</option>`
     ).join('');
 
     modal.innerHTML = `
-        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 450px; width: 90%;">
-            <h2 style="margin-bottom: 20px;">Track a Habit You Want to Quit</h2>
-            <form onsubmit="saveBadHabit(event)">
-                <div class="form-group">
-                    <label>Select Habit *</label>
-                    <select id="habitType" class="form-control" required>
-                        <option value="">Choose a habit...</option>
-                        ${habitOptions}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Cost Per Day (for money saved calc)</label>
-                    <input type="number" id="habitCost" class="form-control" placeholder="E.g., 10" min="0" step="0.5" value="10">
-                </div>
-                <div class="form-group">
-                    <label>Why do you want to quit?</label>
-                    <textarea id="habitReason" class="form-control" placeholder="Your motivation..." rows="3"></textarea>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">Start Tracking</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeBadHabitModal()" style="flex: 1;">Cancel</button>
-                </div>
-            </form>
+        <div class="modal-content" style="max-width: 450px; width: 95%;">
+            <div class="modal-header">
+                <h2>Track a Habit You Want to Quit</h2>
+                <span class="modal-close" onclick="closeBadHabitModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="saveBadHabit(event)">
+                    <div class="form-group">
+                        <label>Select Habit *</label>
+                        <select id="habitType" class="form-control" required>
+                            <option value="">Choose a habit...</option>
+                            ${habitOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cost Per Day (for money saved calc)</label>
+                        <input type="number" id="habitCost" class="form-control" placeholder="E.g., 10" min="0" step="0.5" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Why do you want to quit?</label>
+                        <textarea id="habitReason" class="form-control" placeholder="Your motivation..." rows="3"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Start Tracking</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeBadHabitModal()" style="flex: 1;">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     `;
 
@@ -588,7 +593,7 @@ function generateHabitInsights() {
         insights.push('✨ Good effort! Keep pushing to build stronger habits.');
     }
 
-    const bestDay = Math.max(...Array.from({length: 7}, (_, i) => {
+    const bestDay = Math.max(...Array.from({ length: 7 }, (_, i) => {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
         const dateStr = getDateString(date);
@@ -608,7 +613,7 @@ function generateHabitInsights() {
         insights.push('Start completing tasks to see personalized insights!');
     }
 
-    insightsList.innerHTML = insights.map(insight => 
+    insightsList.innerHTML = insights.map(insight =>
         `<li class="insight-item">${insight}</li>`
     ).join('');
 }

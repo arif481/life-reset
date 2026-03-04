@@ -67,7 +67,7 @@ function renderTaskCategories() {
     const container = document.getElementById('taskCategories');
     if (!container) return;
     container.innerHTML = '';
-    
+
     const categoryIcons = {
         morning: 'fa-sun',
         health: 'fa-heart',
@@ -75,7 +75,7 @@ function renderTaskCategories() {
         evening: 'fa-moon',
         custom: 'fa-star'
     };
-    
+
     const categoryNames = {
         morning: 'Morning Routine',
         health: 'Health & Wellness',
@@ -83,12 +83,12 @@ function renderTaskCategories() {
         evening: 'Evening Routine',
         custom: 'Custom Tasks'
     };
-    
+
     for (const category in appState.userTasks) {
         const tasks = appState.userTasks[category] || [];
         const taskEl = document.createElement('div');
-        taskEl.className = 'task-category';
-        
+        taskEl.className = `task-category ${category}`;
+
         let taskList = '';
         tasks.forEach(task => {
             // Sanitize task name to prevent XSS
@@ -111,7 +111,7 @@ function renderTaskCategories() {
                 </div>
             `;
         });
-        
+
         taskEl.innerHTML = `
             <div class="category-header">
                 <i class="fas ${categoryIcons[category]}"></i>
@@ -162,6 +162,7 @@ function toggleTask(taskId) {
             if (task.completed) {
                 appState.userStats.tasksCompleted++;
                 addXP(10);
+                showToast('Task completed! +10 XP', 'success');
             } else {
                 appState.userStats.tasksCompleted = Math.max(0, (appState.userStats.tasksCompleted || 0) - 1);
                 // Don't remove XP - it's earned, not a punishment
@@ -180,55 +181,72 @@ function toggleTask(taskId) {
 function updateProgress() {
     let totalTasks = 0;
     let completedTasks = 0;
-    
+
     for (const category in appState.userTasks) {
         appState.userTasks[category].forEach(task => {
             totalTasks++;
             if (task.completed) completedTasks++;
         });
     }
-    
+
     const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
     const progressBar = document.getElementById('todayProgress');
     if (progressBar) progressBar.style.width = progressPercentage + '%';
-    
+
     const progressText = document.getElementById('progressText');
     if (progressText) progressText.textContent = `${progressPercentage}% of today's tasks completed`;
-    
+
     const completionRate = document.getElementById('completionRate');
     if (completionRate) completionRate.textContent = `${progressPercentage}%`;
-    
+
+    // Celebrate if 100% complete and not already celebrated today
+    if (progressPercentage === 100 && totalTasks > 0 && !appState.hasCelebratedToday) {
+        celebrateAllTasksCompleted();
+        appState.hasCelebratedToday = true;
+    }
+
     // FIXED: Calculate 30-day average consistency
     let consistency30Day = 0;
     if (appState.tasksHistory && Object.keys(appState.tasksHistory).length > 0) {
         let totalDays = 0;
         let completedDays = 0;
-        
+
         for (let i = 0; i < 30; i++) {
             const date = new Date();
             date.setDate(date.getDate() - i);
             const dateStr = getDateString(date);
             const dayData = appState.tasksHistory[dateStr];
-            
+
             if (dayData && dayData.total > 0) {
                 totalDays++;
                 const dayPercent = (dayData.completed / dayData.total) * 100;
                 completedDays += dayPercent / 100;
             }
         }
-        
+
         consistency30Day = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
     } else {
         // Fallback to today's consistency if no history
         consistency30Day = progressPercentage;
     }
-    
+
     appState.userStats.consistency = consistency30Day;
-    
+
     // Calculate and update streak
     calculateAndUpdateStreak();
-    
+
     updateGamificationUI();
+}
+
+function celebrateAllTasksCompleted() {
+    if (typeof createConfetti === 'function') {
+        createConfetti();
+        setTimeout(createConfetti, 300);
+        setTimeout(createConfetti, 600);
+    }
+
+    showToast('🎉 All tasks completed! Bonus +50 XP!', 'success');
+    addXP(50);
 }
 
 /**
@@ -238,16 +256,16 @@ function updateProgress() {
 function calculateAndUpdateStreak() {
     let streak = 0;
     const today = new Date();
-    
+
     // Start from yesterday and count backwards
     // (today doesn't count unless it's completed)
     for (let i = 0; i <= 365; i++) {
         const checkDate = new Date(today);
         checkDate.setDate(today.getDate() - i);
         const dateStr = getDateString(checkDate);
-        
+
         const dayData = appState.tasksHistory ? appState.tasksHistory[dateStr] : null;
-        
+
         if (i === 0) {
             // Today: only count if there's progress
             if (dayData && dayData.total > 0 && (dayData.completed / dayData.total) >= 0.5) {
@@ -256,7 +274,7 @@ function calculateAndUpdateStreak() {
             // Don't break on day 0 - allow the streak to start from yesterday
             continue;
         }
-        
+
         // For previous days: require >= 50% completion to continue streak
         if (dayData && dayData.total > 0) {
             const completionRate = dayData.completed / dayData.total;
@@ -271,9 +289,9 @@ function calculateAndUpdateStreak() {
             break;
         }
     }
-    
+
     appState.userStats.streak = streak;
-    
+
     // Save updated streak to Firestore
     if (typeof saveUserStatsRealtime === 'function') {
         saveUserStatsRealtime();
@@ -289,10 +307,10 @@ async function saveTaskCompletion(taskId, completed) {
         _totalTasks: getTotalTaskCount(),
         _updatedAt: new Date()
     };
-    
+
     // Check if online and Firebase is available
     const isOnline = navigator.onLine && db && appState.currentUser;
-    
+
     if (isOnline) {
         try {
             window.isLocalTaskUpdate = true;
@@ -300,7 +318,7 @@ async function saveTaskCompletion(taskId, completed) {
                 .collection('tasks').doc(dateString)
                 .set(data, { merge: true });
             setTimeout(() => { window.isLocalTaskUpdate = false; }, 100);
-            
+
             // Backup to local storage
             if (window.OfflineManager) {
                 await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
@@ -308,7 +326,7 @@ async function saveTaskCompletion(taskId, completed) {
         } catch (error) {
             console.warn('Error saving task online, queuing for offline:', error);
             window.isLocalTaskUpdate = false;
-            
+
             // Queue for later sync if online save fails
             if (window.OfflineManager) {
                 await window.OfflineManager.queueWrite('tasks', dateString, data, 'set');
@@ -339,16 +357,16 @@ async function loadTasksForDate() {
     for (const category in appState.userTasks) {
         appState.userTasks[category].forEach(task => task.completed = false);
     }
-    
+
     const dateString = getDateString(appState.currentDate);
     let dataLoaded = false;
-    
+
     // Try to load from Firebase first
     if (db && appState.currentUser) {
         try {
             const doc = await db.collection('users').doc(appState.currentUser.uid)
                 .collection('tasks').doc(dateString).get();
-            
+
             if (doc.exists) {
                 const data = doc.data();
                 for (const category in appState.userTasks) {
@@ -359,7 +377,7 @@ async function loadTasksForDate() {
                     });
                 }
                 dataLoaded = true;
-                
+
                 // Cache the data locally
                 if (window.OfflineManager) {
                     await window.OfflineManager.cacheData(`tasks_${dateString}`, 'tasks', data);
@@ -369,7 +387,7 @@ async function loadTasksForDate() {
             console.error('Error loading tasks from Firebase:', error);
         }
     }
-    
+
     // Fallback to cached data if Firebase unavailable
     if (!dataLoaded && window.OfflineManager) {
         try {
@@ -387,7 +405,7 @@ async function loadTasksForDate() {
             console.error('Error loading cached tasks:', cacheError);
         }
     }
-    
+
     renderTaskCategories();
     updateProgress();
 
@@ -408,29 +426,29 @@ function closeAddTaskModal() {
 async function addCustomTask() {
     const taskName = document.getElementById('customTaskName').value;
     const taskCategory = document.getElementById('taskCategory').value;
-    
+
     if (!taskName.trim()) {
         showToast('Please enter a task name', 'error');
         return;
     }
-    
+
     const newTask = {
         id: 'custom_' + Date.now(),
         name: taskName,
         completed: false,
         isCustom: true
     };
-    
+
     if (!appState.userTasks[taskCategory]) {
         appState.userTasks[taskCategory] = [];
     }
     appState.userTasks[taskCategory].push(newTask);
     saveCustomTasksForCategory(taskCategory);
-    
+
     renderTaskCategories();
     closeAddTaskModal();
     showToast('Task added successfully!', 'success');
-    
+
     document.getElementById('customTaskName').value = '';
 }
 
@@ -449,7 +467,7 @@ async function loadCustomTasks() {
         try {
             const snapshot = await db.collection('users').doc(appState.currentUser.uid)
                 .collection('customTasks').get();
-            
+
             snapshot.forEach(doc => {
                 const category = doc.id;
                 const saved = (doc.data() && Array.isArray(doc.data().tasks)) ? doc.data().tasks : [];

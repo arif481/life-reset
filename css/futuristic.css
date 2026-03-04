@@ -1,7 +1,7 @@
 /**
  * @stylesheet futuristic.css
  * @description Futuristic UI/UX overhaul - glassmorphism, neon effects, animations
- * @version 2.0.0
+ * @version 3.0.0 - Premium UI/UX Upgrade
  */
 
 /* ==========================================================================
@@ -9,43 +9,47 @@
    ========================================================================== */
 
 :root {
-    /* Neon Colors */
-    --neon-blue: #00f5ff;
-    --neon-purple: #bf00ff;
-    --neon-pink: #ff00ff;
-    --neon-green: #00ff88;
-    --neon-orange: #ff6b00;
+    /* Premium Neon Colors */
+    --neon-blue: #00d4ff;
+    --neon-purple: #a855f7;
+    --neon-pink: #ec4899;
+    --neon-green: #22c55e;
+    --neon-orange: #f97316;
+    --neon-cyan: #06b6d4;
 
-    /* Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.18);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    /* Enhanced Glassmorphism */
+    --glass-bg: rgba(15, 15, 35, 0.6);
+    --glass-bg-light: rgba(26, 26, 62, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(99, 102, 241, 0.3);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --glass-blur: blur(24px);
 
     /* Dark Theme Enhancement */
-    --bg-primary: #0a0a1a;
-    --bg-secondary: #12122a;
-    --bg-tertiary: #1a1a3e;
-    --bg-card-glass: rgba(26, 26, 62, 0.7);
+    --bg-primary: #050510;
+    --bg-secondary: #0a0a1f;
+    --bg-tertiary: #0f0f2a;
+    --bg-card-glass: rgba(15, 15, 35, 0.7);
 
-    /* Glows */
-    --glow-primary: 0 0 20px rgba(0, 245, 255, 0.5);
-    --glow-accent: 0 0 20px rgba(191, 0, 255, 0.5);
-    --glow-success: 0 0 20px rgba(0, 255, 136, 0.5);
+    /* Premium Glows */
+    --glow-primary: 0 0 30px rgba(99, 102, 241, 0.4);
+    --glow-accent: 0 0 30px rgba(236, 72, 153, 0.4);
+    --glow-success: 0 0 30px rgba(34, 197, 94, 0.4);
+    --glow-blue: 0 0 30px rgba(6, 182, 212, 0.4);
 
-    /* Enhanced Animations */
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f72585 100%);
-    --gradient-neon: linear-gradient(135deg, #00f5ff 0%, #bf00ff 100%);
-    --gradient-fire: linear-gradient(135deg, #ff6b00 0%, #ff00ff 100%);
-    --gradient-ocean: linear-gradient(135deg, #00f5ff 0%, #00ff88 100%);
-    --gradient-dark: linear-gradient(180deg, #0a0a1a 0%, #1a1a3e 100%);
+    /* Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --gradient-neon: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%);
+    --gradient-fire: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+    --gradient-ocean: linear-gradient(135deg, #06b6d4 0%, #22c55e 100%);
+    --gradient-dark: linear-gradient(180deg, #050510 0%, #0f0f2a 50%, #100820 100%);
+    --gradient-mesh: radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.15) 0, transparent 50%), 
+                     radial-gradient(at 80% 0%, rgba(236, 72, 153, 0.1) 0, transparent 50%),
+                     radial-gradient(at 0% 50%, rgba(139, 92, 246, 0.1) 0, transparent 50%);
 }
 
 /* ==========================================================================
-   ANIMATED BACKGROUND
+   ANIMATED BACKGROUND - Refined
    ========================================================================== */
 
 body {
@@ -62,27 +66,20 @@ body::before {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at 20% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(191, 0, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 40%);
+        radial-gradient(ellipse at 15% 85%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 15%, rgba(236, 72, 153, 0.06) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
-    animation: ambientPulse 8s ease-in-out infinite;
+    animation: ambientPulse 12s ease-in-out infinite;
 }
 
 @keyframes ambientPulse {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
-/* Floating Particles */
+/* Subtle Floating Particles */
 body::after {
     content: '';
     position: fixed;
@@ -91,11 +88,11 @@ body::after {
     right: 0;
     bottom: 0;
     background-image:
-        radial-gradient(2px 2px at 20px 30px, rgba(0, 245, 255, 0.3), transparent),
-        radial-gradient(2px 2px at 40px 70px, rgba(191, 0, 255, 0.3), transparent),
-        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.3), transparent),
-        radial-gradient(2px 2px at 130px 80px, rgba(0, 255, 136, 0.3), transparent),
-        radial-gradient(1px 1px at 160px 120px, rgba(255, 255, 255, 0.2), transparent);
+        radial-gradient(1.5px 1.5px at 20px 30px, rgba(99, 102, 241, 0.2), transparent),
+        radial-gradient(1.5px 1.5px at 40px 70px, rgba(139, 92, 246, 0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.15), transparent),
+        radial-gradient(1.5px 1.5px at 130px 80px, rgba(236, 72, 153, 0.15), transparent),
+        radial-gradient(1px 1px at 160px 120px, rgba(255, 255, 255, 0.1), transparent);
     background-repeat: repeat;
     background-size: 200px 200px;
     animation: particleFloat 20s linear infinite;

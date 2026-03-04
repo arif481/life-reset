@@ -23,7 +23,7 @@ function initDashboard() {
     if (dashboardCharts.moodTrend) { dashboardCharts.moodTrend.destroy(); dashboardCharts.moodTrend = null; }
     if (dashboardCharts.habitCompletion) { dashboardCharts.habitCompletion.destroy(); dashboardCharts.habitCompletion = null; }
     if (dashboardCharts.categoryBreakdown) { dashboardCharts.categoryBreakdown.destroy(); dashboardCharts.categoryBreakdown = null; }
-    
+
     renderDashboardOverview();
     renderWeeklyActivityChart();
     renderMoodTrendChart();
@@ -33,18 +33,18 @@ function initDashboard() {
     renderRecentActivity();
     renderInsights();
     renderMilestones();
-    
+
     // Initialize new features (v2.1)
     if (typeof initChallenges === 'function') {
         initChallenges().then(() => {
             if (typeof renderChallengesUI === 'function') renderChallengesUI();
         }).catch(e => console.error('[Dashboard] Challenges init error:', e));
     }
-    
+
     if (typeof renderAdvancedAnalytics === 'function') {
         renderAdvancedAnalytics();
     }
-    
+
     if (typeof initReminders === 'function') {
         initReminders().catch(e => console.error('[Dashboard] Reminders init error:', e));
     }
@@ -58,17 +58,18 @@ function renderDashboardOverview() {
     if (!overview) return;
 
     const stats = calculateDashboardStats();
-    
+
     overview.innerHTML = `
         <div class="overview-grid">
+            <!-- Overall Score Card -->
             <div class="overview-card shine">
                 <div class="overview-header">
                     <h3>Overall Score</h3>
-                    <span class="score-badge" style="background: ${stats.scoreColor}">${stats.overallScore}%</span>
+                    <div class="score-badge" style="background: ${stats.scoreColor}">${stats.overallScore}%</div>
                 </div>
-                <div class="overview-chart">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 0;">
                     <div class="score-circle" style="--score: ${stats.overallScore}">
-                        <span class="score-value">${stats.overallScore}%</span>
+                        <div class="score-value">${stats.overallScore}</div>
                     </div>
                 </div>
                 <div class="score-breakdown">
@@ -90,31 +91,36 @@ function renderDashboardOverview() {
                 </div>
             </div>
 
+            <!-- Weekly Snapshot Card -->
             <div class="overview-card shine">
                 <div class="overview-header">
                     <h3>Weekly Snapshot</h3>
-                    <button class="btn-icon" onclick="switchDashboardPeriod('week')">📅</button>
+                    <button class="btn-icon" onclick="switchDashboardPeriod('week')" title="View details">📅</button>
                 </div>
                 <div class="snapshot-stats">
                     <div class="snapshot-item">
                         <i class="fas fa-tasks"></i>
-                        <div>
+                        <div style="flex: 1;">
                             <div class="snapshot-value">${stats.weeklyTasksCompleted}/${stats.weeklyTasksTotal}</div>
                             <div class="snapshot-label">Tasks Completed</div>
                         </div>
-                        <div class="snapshot-percent">${stats.weeklyTaskPercent}%</div>
+                        <div class="snapshot-percent" style="color: ${stats.weeklyTaskPercent >= 80 ? '#00ff88' : '#ffb347'}">
+                            ${stats.weeklyTaskPercent}%
+                        </div>
                     </div>
                     <div class="snapshot-item">
-                        <i class="fas fa-book"></i>
-                        <div>
+                        <i class="fas fa-smile-beam"></i>
+                        <div style="flex: 1;">
                             <div class="snapshot-value">${stats.weeklyMoodEntries}</div>
                             <div class="snapshot-label">Mood Entries</div>
                         </div>
-                        <div class="snapshot-percent">${Math.round(stats.weeklyMoodEntries / 7 * 100)}%</div>
+                        <div class="snapshot-percent">
+                            ${Math.round((stats.weeklyMoodEntries / 7) * 100)}%
+                        </div>
                     </div>
                     <div class="snapshot-item">
                         <i class="fas fa-fire"></i>
-                        <div>
+                        <div style="flex: 1;">
                             <div class="snapshot-value">${stats.currentStreak}</div>
                             <div class="snapshot-label">Day Streak</div>
                         </div>
@@ -123,6 +129,7 @@ function renderDashboardOverview() {
                 </div>
             </div>
 
+            <!-- Active Challenges Card -->
             <div class="overview-card shine">
                 <div class="overview-header">
                     <h3>Active Challenges</h3>
@@ -130,23 +137,23 @@ function renderDashboardOverview() {
                 </div>
                 <div class="challenges-list">
                     ${stats.activeChallenges.length ? stats.activeChallenges.map(challenge => {
-                        const progressPercent = Math.round((challenge.progress / challenge.target) * 100);
-                        const daysLeft = challenge.expiresAt ? Math.max(0, Math.ceil((challenge.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : '∞';
-                        return `
+        const progressPercent = Math.round((challenge.progress / challenge.target) * 100);
+        const daysLeft = challenge.expiresAt ? Math.max(0, Math.ceil((challenge.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : '∞';
+        return `
                         <div class="challenge-item">
                             <div class="challenge-header">
-                                <span class="challenge-name">${challenge.title}</span>
+                                <span class="challenge-name" style="font-size: 13px;">${challenge.title}</span>
                                 <span class="challenge-progress">${progressPercent}%</span>
                             </div>
                             <div class="progress-bar-small">
-                                <div class="progress-fill-small" style="width: ${progressPercent}%"></div>
+                                <div class="progress-fill-small" style="width: ${progressPercent}%; background: linear-gradient(90deg, #00f5ff, #bf00ff);"></div>
                             </div>
                             <div class="challenge-details">
                                 <span>${challenge.progress}/${challenge.target}</span>
                                 <span class="challenge-days">${daysLeft === '∞' ? 'No deadline' : daysLeft + ' days left'}</span>
                             </div>
                         </div>
-                    `}).join('') : '<div class="empty-state">No challenges yet.</div>'}
+                    `}).join('') : '<div class="empty-state" style="text-align: center; padding: 20px; color: #777;">No active challenges. <br><a href="#" onclick="navigateTo(\'gamification\'); return false;" style="color: var(--primary);">Join one!</a></div>'}
                 </div>
             </div>
         </div>
@@ -159,7 +166,7 @@ function renderWeeklyActivityChart() {
 
     const weekData = getWeeklyActivityData();
     const maxValue = Math.max(...weekData.values, 0) || 1;
-    
+
     container.innerHTML = `
         <div class="chart-header">
             <h3>📊 Weekly Activity</h3>
@@ -180,11 +187,11 @@ function renderWeeklyActivityChart() {
         <div class="chart-stats">
             <div class="stat-item">
                 <span>Average:</span>
-                <span class="stat-value">${Math.round(weekData.values.reduce((a,b) => a+b, 0) / weekData.values.length)}</span>
+                <span class="stat-value">${Math.round(weekData.values.reduce((a, b) => a + b, 0) / weekData.values.length)}</span>
             </div>
             <div class="stat-item">
                 <span>Total:</span>
-                <span class="stat-value">${weekData.values.reduce((a,b) => a+b, 0)}</span>
+                <span class="stat-value">${weekData.values.reduce((a, b) => a + b, 0)}</span>
             </div>
         </div>
     `;
@@ -196,7 +203,7 @@ function renderMoodTrendChart() {
 
     const moodData = getMoodTrendData();
     const moodEmojis = { 'very-sad': '😢', 'sad': '😞', 'okay': '😐', 'good': '😊', 'great': '😄' };
-    
+
     container.innerHTML = `
         <div class="chart-header">
             <h3>💭 Mood Trend (Last 7 Days)</h3>
@@ -233,7 +240,7 @@ function renderHabitCompletionChart() {
         `;
         return;
     }
-    
+
     container.innerHTML = `
         <div class="chart-header">
             <h3>✅ Habit Completion Rate</h3>
@@ -265,7 +272,7 @@ function renderCategoryBreakdown() {
 
     const categories = getCategoryData();
     const total = categories.reduce((sum, cat) => sum + cat.count, 0);
-    
+
     container.innerHTML = `
         <div class="chart-header">
             <h3>📂 Task Categories</h3>
@@ -295,74 +302,112 @@ function renderQuickStats() {
     const container = document.getElementById('quickStats');
     if (!container) return;
 
+    // Helper to calculate next milestone
+    const calculateNextMilestone = () => {
+        const xp = appState.userStats.xp || 0;
+        const level = appState.userStats.level || 1;
+        const nextLevelXp = level * 1000;
+        return Math.max(0, nextLevelXp - xp);
+    };
+
+    // Helper to get consistency text
+    const getConsistencyLevel = (c) => {
+        if (c >= 90) return 'Legendary';
+        if (c >= 75) return 'Excellent';
+        if (c >= 50) return 'Good';
+        if (c >= 25) return 'Fair';
+        return 'Building';
+    };
+
+    // Helper to get health status text
+    const getHealthStatus = (h) => {
+        if (h >= 80) return 'Peak';
+        if (h >= 60) return 'Strong';
+        if (h >= 40) return 'Fair';
+        return 'At Risk';
+    };
+
     const stats = {
-        xp: appState.userStats.xp,
-        level: appState.userStats.level,
-        healthScore: appState.userStats.healthScore,
-        consistency: appState.userStats.consistency,
-        streak: appState.userStats.streak,
-        totalTasks: appState.userStats.tasksCompleted,
+        xp: appState.userStats.xp || 0,
+        level: appState.userStats.level || 1,
+        xpNeeded: appState.userStats.xpNeeded || 1000,
+        healthScore: Math.round(appState.userStats.healthScore || 0),
+        consistency: Math.round(appState.userStats.consistency || 0),
+        streak: appState.userStats.streak || 0,
         nextMilestone: calculateNextMilestone()
     };
 
+    // Calculate progress percentage for ring
+    const xpProgress = Math.min(1, Math.max(0, stats.xp / stats.xpNeeded));
+    const circumference = 2 * Math.PI * 40; // r=40
+    const offset = circumference - (xpProgress * circumference);
+
     container.innerHTML = `
         <div class="quick-stats-grid">
+            <!-- Level Stat -->
             <div class="quick-stat-card">
-                <div class="stat-icon-lg">⭐</div>
+                <div class="stat-icon-lg" style="background: rgba(0, 245, 255, 0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #00f5ff; font-size: 28px;">⭐</div>
                 <div class="stat-content">
                     <div class="stat-value">${stats.level}</div>
                     <div class="stat-name">Current Level</div>
                 </div>
                 <div class="stat-progress">
-                    <div class="progress-ring">
-                        <svg class="progress-svg" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" class="progress-bg"></circle>
-                            <circle cx="50" cy="50" r="40" class="progress-circle" style="--progress: ${stats.xp / appState.userStats.xpNeeded}"></circle>
+                    <div class="progress-ring" style="width: 60px; height: 60px;">
+                        <svg class="progress-svg" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                            <circle cx="50" cy="50" r="40" class="progress-bg" stroke-width="8" stroke="rgba(255,255,255,0.1)" fill="none"></circle>
+                            <circle cx="50" cy="50" r="40" class="progress-circle" stroke-width="8" stroke="#00f5ff" fill="none" 
+                                style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset}; transition: stroke-dashoffset 1s ease; opacity: 0.8;"></circle>
                         </svg>
-                        <span class="ring-text">${stats.xp}/${appState.userStats.xpNeeded}</span>
+                        <span class="ring-text" style="font-size: 10px; color: #fff;">${Math.round(xpProgress * 100)}%</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Health Score Stat -->
             <div class="quick-stat-card">
-                <div class="stat-icon-lg">❤️</div>
+                <div class="stat-icon-lg" style="background: rgba(255, 0, 110, 0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #ff006e; font-size: 28px;">❤️</div>
                 <div class="stat-content">
-                    <div class="stat-value">${stats.healthScore}%</div>
+                    <div class="stat-value">${stats.healthScore}</div>
                     <div class="stat-name">Health Score</div>
                 </div>
                 <div class="stat-progress">
-                    <div class="circular-bar" style="--value: ${stats.healthScore}">
-                        <div class="health-status">${getHealthStatus(stats.healthScore)}</div>
+                    <div class="circular-bar" style="--value: ${stats.healthScore}; width: 60px; height: 60px; font-size: 10px;">
+                        <div class="health-status" style="background: var(--bg-card); width: 80%; height: 80%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: ${stats.healthScore >= 60 ? '#00ff88' : '#ff006e'}">
+                            ${getHealthStatus(stats.healthScore)}
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Streak Stat -->
             <div class="quick-stat-card">
-                <div class="stat-icon-lg">🔥</div>
+                <div class="stat-icon-lg" style="background: rgba(255, 153, 0, 0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #ff9900; font-size: 28px;">🔥</div>
                 <div class="stat-content">
                     <div class="stat-value">${stats.streak}</div>
                     <div class="stat-name">
-                        Overall Streak
-                        <span class="info-icon" title="Days with completed tasks" style="cursor: help; font-size: 0.8em; color: #888;">ℹ️</span>
+                        Day Streak
                     </div>
                 </div>
-                <div class="stat-progress">
-                    <div class="streak-indicator" style="--streak: ${Math.min(stats.streak * 10, 100)}%">
-                        <span>+${stats.streak} bonus XP/day</span>
+                <div class="stat-progress" style="flex-direction: column; align-items: flex-end; gap: 5px;">
+                    <div class="streak-indicator" style="width: 80px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;">
+                        <div style="width: ${Math.min(stats.streak * 10, 100)}%; height: 100%; background: #ff9900; border-radius: 3px; box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);"></div>
                     </div>
+                    <span style="font-size: 10px; color: #aaa;">+${Math.min(stats.streak * 10, 100)} XP/day</span>
                 </div>
             </div>
 
+            <!-- Consistency Stat -->
             <div class="quick-stat-card">
-                <div class="stat-icon-lg">📊</div>
+                <div class="stat-icon-lg" style="background: rgba(0, 255, 136, 0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #00ff88; font-size: 28px;">📊</div>
                 <div class="stat-content">
                     <div class="stat-value">${stats.consistency}%</div>
                     <div class="stat-name">Consistency</div>
                 </div>
-                <div class="stat-progress">
-                    <div class="consistency-meter" style="--consistency: ${stats.consistency}%">
-                        <span>${getConsistencyLevel(stats.consistency)}</span>
+                <div class="stat-progress" style="flex-direction: column; align-items: flex-end; gap: 5px;">
+                    <div class="consistency-meter" style="width: 80px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;">
+                        <div style="width: ${stats.consistency}%; height: 100%; background: #00ff88; border-radius: 3px; box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);"></div>
                     </div>
+                    <span style="font-size: 10px; color: ${stats.consistency >= 80 ? '#00ff88' : '#aaa'}">${getConsistencyLevel(stats.consistency)}</span>
                 </div>
             </div>
         </div>
@@ -374,7 +419,7 @@ function renderRecentActivity() {
     if (!container) return;
 
     const activities = getRecentActivities();
-    
+
     container.innerHTML = `
         <div class="activity-header">
             <h3>📜 Recent Activity</h3>
@@ -403,7 +448,7 @@ function renderInsights() {
     if (!container) return;
 
     const insights = generateInsights();
-    
+
     container.innerHTML = `
         <div class="insights-header">
             <h3>💡 AI Insights</h3>
@@ -436,7 +481,7 @@ function renderMilestones() {
     const milestones = getUpcomingMilestones();
     const upcoming = milestones.filter(m => !m.reached);
     const completed = milestones.filter(m => m.reached);
-    
+
     container.innerHTML = `
         <div class="milestones-header">
             <h3>🎯 Upcoming Milestones</h3>
@@ -495,10 +540,10 @@ function calculateDashboardStats() {
     const habitScore = calculateHabitScore();
 
     const overallScore = Math.round((taskScore + moodScore + habitScore) / 3);
-    
-    const scoreColor = overallScore >= 80 ? '#06ffa5' : 
-                       overallScore >= 60 ? '#4361ee' : 
-                       overallScore >= 40 ? '#f72585' : '#ff006e';
+
+    const scoreColor = overallScore >= 80 ? '#06ffa5' :
+        overallScore >= 60 ? '#4361ee' :
+            overallScore >= 40 ? '#f72585' : '#ff006e';
 
     const weekData = getWeeklyActivityData();
     const weeklyTasksCompleted = weekData.values.reduce((a, b) => a + b, 0);
@@ -530,16 +575,16 @@ function calculateMoodScore() {
     if (!appState.moodHistory || appState.moodHistory.length === 0) {
         return 0;
     }
-    
+
     // Calculate score based on last 7 days
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
+
     const recentMoods = appState.moodHistory.filter(entry => {
         const entryDate = entry.timestamp?.toDate ? entry.timestamp.toDate() : new Date(entry.timestamp);
         return entryDate >= sevenDaysAgo;
     });
-    
+
     // Score = (entries in last 7 days / 7) * 100
     // This rewards consistency in mood tracking
     const score = Math.min((recentMoods.length / 7) * 100, 100);
@@ -734,7 +779,7 @@ function getActiveChallenges() {
             expiresAt: getEndOfWeek()
         }
     ];
-    
+
     // Filter to only show incomplete challenges
     return challenges.filter(c => c.progress < c.target);
 }
@@ -769,19 +814,19 @@ function getEndOfWeek() {
  */
 function getMoodEntriesThisWeek() {
     if (!appState.moodHistory || appState.moodHistory.length === 0) return 0;
-    
+
     const now = new Date();
     const dayOfWeek = now.getDay();
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - daysFromMonday);
     startOfWeek.setHours(0, 0, 0, 0);
-    
+
     const thisWeekMoods = appState.moodHistory.filter(entry => {
         const entryDate = entry.timestamp?.toDate ? entry.timestamp.toDate() : new Date(entry.timestamp);
         return entryDate >= startOfWeek;
     });
-    
+
     return thisWeekMoods.length;
 }
 
@@ -932,10 +977,10 @@ function showChallengeDetails() {
             </div>
             <div class="modal-body">
                 ${challenges.length ? challenges.map(ch => {
-                    const progressPercent = Math.round((ch.progress / ch.target) * 100);
-                    const daysLeft = ch.expiresAt ? Math.max(0, Math.ceil((ch.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : null;
-                    const timeText = daysLeft !== null ? `${daysLeft} days` : 'No deadline';
-                    return `
+        const progressPercent = Math.round((ch.progress / ch.target) * 100);
+        const daysLeft = ch.expiresAt ? Math.max(0, Math.ceil((ch.expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : null;
+        const timeText = daysLeft !== null ? `${daysLeft} days` : 'No deadline';
+        return `
                     <div class="challenge-detail-card">
                         <h4>${ch.title}</h4>
                         <p>Progress: ${ch.progress}/${ch.target}</p>

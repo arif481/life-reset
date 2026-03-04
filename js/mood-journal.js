@@ -56,8 +56,10 @@ function toggleTrigger(element, trigger) {
 
 // Update intensity display
 function updateIntensityDisplay() {
-    const intensity = document.getElementById('moodIntensity').value;
+    const slider = document.getElementById('moodIntensity');
+    const intensity = slider.value;
     document.getElementById('intensityValue').textContent = intensity + '%';
+    slider.style.setProperty('--value', intensity + '%');
 }
 
 // Save mood entry with advanced features
@@ -66,31 +68,31 @@ async function saveMoodEntry() {
         showToast('Please select a mood', 'error');
         return;
     }
-    
+
     if (!appState.currentUser || !db) {
         showToast('Please login first', 'error');
         return;
     }
-    
+
     const note = document.getElementById('moodNote').value;
     const intensity = document.getElementById('moodIntensity').value;
     const dateString = getDateString(appState.currentDate);
     const moodValue = appState.selectedMood;
-    
+
     // Store original state for rollback on error
     const originalMoodLogged = appState.userStats.moodLogged;
     const originalXP = appState.userStats.xp;
     const originalLevel = appState.userStats.level;
     const originalBadges = JSON.parse(JSON.stringify(appState.userStats.unlockedBadges || []));
-    
+
     try {
         appState.userStats.moodLogged++;
         addXP(15);
         checkAndUnlockBadges();
-        
+
         await db.collection('users').doc(appState.currentUser.uid)
             .collection('mood').doc(dateString).set(
-                { 
+                {
                     mood: moodValue,
                     intensity: parseInt(intensity),
                     note: note,
@@ -100,17 +102,20 @@ async function saveMoodEntry() {
                 },
                 { merge: true }
             );
-        
+
         // Only reset UI on SUCCESS
         showToast('Mood logged successfully! 🎉', 'success');
+        if (typeof createConfetti === 'function') createConfetti();
+
         document.getElementById('moodNote').value = '';
         document.getElementById('moodIntensity').value = '50';
         document.getElementById('intensityValue').textContent = '50%';
+        document.getElementById('moodIntensity').style.setProperty('--value', '50%');
         appState.selectedMood = null;
         selectedMoodTriggers = [];
         document.querySelectorAll('#mood-view .mood-btn').forEach(btn => btn.classList.remove('selected'));
         document.querySelectorAll('.trigger-tag').forEach(tag => tag.classList.remove('active'));
-        
+
         updateGamificationUI();
         loadMoodStats();
     } catch (error) {
@@ -129,7 +134,7 @@ async function saveMoodEntry() {
 function formatText(command) {
     const textarea = document.getElementById('journalEntry');
     const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-    
+
     if (command === 'color') {
         const color = document.getElementById('textColor').value;
         // Textarea elements don't support inline styling - use visual indicator
@@ -161,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateJournalTagsDisplay() {
     const container = document.getElementById('journalTagsDisplay');
     if (!container) return;
-    
+
     container.innerHTML = '';
     journalTags.forEach((tag, index) => {
         const tagEl = document.createElement('div');
@@ -183,26 +188,26 @@ async function saveJournalEntry() {
         showToast('Please write something', 'error');
         return;
     }
-    
+
     if (!appState.currentUser || !db) {
         showToast('Please login first', 'error');
         return;
     }
-    
+
     // Store original state for rollback on error
     const originalJournalCount = appState.userStats.journalEntries;
     const originalXP = appState.userStats.xp;
     const originalLevel = appState.userStats.level;
     const originalBadges = JSON.parse(JSON.stringify(appState.userStats.unlockedBadges || []));
-    
+
     try {
         appState.userStats.journalEntries++;
         addXP(20);
         checkAndUnlockBadges();
-        
+
         // Simple sentiment analysis (basic implementation)
         const sentiment = analyzeSentiment(entry);
-        
+
         await db.collection('users').doc(appState.currentUser.uid)
             .collection('journal').add({
                 content: entry,
@@ -213,7 +218,7 @@ async function saveJournalEntry() {
                 timestamp: new Date(),
                 date: getDateString(new Date())
             });
-        
+
         // Only reset UI on SUCCESS
         showToast('Journal entry saved! 📝', 'success');
         document.getElementById('journalEntry').value = '';
@@ -222,7 +227,7 @@ async function saveJournalEntry() {
         document.getElementById('journalTags').value = '';
         updateJournalTagsDisplay();
         document.querySelectorAll('.journal-container .mood-btn').forEach(btn => btn.classList.remove('selected'));
-        
+
         loadJournalEntries();
         updateGamificationUI();
     } catch (error) {
@@ -242,20 +247,20 @@ function analyzeSentiment(text) {
     const lowerText = text.toLowerCase();
     const positiveWords = ['happy', 'great', 'amazing', 'wonderful', 'excellent', 'good', 'love', 'awesome', 'fantastic', 'beautiful'];
     const negativeWords = ['sad', 'bad', 'terrible', 'awful', 'hate', 'angry', 'frustrated', 'disappointed', 'depressed', 'anxious'];
-    
+
     let positiveCount = 0;
     let negativeCount = 0;
-    
+
     positiveWords.forEach(word => {
         const regex = new RegExp('\\b' + word + '\\b', 'g');
         positiveCount += (lowerText.match(regex) || []).length;
     });
-    
+
     negativeWords.forEach(word => {
         const regex = new RegExp('\\b' + word + '\\b', 'g');
         negativeCount += (lowerText.match(regex) || []).length;
     });
-    
+
     if (positiveCount > negativeCount) return 'positive';
     if (negativeCount > positiveCount) return 'negative';
     return 'neutral';
@@ -266,61 +271,69 @@ let isMoodStatsLoading = false;
 
 async function loadMoodStats() {
     if (!appState.currentUser || !db) return;
-    
+
     // Prevent concurrent calls
     if (isMoodStatsLoading) return;
     isMoodStatsLoading = true;
-    
+
     try {
         const today = getDateString(new Date());
         const todayMood = await db.collection('users').doc(appState.currentUser.uid)
             .collection('mood').doc(today).get();
-        
+
         // Calculate statistics
         const moods = { 'very-sad': 1, 'sad': 2, 'okay': 3, 'good': 4, 'great': 5 };
         const moodEmojis = { 'very-sad': '😢', 'sad': '😞', 'okay': '😐', 'good': '😊', 'great': '😄' };
-        
+
         // Get moods from this week
         const weekSnapshot = await db.collection('users').doc(appState.currentUser.uid)
             .collection('mood').where('date', '>=', getDateString(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)))
             .get();
-        
+
         let totalMood = 0;
         let moodCount = 0;
         let bestMood = 0;
         let triggerCounts = {};
-        
+
         weekSnapshot.forEach(doc => {
             const data = doc.data();
             const moodValue = moods[data.mood] || 3;
             totalMood += moodValue;
             moodCount++;
             bestMood = Math.max(bestMood, moodValue);
-            
+
             if (data.triggers) {
                 data.triggers.forEach(trigger => {
                     triggerCounts[trigger] = (triggerCounts[trigger] || 0) + 1;
                 });
             }
         });
-        
+
+        // Render Chart
+        const moodMap = {};
+        weekSnapshot.forEach(doc => {
+            const data = doc.data();
+            moodMap[data.date] = moods[data.mood] || 3;
+        });
+        renderMoodViewChart(moodMap);
+
         // Update stats display
         const avgMood = moodCount > 0 ? (totalMood / moodCount).toFixed(1) : '--';
         const bestMoodEmoji = Object.values(moodEmojis)[Math.min(Math.max(bestMood - 1, 0), 4)];
-        const commonTrigger = Object.keys(triggerCounts).length > 0 
+        const commonTrigger = Object.keys(triggerCounts).length > 0
             ? Object.keys(triggerCounts).reduce((a, b) => triggerCounts[a] > triggerCounts[b] ? a : b)
             : '--';
-        
+
         const avgEl = document.getElementById('averageMood');
         const bestEl = document.getElementById('bestMood');
         const streakEl = document.getElementById('moodStreak');
         const triggerEl = document.getElementById('commonTrigger');
-        
+
         if (avgEl) avgEl.textContent = avgMood;
         if (bestEl) bestEl.textContent = bestMoodEmoji || '😄';
         if (streakEl) streakEl.textContent = moodCount;
         if (triggerEl) triggerEl.textContent = commonTrigger;
-        
+
     } catch (error) {
         console.error('Error loading mood stats:', error);
     } finally {
@@ -332,38 +345,38 @@ async function loadMoodStats() {
 async function loadJournalEntries() {
     const container = document.getElementById('journalEntriesContainer');
     if (!container || !appState.currentUser || !db) return;
-    
+
     try {
         const snapshot = await db.collection('users').doc(appState.currentUser.uid)
             .collection('journal').orderBy('timestamp', 'desc').limit(50).get();
-        
+
         const moodEmojis = { 'very-sad': '😢', 'sad': '😞', 'okay': '😐', 'good': '😊', 'great': '😄' };
-        
+
         container.innerHTML = '';
         snapshot.forEach(doc => {
             const data = doc.data();
             const date = new Date(data.timestamp.seconds * 1000);
             const moodEmoji = moodEmojis[data.mood] || '📝';
-            
+
             const entry = document.createElement('div');
             entry.className = `journal-entry entry-${data.mood || 'good'}`;
             entry.setAttribute('data-date', data.date);
             entry.setAttribute('data-tags', JSON.stringify(data.tags || []));
             entry.setAttribute('data-sentiment', data.sentiment || '');
-            
+
             let tagHTML = '';
             if (data.tags && data.tags.length > 0) {
-                tagHTML = '<div class="entry-tags">' + 
-                    data.tags.map(tag => `<div class="entry-tag">${tag}</div>`).join('') + 
+                tagHTML = '<div class="entry-tags">' +
+                    data.tags.map(tag => `<div class="entry-tag">${tag}</div>`).join('') +
                     '</div>';
             }
-            
+
             entry.innerHTML = `
                 <div class="entry-header">
                     <span class="entry-mood-indicator">${moodEmoji}</span>
                     <div class="entry-meta">
                         <span>${date.toLocaleDateString()}</span>
-                        <span>${date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</span>
+                        <span>${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         ${data.wordCount ? `<span>${data.wordCount} words</span>` : ''}
                     </div>
                 </div>
@@ -392,23 +405,23 @@ function viewFullEntry(entryId) {
 function filterJournalEntries(period, element) {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
-    
+
     const entries = document.querySelectorAll('.journal-entry');
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    
+
     entries.forEach(entry => {
         const entryDate = entry.getAttribute('data-date');
         const date = new Date(entryDate);
         let show = true;
-        
+
         if (period === 'week') {
             show = date >= oneWeekAgo;
         } else if (period === 'month') {
             show = date >= oneMonthAgo;
         }
-        
+
         entry.style.display = show ? 'block' : 'none';
     });
 }
@@ -426,7 +439,7 @@ async function deleteJournalEntry(entryId) {
         showToast('Please login first', 'error');
         return;
     }
-    
+
     if (confirm('Delete this entry?')) {
         try {
             await db.collection('users').doc(appState.currentUser.uid)
@@ -437,4 +450,113 @@ async function deleteJournalEntry(entryId) {
             showToast('Error deleting entry: ' + error.message, 'error');
         }
     }
+}
+// Render Mood Chart
+let moodChartInstance = null;
+
+function renderMoodViewChart(moods) {
+    const ctx = document.getElementById('moodViewChart');
+    if (!ctx || typeof Chart === 'undefined') return;
+
+    // Prepare data
+    const labels = [];
+    const dataPoints = [];
+    const pointColors = [];
+
+    // Last 7 days
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = getDateString(date);
+
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        labels.push(dayName);
+
+        const moodVal = moods[dateStr] || null;
+        dataPoints.push(moodVal);
+
+        // Color based on mood
+        if (moodVal >= 4) pointColors.push('#00f5ff'); // Good/Great
+        else if (moodVal === 3) pointColors.push('#bf00ff'); // Okay
+        else pointColors.push('#ff006e'); // Bad
+    }
+
+    if (moodChartInstance) {
+        moodChartInstance.destroy();
+    }
+
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 245, 255, 0.5)');
+    gradient.addColorStop(1, 'rgba(0, 245, 255, 0)');
+
+    moodChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Mood Level',
+                data: dataPoints,
+                borderColor: '#00f5ff',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                pointBackgroundColor: '#1a1a3e',
+                pointBorderColor: pointColors,
+                pointBorderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 6,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        callback: function (value) {
+                            const emojis = ['', '😢', '😞', '😐', '😊', '😄'];
+                            return emojis[value] || '';
+                        },
+                        font: {
+                            size: 16
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.6)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(18, 18, 42, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#ccc',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function (context) {
+                            const value = context.raw;
+                            const labels = ['Unknown', 'Very Sad', 'Sad', 'Okay', 'Good', 'Great'];
+                            return labels[value] || '';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }

@@ -30,10 +30,10 @@ function queueDailyXP(amount) {
         // Prevent concurrent flushes
         if (isFlushingDailyXP || pendingDailyXP === 0) return;
         isFlushingDailyXP = true;
-        
+
         const delta = pendingDailyXP;
         pendingDailyXP = 0; // Reset before async operation
-        
+
         try {
             const dateString = getDateString(new Date());
             await db.collection('users').doc(appState.currentUser.uid)
@@ -63,12 +63,12 @@ function queueDailyXP(amount) {
 
 function addXP(amount) {
     appState.userStats.xp += amount;
-    
+
     while (appState.userStats.xp >= appState.userStats.xpNeeded) {
         appState.userStats.xp -= appState.userStats.xpNeeded;
         levelUp();
     }
-    
+
     updateGamificationUI();
 
     // Persist stats smoothly
@@ -93,56 +93,59 @@ function updateGamificationUI() {
     // Update level badge
     const levelBadge = document.getElementById('levelBadge');
     if (levelBadge) levelBadge.textContent = appState.userStats.level;
-    
+
     // Update XP bar
     const xpPercentage = (appState.userStats.xp / appState.userStats.xpNeeded) * 100;
     const xpFill = document.getElementById('xpFill');
     const xpText = document.getElementById('xpText');
     if (xpFill) xpFill.style.width = xpPercentage + '%';
     if (xpText) xpText.textContent = `${appState.userStats.xp}/${appState.userStats.xpNeeded} XP`;
-    
+
+    // Update new header badge
+    updateHeaderLevelBadge(appState.userStats.level, xpPercentage);
+
     // Update streak
     const streakDays = document.getElementById('streakDays');
     if (streakDays) streakDays.textContent = `${appState.userStats.streak} Days`;
-    
+
     // Update health score
     calculateHealthScore();
     const healthScore = document.getElementById('healthScore');
     if (healthScore) healthScore.textContent = Math.round(appState.userStats.healthScore);
-    
+
     // Update stats
     const taskCompletionStat = document.getElementById('taskCompletionStat');
     if (taskCompletionStat) {
-        taskCompletionStat.textContent = appState.userStats.tasksCompleted > 0 
-            ? Math.round((appState.userStats.tasksCompleted / (appState.userStats.tasksCompleted + 10)) * 100) + '%' 
+        taskCompletionStat.textContent = appState.userStats.tasksCompleted > 0
+            ? Math.round((appState.userStats.tasksCompleted / (appState.userStats.tasksCompleted + 10)) * 100) + '%'
             : '0%';
     }
-    
+
     const journalEntriesStat = document.getElementById('journalEntriesStat');
     if (journalEntriesStat) journalEntriesStat.textContent = appState.userStats.journalEntries;
-    
+
     const consistencyStat = document.getElementById('consistencyStat');
     if (consistencyStat) consistencyStat.textContent = Math.round(appState.userStats.consistency) + '%';
 }
 
 function calculateHealthScore() {
     let score = 0;
-    
+
     // 30 points for task completion
     const taskCompletion = Math.min((appState.userStats.tasksCompleted / 100) * 100, 30);
     score += taskCompletion;
-    
+
     // 20 points for mood tracking
     const moodTracking = Math.min((appState.userStats.moodLogged / 30) * 100, 20);
     score += moodTracking;
-    
+
     // 25 points for streak
     const streakScore = Math.min((appState.userStats.streak / 30) * 100, 25);
     score += streakScore;
-    
+
     // 25 points for consistency
     score += Math.min(appState.userStats.consistency, 25);
-    
+
     appState.userStats.healthScore = Math.min(score, 100);
 }
 
@@ -179,9 +182,9 @@ async function loadXPDailyHistory(daysBack = 30) {
 function renderBadges() {
     const container = document.getElementById('badgesContainer');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     badgesData.forEach(badge => {
         const isUnlocked = appState.userStats.unlockedBadges.includes(badge.id);
         const badgeEl = document.createElement('div');
@@ -209,7 +212,7 @@ function checkAndUnlockBadges() {
 // Safe badge condition evaluation without eval()
 function evaluateBadgeCondition(badgeId) {
     const stats = appState.userStats;
-    switch(badgeId) {
+    switch (badgeId) {
         case 'first_task': return stats.tasksCompleted >= 1;
         case 'task_master': return stats.tasksCompleted >= 50;
         case 'mood_tracker': return stats.moodLogged >= 10;
@@ -248,10 +251,10 @@ function celebrateAchievement(title, icon) {
     if (popup) {
         // Show popup
         popup.style.display = 'block';
-        
+
         document.getElementById('popupTitle').textContent = title;
         const iconEl = document.getElementById('popupIcon');
-        
+
         // Check if icon is a Font Awesome class (contains 'fa-')
         if (typeof icon === 'string' && icon.includes('fa-')) {
             iconEl.innerHTML = `<i class="fas ${icon}"></i>`;
@@ -259,9 +262,9 @@ function celebrateAchievement(title, icon) {
             // Otherwise treat as emoji or text
             iconEl.textContent = typeof icon === 'string' ? icon : '🏆';
         }
-        
+
         popup.classList.add('show');
-        
+
         setTimeout(() => {
             popup.classList.remove('show');
             // Hide after animation completes
@@ -270,7 +273,7 @@ function celebrateAchievement(title, icon) {
             }, 300);
         }, 3000);
     }
-    
+
     // Create confetti
     createConfetti();
 }
@@ -285,14 +288,14 @@ function createConfetti() {
         confetti.style.backgroundColor = ['#4361ee', '#7209b7', '#f72585', '#4cc9f0'][Math.floor(Math.random() * 4)];
         confetti.style.animationDelay = (Math.random() * 0.5) + 's';
         document.body.appendChild(confetti);
-        
+
         setTimeout(() => confetti.remove(), 1500);
     }
 }
 
 async function saveUserStats() {
     if (!appState.currentUser || !db) return;
-    
+
     try {
         window.isLocalUpdate = true;
         await db.collection('users').doc(appState.currentUser.uid).update(
@@ -312,5 +315,29 @@ function saveUserStatsRealtime() {
         debouncedSave('userStats', saveUserStats, 500);
     } else {
         saveUserStats();
+    }
+}
+
+/**
+ * Updates the new header level badge
+ * @param {number} level - Current user level
+ * @param {number} progressPercent - Percentage to next level
+ */
+function updateHeaderLevelBadge(level, progressPercent) {
+    const headerLevelNum = document.getElementById('headerLevelNum');
+    const headerLevelText = document.getElementById('headerLevelText');
+    const headerXpFill = document.getElementById('headerXpFill');
+
+    if (headerLevelNum && headerLevelText && headerXpFill) {
+        // Animate numbers if they changed
+        if (headerLevelNum.textContent != level) {
+            headerLevelNum.textContent = level;
+            headerLevelNum.style.animation = 'none';
+            headerLevelNum.offsetHeight; /* trigger reflow */
+            headerLevelNum.style.animation = 'levelBadgePulse 0.5s ease-in-out';
+        }
+
+        headerLevelText.textContent = level;
+        headerXpFill.style.width = `${progressPercent}%`;
     }
 }

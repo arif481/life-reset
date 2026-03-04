@@ -1,7 +1,7 @@
 /**
  * @stylesheet variables.css
  * @description Design system tokens - colors, spacing, typography, and effects
- * @version 2.0.0 - Expanded design system
+ * @version 3.0.0 - Premium UI/UX Upgrade
  */
 
 /* ==========================================================================
@@ -9,24 +9,48 @@
    ========================================================================== */
 
 :root {
-    /* ========== Color Palette ========== */
-    --primary: #4361ee;
-    --primary-light: #4895ef;
-    --primary-dark: #3a0ca3;
-    --secondary: #7209b7;
-    --accent: #f72585;
-    --success: #4cc9f0;
-    --warning: #f8961e;
-    --danger: #e63946;
+    /* ========== Premium Color Palette ========== */
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-dark: #4f46e5;
+    --primary-50: rgba(99, 102, 241, 0.05);
+    --primary-100: rgba(99, 102, 241, 0.1);
+    --primary-200: rgba(99, 102, 241, 0.2);
+    --secondary: #8b5cf6;
+    --secondary-light: #a78bfa;
+    --accent: #ec4899;
+    --accent-light: #f472b6;
+    --success: #10b981;
+    --success-light: #34d399;
+    --warning: #f59e0b;
+    --warning-light: #fbbf24;
+    --danger: #ef4444;
+    --danger-light: #f87171;
+    --info: #06b6d4;
+    --info-light: #22d3ee;
+
+    /* ========== Premium Gradients ========== */
+    --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+    --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    --gradient-cool: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+    --gradient-aurora: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ec4899 100%);
+    --gradient-sunset: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --gradient-ocean: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-mesh: radial-gradient(at 40% 20%, #6366f1 0, transparent 50%), 
+                     radial-gradient(at 80% 0%, #ec4899 0, transparent 50%), 
+                     radial-gradient(at 0% 50%, #8b5cf6 0, transparent 50%);
 
     /* ========== Semantic Colors ========== */
     --color-surface: #ffffff;
-    --color-surface-elevated: #f8f9fa;
-    --color-surface-overlay: rgba(0, 0, 0, 0.5);
-    --color-on-surface: #2b2d42;
-    --color-on-surface-muted: #6c757d;
-    --color-border: #e0e0e0;
-    --color-border-subtle: #f0f0f0;
+    --color-surface-elevated: #f8fafc;
+    --color-surface-overlay: rgba(0, 0, 0, 0.6);
+    --color-on-surface: #1e293b;
+    --color-on-surface-muted: #64748b;
+    --color-border: #e2e8f0;
+    --color-border-subtle: #f1f5f9;
 
     /* ========== Text Colors ========== */
     --text-dark: #2b2d42;
@@ -94,41 +118,85 @@
     /* 80px */
 
     /* ========== Border Radius ========== */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
-    --radius-2xl: 24px;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
     --radius-full: 9999px;
 
-    /* ========== Shadows ========== */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-    --shadow-glow: 0 0 20px rgba(67, 97, 238, 0.3);
+    /* ========== Premium Shadows ========== */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    --shadow-2xl: 0 35px 60px -15px rgba(0, 0, 0, 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.35);
+    --shadow-glow-lg: 0 0 40px rgba(99, 102, 241, 0.45);
+    --shadow-glow-accent: 0 0 20px rgba(236, 72, 153, 0.35);
+    --shadow-glow-success: 0 0 20px rgba(16, 185, 129, 0.35);
+    --shadow-colored: 0 10px 40px -10px var(--primary);
+    --shadow-float: 0 22px 70px 4px rgba(0, 0, 0, 0.12);
+    
+    /* ========== Glass Effects ========== */
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-bg-light: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-light: rgba(255, 255, 255, 0.18);
+    --glass-blur: blur(24px);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --frosted-glass: saturate(180%) blur(20px);
+    
+    /* ========== Neon Effects ========== */
+    --neon-blue: #00d4ff;
+    --neon-purple: #a855f7;
+    --neon-pink: #ec4899;
+    --neon-green: #22c55e;
+    --neon-orange: #f97316;
+    --neon-glow-blue: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3);
+    --neon-glow-purple: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
+    --neon-glow-pink: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(236, 72, 153, 0.3);
 
     /* ========== Animation Tokens ========== */
     --duration-instant: 50ms;
+    --duration-faster: 100ms;
     --duration-fast: 150ms;
-    --duration-normal: 300ms;
-    --duration-slow: 500ms;
-    --duration-slower: 700ms;
+    --duration-normal: 250ms;
+    --duration-slow: 400ms;
+    --duration-slower: 600ms;
+    --duration-slowest: 1000ms;
 
+    /* Premium Easing Curves */
     --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-in: cubic-bezier(0.4, 0, 1, 1);
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-snappy: cubic-bezier(0.2, 0.9, 0.3, 1);
 
-    --transition: all 0.3s ease;
-    --transition-fast: all 0.15s ease;
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Transition Presets */
+    --transition: all 0.25s var(--ease-default);
+    --transition-fast: all 0.15s var(--ease-default);
+    --transition-slow: all 0.4s var(--ease-default);
+    --transition-smooth: all 0.35s var(--ease-smooth);
+    --transition-bounce: all 0.5s var(--ease-bounce);
+    --transition-spring: all 0.5s var(--ease-spring);
+    --transition-colors: color 0.2s, background-color 0.2s, border-color 0.2s;
+    --transition-transform: transform 0.25s var(--ease-spring);
+    --transition-opacity: opacity 0.2s var(--ease-default);
+    --transition-shadow: box-shadow 0.25s var(--ease-default);
 
     /* ========== Z-Index Scale ========== */
     --z-base: 0;
+    --z-elevated: 1;
     --z-dropdown: 100;
     --z-sticky: 200;
     --z-fixed: 300;
@@ -139,50 +207,79 @@
     --z-tooltip: 800;
     --z-toast: 900;
     --z-top: 1000;
+    --z-max: 9999;
 }
 
 /* ========== Dark Mode Semantic Overrides ========== */
 body.dark-mode {
-    --color-surface: #1a1a2e;
-    --color-surface-elevated: #2a2a3e;
-    --color-surface-overlay: rgba(0, 0, 0, 0.7);
-    --color-on-surface: #f8f9fa;
-    --color-on-surface-muted: #a0a0a0;
-    --color-border: #3a3a4e;
-    --color-border-subtle: #2a2a3e;
+    --color-surface: #0f0f1a;
+    --color-surface-elevated: #1a1a2e;
+    --color-surface-overlay: rgba(0, 0, 0, 0.8);
+    --color-on-surface: #f1f5f9;
+    --color-on-surface-muted: #94a3b8;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-subtle: rgba(255, 255, 255, 0.04);
+    
+    /* Enhanced dark mode glass effects */
+    --glass-bg: rgba(15, 15, 26, 0.7);
+    --glass-bg-light: rgba(26, 26, 46, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    
+    /* Dark mode shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* ========== Theme Palettes (applied via body[data-theme]) ========== */
+/* ========== Premium Theme Palettes ========== */
 body[data-theme="default"] {
-    /* Default theme uses :root values - no overrides needed */
     color: inherit;
 }
 
 body[data-theme="ocean"] {
-    --primary: #06b6d4;
-    --primary-light: #22d3ee;
+    --primary: #0ea5e9;
+    --primary-light: #38bdf8;
     --primary-dark: #0284c7;
-    --secondary: #0284c7;
-    --accent: #4cc9f0;
-    --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.3);
+    --secondary: #06b6d4;
+    --accent: #22d3ee;
+    --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #22d3ee 100%);
+    --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.35);
+    --neon-blue: #38bdf8;
 }
 
 body[data-theme="sunset"] {
     --primary: #f97316;
     --primary-light: #fb923c;
-    --primary-dark: #dc2626;
-    --secondary: #dc2626;
-    --accent: #f72585;
-    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.3);
+    --primary-dark: #ea580c;
+    --secondary: #ef4444;
+    --accent: #f43f5e;
+    --gradient-primary: linear-gradient(135deg, #f97316 0%, #ef4444 50%, #f43f5e 100%);
+    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.35);
+    --neon-orange: #fb923c;
 }
 
 body[data-theme="forest"] {
     --primary: #10b981;
     --primary-light: #34d399;
     --primary-dark: #059669;
-    --secondary: #059669;
-    --accent: #4cc9f0;
-    --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+    --secondary: #14b8a6;
+    --accent: #22d3ee;
+    --gradient-primary: linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #22d3ee 100%);
+    --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.35);
+    --neon-green: #34d399;
+}
+
+body[data-theme="midnight"] {
+    --primary: #8b5cf6;
+    --primary-light: #a78bfa;
+    --primary-dark: #7c3aed;
+    --secondary: #6366f1;
+    --accent: #ec4899;
+    --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #ec4899 100%);
+    --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.35);
+    --neon-purple: #a78bfa;
 }
 
 /* ========== Reduced Motion Support ========== */

@@ -38,13 +38,16 @@ body.dark-mode .bad-habits-section {
 
 /* Bad Habit Card */
 .bad-habit-card {
-    background: var(--bg-light);
-    border: 2px solid #ff6b6b;
-    padding: 20px;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    padding: 24px;
+    border-radius: 20px;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 body.dark-mode .bad-habit-card {
@@ -337,10 +340,13 @@ body.dark-mode .empty-habits-text {
 
 /* Advanced Habit Chain */
 .advanced-habit-chain {
-    background: var(--bg-light);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     margin-top: 30px;
 }
 
@@ -439,6 +445,14 @@ body.dark-mode .calendar-cell {
 
 body.dark-mode .calendar-cell.empty {
     background: #4a4a5e;
+}
+
+.habit-day.completed {
+    background: linear-gradient(135deg, #00f5ff, #00d9ff);
+    color: #1a1a3e;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    z-index: 1;
 }
 
 .calendar-cell.completed {
@@ -654,13 +668,25 @@ body.dark-mode .insight-item {
 
 /* Animations */
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 /* Responsive */
@@ -679,6 +705,7 @@ body.dark-mode .insight-item {
 }
 
 @media (max-width: 768px) {
+
     .bad-habits-section,
     .advanced-habit-chain {
         padding: 15px;

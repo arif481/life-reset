@@ -1,86 +1,235 @@
 /**
  * @stylesheet tracker.css
- * @description Daily tracker - tasks, mood logging, date navigation
- * @version 1.0.0
+ * @description Premium glassmorphic daily tracker with animations
+ * @version 2.0.0 - UI/UX Overhaul
  */
 
 /* ==========================================================================
-   Date Navigation
+   Date Navigation & Greeting
    ========================================================================== */
+
+.tracker-greeting {
+    margin-bottom: 24px;
+}
+
+.tracker-greeting h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tracker-greeting .greeting-date {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+}
 
 .date-selector {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: rgba(26, 26, 62, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 12px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .date-btn {
-    background: var(--bg-card);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
-}
-
-body.dark-mode .date-btn {
-    background: #3a3a4e;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    font-size: 16px;
 }
 
 .date-btn:hover {
-    background: var(--primary);
-    color: white;
+    background: rgba(0, 245, 255, 0.2);
+    border-color: rgba(0, 245, 255, 0.4);
+    color: #00f5ff;
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+    transform: scale(1.05);
 }
 
 .current-date {
     font-weight: 600;
     font-size: 18px;
+    color: white;
+    flex: 1;
+    text-align: center;
 }
 
-.task-categories {
+/* ==========================================================================
+   Progress Bar
+   ========================================================================== */
+
+.tracker-progress {
+    margin-bottom: 28px;
+}
+
+.progress-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f5ff 0%, #667eea 50%, #bf00ff 100%);
+    border-radius: 8px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+#progressText {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* ==========================================================================
+   Task Categories
+   ========================================================================== */
+
+.task-categories,
+#taskCategories {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 28px;
 }
 
 .task-category {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 20px;
+    background: rgba(26, 26, 62, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-body.dark-mode .task-category {
-    background: #3a3a4e;
+.task-category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00f5ff, #bf00ff);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.task-category:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 245, 255, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 245, 255, 0.1);
+}
+
+.task-category:hover::before {
+    opacity: 1;
+}
+
+/* Category Colors */
+.task-category[data-category="health"]::before,
+.task-category.health::before {
+    background: linear-gradient(90deg, #00ff88, #00f5ff);
+}
+
+.task-category[data-category="productivity"]::before,
+.task-category.productivity::before {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.task-category[data-category="learning"]::before,
+.task-category.learning::before {
+    background: linear-gradient(90deg, #f72585, #7209b7);
+}
+
+.task-category[data-category="personal"]::before,
+.task-category.personal::before {
+    background: linear-gradient(90deg, #ff6b00, #ff00ff);
 }
 
 .category-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-body.dark-mode .category-header {
-    border-color: #444;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .category-icon {
-    font-size: 20px;
-    color: var(--primary);
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 245, 255, 0.15);
+    border-radius: 12px;
+    color: #00f5ff;
 }
 
 .category-title {
     font-weight: 600;
-    font-size: 18px;
+    font-size: 17px;
+    color: white;
+    flex: 1;
 }
+
+.category-count {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* ==========================================================================
+   Task Items
+   ========================================================================== */
 
 .task-list {
     display: flex;
@@ -91,137 +240,449 @@ body.dark-mode .category-header {
 .task-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--bg-light);
-    border-radius: 8px;
-    transition: var(--transition);
+    gap: 14px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
-body.dark-mode .task-item {
-    background: var(--bg-card-dark);
+.task-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #00f5ff, #bf00ff);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .task-item:hover {
-    background: #f0f3ff;
+    background: rgba(0, 245, 255, 0.08);
+    border-color: rgba(0, 245, 255, 0.2);
+    transform: translateX(4px);
 }
 
-body.dark-mode .task-item:hover {
-    background: #3a3a4e;
+.task-item:hover::before {
+    opacity: 1;
 }
 
+/* Checkbox */
 .task-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
-    accent-color: var(--primary);
+    accent-color: #00f5ff;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .task-item label {
     cursor: pointer;
     flex: 1;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+}
+
+/* Completed State */
+.task-item.completed {
+    opacity: 0.6;
+    border-color: rgba(0, 255, 136, 0.3);
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.task-item.completed::before {
+    background: #00ff88;
+    opacity: 1;
 }
 
 .task-item.completed label {
     text-decoration: line-through;
-    color: #999;
+    color: rgba(255, 255, 255, 0.5);
 }
+
+/* Task XP Badge */
+.task-xp {
+    font-size: 12px;
+    font-weight: 600;
+    color: #00f5ff;
+    background: rgba(0, 245, 255, 0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* Priority Indicators */
+.task-item[data-priority="high"] .task-priority,
+.task-item.priority-high .task-priority {
+    color: #ff7b7b;
+}
+
+.task-item[data-priority="medium"] .task-priority,
+.task-item.priority-medium .task-priority {
+    color: #ffb347;
+}
+
+.task-item[data-priority="low"] .task-priority,
+.task-item.priority-low .task-priority {
+    color: #7bffb7;
+}
+
+.task-priority {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Completion Animation
+   ========================================================================== */
+
+@keyframes taskComplete {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+        background: rgba(0, 255, 136, 0.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.task-item.just-completed {
+    animation: taskComplete 0.5s ease;
+}
+
+/* ==========================================================================
+   Mood Section
+   ========================================================================== */
 
 .mood-section {
-    background: var(--bg-light);
-    padding: 25px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background: rgba(26, 26, 62, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 28px;
+    border-radius: 20px;
+    margin-bottom: 24px;
 }
 
-body.dark-mode .mood-section {
-    background: var(--bg-card-dark);
+.mood-section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .mood-tracker {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin: 15px 0;
+    gap: 12px;
+    margin: 20px 0;
 }
 
 .mood-btn {
-    padding: 15px;
-    border: 2px solid #e0e0e0;
-    background: var(--bg-light);
-    border-radius: 8px;
+    padding: 18px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
     cursor: pointer;
-    font-size: 24px;
-    transition: var(--transition);
+    font-size: 32px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
-body.dark-mode .mood-btn {
-    background: var(--bg-card-dark);
-    border-color: #4a4a5e;
+.mood-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0, 245, 255, 0.3), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .mood-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.08) translateY(-4px);
+    border-color: rgba(0, 245, 255, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 245, 255, 0.2);
+}
+
+.mood-btn:hover::before {
+    opacity: 1;
 }
 
 .mood-btn.selected {
-    border-color: var(--primary);
-    background: #f0f3ff;
+    border-color: #00f5ff;
+    background: rgba(0, 245, 255, 0.15);
+    box-shadow: 0 0 40px rgba(0, 245, 255, 0.3), inset 0 0 30px rgba(0, 245, 255, 0.1);
+    animation: moodSelectedPulse 2s ease-in-out infinite;
 }
 
-body.dark-mode .mood-btn.selected {
-    background: #4a5a7e;
-    border-color: var(--primary);
+@keyframes moodSelectedPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 40px rgba(0, 245, 255, 0.3), inset 0 0 30px rgba(0, 245, 255, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 60px rgba(0, 245, 255, 0.5), inset 0 0 40px rgba(0, 245, 255, 0.15);
+    }
 }
 
 .mood-label {
     font-size: 12px;
-    color: #777;
-}
-
-body.dark-mode .mood-label {
-    color: #aaa;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
 }
 
 .mood-btn.selected .mood-label {
-    color: var(--primary);
+    color: #00f5ff;
     font-weight: 600;
 }
 
+/* ==========================================================================
+   Intensity Slider
+   ========================================================================== */
+
+.mood-intensity {
+    margin: 24px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+}
+
+.intensity-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+#intensityValue {
+    color: #00f5ff;
+    font-weight: 600;
+}
+
+.intensity-slider,
+input[type="range"] {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.intensity-slider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--value, 50%);
+    background: linear-gradient(90deg, #00f5ff, #bf00ff);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+    transition: width 0.1s;
+}
+
+.intensity-slider::-webkit-slider-thumb,
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00f5ff, #bf00ff);
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+    transition: transform 0.2s ease;
+}
+
+.intensity-slider::-webkit-slider-thumb:hover,
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   Mood Triggers
+   ========================================================================== */
+
+.mood-triggers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.trigger-tag {
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.trigger-tag:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.trigger-tag.selected {
+    background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(191, 0, 255, 0.2));
+    border-color: #00f5ff;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+    text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+}
+
+/* ==========================================================================
+   Mood Stats
+   ========================================================================== */
+
+.mood-trends {
+    background: rgba(26, 26, 62, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.mood-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.mood-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.mood-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 245, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mood-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f5ff 0%, #bf00ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.mood-stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Add Task Button
+   ========================================================================== */
+
+.section .btn-primary,
+.tracker-add-btn {
+    background: linear-gradient(135deg, #00f5ff 0%, #667eea 50%, #bf00ff 100%);
+    background-size: 200% 200%;
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+}
+
+.section .btn-primary:hover,
+.tracker-add-btn:hover {
+    background-position: 100% 100%;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 245, 255, 0.3);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
 @media (max-width: 768px) {
-    .task-categories {
+
+    .task-categories,
+    #taskCategories {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 16px;
     }
 
     .mood-tracker {
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-
-    .mood-btn {
-        padding: 12px 8px;
-        font-size: 20px;
-        min-height: 70px;
-    }
-
-    .mood-label {
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    .mood-tracker {
-        grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
 
     .mood-btn {
-        padding: 15px 10px;
+        padding: 14px 8px;
+        font-size: 26px;
+    }
+
+    .mood-label {
+        font-size: 10px;
+    }
+
+    .mood-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .task-category {
+        padding: 20px;
     }
 }
 
@@ -229,27 +690,101 @@ body.dark-mode .mood-label {
     .date-selector {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .current-date {
-        font-size: 14px;
-        text-align: center;
         width: 100%;
         order: -1;
+        font-size: 16px;
     }
 
     .mood-tracker {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 10px;
     }
 
     .mood-btn {
-        padding: 8px;
-        font-size: 16px;
+        padding: 12px;
+        font-size: 24px;
     }
 
-    .mood-label {
-        font-size: 10px;
+    .trigger-tag {
+        padding: 8px 12px;
+        font-size: 13px;
     }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .progress-fill::after {
+        animation: none !important;
+    }
+
+    .mood-btn.selected {
+        animation: none !important;
+    }
+
+    .task-item.just-completed {
+        animation: none !important;
+    }
+
+    .mood-btn:hover,
+    .task-item:hover,
+    .task-category:hover {
+        transform: none !important;
+    }
+}
+
+/* ==========================================================================
+   Journal Editor
+   ========================================================================== */
+
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+}
+
+textarea.textarea {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.toolbar-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.7);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+    background: rgba(0, 245, 255, 0.15);
+    color: #00f5ff;
+}
+
+.entry-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: rgba(0, 245, 255, 0.1);
+    color: #00f5ff;
+    border-radius: 12px;
+    font-size: 12px;
+    border: 1px solid rgba(0, 245, 255, 0.2);
 }

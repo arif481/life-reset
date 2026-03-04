@@ -61,14 +61,14 @@ function initApp() {
 
 function navigateTo(view) {
     appState.currentView = view;
-    
+
     // Update active nav item
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
     const activeNav = document.querySelector(`.nav-item[onclick="navigateTo('${view}')"]`);
     if (activeNav) activeNav.classList.add('active');
-    
+
     // Update page title
     const titles = {
         'dashboard': 'Dashboard',
@@ -81,11 +81,11 @@ function navigateTo(view) {
         'settings': 'Settings'
     };
     document.getElementById('pageTitle').textContent = titles[view] || 'Dashboard';
-    
+
     // Show/hide views
     document.querySelectorAll('[id$="-view"]').forEach(v => v.style.display = 'none');
     document.getElementById(view + '-view').style.display = 'block';
-    
+
     // Load specific data for the view
     if (view === 'dashboard') {
         initDashboard();
@@ -112,9 +112,9 @@ function navigateTo(view) {
             initSettings();
         }
     }
-    
+
     closeUserMenu();
-    
+
     // Close mobile sidebar after navigation
     if (window.innerWidth <= 768) {
         const sidebar = document.querySelector('.sidebar');
@@ -221,17 +221,32 @@ function changeDate(days) {
 
 function updateDateDisplay() {
     const dateElement = document.getElementById('currentDate');
-    if (!dateElement) return;
-    
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateElement.textContent = appState.currentDate.toLocaleDateString('en-US', options);
+    const greetingElement = document.getElementById('dateGreeting');
+
+    if (dateElement) {
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        dateElement.textContent = appState.currentDate.toLocaleDateString('en-US', options);
+    }
+
+    if (greetingElement) {
+        greetingElement.textContent = getMotivationalGreeting();
+    }
+}
+
+function getMotivationalGreeting() {
+    const hour = new Date().getHours();
+    const name = appState.currentUser?.displayName?.split(' ')[0] || 'Friend';
+
+    if (hour < 12) return `Good morning, ${name}! Ready to seize the day?`;
+    if (hour < 18) return `Good afternoon, ${name}! Keep the momentum going.`;
+    return `Good evening, ${name}! Time to reflect and recharge.`;
 }
 
 function toggleMobileSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     if (!sidebar) return;
-    
+
     sidebar.classList.toggle('mobile-open');
     if (overlay) {
         overlay.style.display = sidebar.classList.contains('mobile-open') ? 'block' : 'none';

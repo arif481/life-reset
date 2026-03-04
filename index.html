@@ -307,6 +307,16 @@
                     <h1 id="pageTitle">Dashboard</h1>
                 </div>
                 <div class="header-actions">
+                    <!-- Level Badge -->
+                    <div class="header-level-badge" id="headerLevelBadge">
+                        <div class="header-level-icon" id="headerLevelNum">1</div>
+                        <div class="header-level-info">
+                            <span class="header-level-text">Level <span id="headerLevelText">1</span></span>
+                            <div class="header-xp-bar">
+                                <div class="header-xp-fill" id="headerXpFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="user-menu">
                         <button class="user-btn" onclick="toggleUserMenu()">
                             <i class="fas fa-user-circle"></i> <span id="userName">User</span>
@@ -519,6 +529,7 @@
                         <span class="current-date" id="currentDate">Today</span>
                         <button class="date-btn" onclick="changeDate(1)"><i class="fas fa-chevron-right"></i></button>
                     </div>
+                    <div class="date-greeting" id="dateGreeting" style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-size: 1.1em;"></div>
                     <div style="margin-bottom: 15px;">
                         <div class="progress-bar"><div class="progress-fill" id="todayProgress"></div></div>
                         <p id="progressText">0% of today's tasks completed</p>
@@ -583,6 +594,10 @@
                             <div class="mood-stat-value" id="commonTrigger">--</div>
                             <div class="mood-stat-label">Common Trigger</div>
                         </div>
+                    </div>
+                    
+                    <div class="chart-container" style="position: relative; height: 300px; margin-top: 30px; background: rgba(0,0,0,0.2); border-radius: 16px; padding: 16px;">
+                        <canvas id="moodViewChart"></canvas>
                     </div>
                 </div>
             `;
