@@ -3,11 +3,9 @@
 buildscript {
     
     repositories {
-        maven { url "https://mirrors.aliyun.com/maven/" }
-        maven { url "https://jcenter.bintray.com/" }
-        maven { url "https://maven.aliyun.com/repository/public" }
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.7.2'
@@ -22,8 +20,6 @@ apply from: "variables.gradle"
 
 allprojects {
     repositories {
-        maven { url "https://mirrors.aliyun.com/maven/" }
-        maven { url "https://maven.aliyun.com/repository/public" }
         google()
         mavenCentral()
     }
