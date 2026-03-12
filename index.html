@@ -60,6 +60,9 @@
     <link rel="stylesheet" href="css/rewards-store.css">
     <link rel="stylesheet" href="css/data-export.css">
     <link rel="stylesheet" href="css/customization.css">
+    <!-- Enterprise Grade v4.0 -->
+    <link rel="stylesheet" href="css/premium-system.css">
+    <link rel="stylesheet" href="css/premium-components.css">
 
     <!-- Service Worker Registration -->
     <script>
@@ -142,6 +145,27 @@
 </head>
 
 <body>
+    <!-- Premium Loading Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <div class="splash-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="splash-rings">
+                    <div class="splash-ring"></div>
+                    <div class="splash-ring"></div>
+                    <div class="splash-ring"></div>
+                </div>
+            </div>
+            <h1 class="splash-title">Life Reset</h1>
+            <p class="splash-subtitle">Preparing your experience</p>
+            <div class="splash-progress">
+                <div class="splash-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Accessibility: Skip to main content link for keyboard users -->
     <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
@@ -428,6 +452,8 @@
     <script src="js/rewards-store.js"></script>
     <script src="js/data-export.js"></script>
     <script src="js/customization.js"></script>
+    <!-- Enterprise Grade v4.0 -->
+    <script src="js/premium-interactions.js"></script></script>
 
     <!-- New Modular Architecture (v2.0) - DISABLED to prevent duplicate declarations -->
     <!-- 
