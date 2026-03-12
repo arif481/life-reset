@@ -520,8 +520,9 @@ h6 { font-size: var(--text-base); }
     line-height: 1;
     background: var(--gradient-brand);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     margin-bottom: var(--space-1);
 }
 
@@ -579,6 +580,7 @@ h6 { font-size: var(--text-base); }
     border-radius: var(--radius-lg);
     transition: all var(--duration-fast) var(--ease-out);
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .form-control::placeholder {
